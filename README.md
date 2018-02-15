@@ -5,10 +5,13 @@
 [![License](https://img.shields.io/cocoapods/l/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 
-## Example
+## How to Identify Trust Provider?
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+If trust provider injected properly `isTrust` will be `true`
 
+```javascript
+ web3.currentProvider.isTrust
+```
 ## Requirements
 
 ## Installation
