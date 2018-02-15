@@ -1,0 +1,3 @@
+class TrustWeb3Provider {
+
+}
