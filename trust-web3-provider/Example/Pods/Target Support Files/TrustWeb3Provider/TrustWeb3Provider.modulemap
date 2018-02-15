@@ -1,0 +1,6 @@
+framework module TrustWeb3Provider {
+  umbrella header "TrustWeb3Provider-umbrella.h"
+
+  export *
+  module * { export * }
+}

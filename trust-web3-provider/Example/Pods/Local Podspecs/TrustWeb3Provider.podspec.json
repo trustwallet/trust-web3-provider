@@ -1,0 +1,29 @@
+{
+  "name": "TrustWeb3Provider",
+  "version": "0.1.5",
+  "summary": "A short description of trust-web3-provider.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/Viktor Radchenko/trust-web3-provider",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Viktor Radchenko": "yazexel@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/Viktor Radchenko/trust-web3-provider.git",
+    "tag": "0.1.5"
+  },
+  "platforms": {
+    "ios": "9.3"
+  },
+  "source_files": "trust-web3-provider/trust-web3-provider/Classes/**/*",
+  "resource_bundles": {
+    "TrustWeb3Provider": [
+      "JS/dist/trust-min.js",
+      "trust-web3-provider/trust-web3-provider/Assets/*.png",
+      "trust-web3-provider/trust-web3-provider/Classes/*.swift"
+    ]
+  }
+}

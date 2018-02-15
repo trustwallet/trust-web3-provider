@@ -1,6 +1,0 @@
-framework module trust_web3_provider {
-  umbrella header "trust-web3-provider-umbrella.h"
-
-  export *
-  module * { export * }
-}

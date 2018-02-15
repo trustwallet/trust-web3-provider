@@ -350,11 +350,11 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-trust-web3-provider_Example/Pods-trust-web3-provider_Example-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/trust-web3-provider/trust_web3_provider.framework",
+				"${BUILT_PRODUCTS_DIR}/TrustWeb3Provider/TrustWeb3Provider.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/trust_web3_provider.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TrustWeb3Provider.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

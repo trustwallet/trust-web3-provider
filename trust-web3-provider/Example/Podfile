@@ -1,11 +1,10 @@
 use_frameworks!
+platform :ios, '9.3'
 
 target 'trust-web3-provider_Example' do
-  pod 'trust-web3-provider', :path => '../'
+  pod 'TrustWeb3Provider', :path => '../../'
 
   target 'trust-web3-provider_Tests' do
     inherit! :search_paths
-
-    
   end
 end

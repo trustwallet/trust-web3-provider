@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double trust_web3_providerVersionNumber;
-FOUNDATION_EXPORT const unsigned char trust_web3_providerVersionString[];
+FOUNDATION_EXPORT double TrustWeb3ProviderVersionNumber;
+FOUNDATION_EXPORT const unsigned char TrustWeb3ProviderVersionString[];
 

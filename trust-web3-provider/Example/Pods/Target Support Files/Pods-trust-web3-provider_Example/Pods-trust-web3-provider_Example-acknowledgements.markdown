@@ -1,7 +1,7 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
-## trust-web3-provider
+## TrustWeb3Provider
 
 Copyright (c) 2018 Viktor Radchenko <yazexel@gmail.com>
 

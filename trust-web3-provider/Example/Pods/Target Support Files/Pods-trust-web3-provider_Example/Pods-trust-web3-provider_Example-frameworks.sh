@@ -134,10 +134,10 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "${BUILT_PRODUCTS_DIR}/trust-web3-provider/trust_web3_provider.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TrustWeb3Provider/TrustWeb3Provider.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "${BUILT_PRODUCTS_DIR}/trust-web3-provider/trust_web3_provider.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TrustWeb3Provider/TrustWeb3Provider.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then
   wait
