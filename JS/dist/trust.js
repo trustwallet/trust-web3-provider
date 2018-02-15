@@ -33341,7 +33341,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/viktorradchenko/Documents/iOSProjects/trust-ios/JS"
+      "/Users/viktor/Documents/GitHub/trust-web3-provider/JS"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -33367,7 +33367,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/viktorradchenko/Documents/iOSProjects/trust-ios/JS",
+  "_where": "/Users/viktor/Documents/GitHub/trust-web3-provider/JS",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -57432,7 +57432,7 @@ ProviderEngine.prototype.send = function (payload) {
 
     case 'eth_accounts':
       var address = globalSyncOptions.address;
-      result = address || null;
+      result = address ? [address] : [];
       break;
 
     case 'eth_coinbase':

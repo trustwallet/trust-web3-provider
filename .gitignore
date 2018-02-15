@@ -35,3 +35,10 @@ Carthage/Build
 # `pod install` in .travis.yml
 #
 # Pods/
+
+
+
+# JS
+JS/node_modules/
+JS/jspm_packages/
+JS/staging/
