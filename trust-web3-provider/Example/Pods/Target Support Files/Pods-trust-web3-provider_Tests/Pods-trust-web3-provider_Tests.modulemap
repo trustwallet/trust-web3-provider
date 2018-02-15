@@ -1,0 +1,6 @@
+framework module Pods_trust_web3_provider_Tests {
+  umbrella header "Pods-trust-web3-provider_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

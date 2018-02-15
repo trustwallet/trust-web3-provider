@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'trust-web3-provider_Example' do
+  pod 'trust-web3-provider', :path => '../'
+
+  target 'trust-web3-provider_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

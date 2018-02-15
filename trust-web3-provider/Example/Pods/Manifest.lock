@@ -1,0 +1,16 @@
+PODS:
+  - trust-web3-provider (0.1.0)
+
+DEPENDENCIES:
+  - trust-web3-provider (from `../`)
+
+EXTERNAL SOURCES:
+  trust-web3-provider:
+    :path: ../
+
+SPEC CHECKSUMS:
+  trust-web3-provider: 6308a26f155d9712e9f2037ca8c91221d137938c
+
+PODFILE CHECKSUM: dc21abc612f0d3c1b725838c26d6e64c4291d0c1
+
+COCOAPODS: 1.4.0
