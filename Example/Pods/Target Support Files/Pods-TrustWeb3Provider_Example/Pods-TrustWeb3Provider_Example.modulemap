@@ -1,0 +1,6 @@
+framework module Pods_TrustWeb3Provider_Example {
+  umbrella header "Pods-TrustWeb3Provider_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

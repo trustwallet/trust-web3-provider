@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'TrustWeb3Provider_Example' do
+  pod 'TrustWeb3Provider', :path => '../'
+
+  target 'TrustWeb3Provider_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
