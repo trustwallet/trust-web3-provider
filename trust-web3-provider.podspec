@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'trust-web3-provider'
+  s.name             = 'TrustWeb3Provider'
   s.version          = '0.1.0'
   s.summary          = 'A short description of trust-web3-provider.'
 
