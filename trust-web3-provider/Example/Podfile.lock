@@ -1,5 +1,5 @@
 PODS:
-  - TrustWeb3Provider (0.1.5)
+  - TrustWeb3Provider (0.1.6)
 
 DEPENDENCIES:
   - TrustWeb3Provider (from `../../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: ../../
 
 SPEC CHECKSUMS:
-  TrustWeb3Provider: eb9d26f3bc7d4c512a290402b0c0da809e2a9fc7
+  TrustWeb3Provider: 472f2499073becbf6bea1bfdbfaa612890b9a480
 
-PODFILE CHECKSUM: 25f20780210f56bd40b35ead00e791784344abda
+PODFILE CHECKSUM: 119702f0d87cc9f742d3f190c83a5ed90538c3a9
 
 COCOAPODS: 1.4.0

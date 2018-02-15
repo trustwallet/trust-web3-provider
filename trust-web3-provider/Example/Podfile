@@ -1,5 +1,5 @@
 use_frameworks!
-platform :ios, '9.3'
+platform :ios, '10.0'
 
 target 'trust-web3-provider_Example' do
   pod 'TrustWeb3Provider', :path => '../../'

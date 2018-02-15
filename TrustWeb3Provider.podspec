@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TrustWeb3Provider'
-  s.version          = '0.1.5'
+  s.version          = '0.1.6'
   s.summary          = 'A short description of trust-web3-provider.'
 
 # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/Viktor Radchenko/trust-web3-provider.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '9.3'
+  s.ios.deployment_target = '10.0'
 
   s.source_files = 'trust-web3-provider/trust-web3-provider/Classes/**/*'
   
