@@ -13,6 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		77E81D8E203594FF00534C99 /* trust-web3-provider.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 77E81D8D203594FF00534C99 /* trust-web3-provider.podspec */; };
 		D2354C3AB9919B4AD6E01F6E /* Pods_trust_web3_provider_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC8AFCA09C78592291C31099 /* Pods_trust_web3_provider_Example.framework */; };
 		D9C34033F4EC9C50A11639CB /* Pods_trust_web3_provider_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D9A5C1ECA3E8B65BB18C74 /* Pods_trust_web3_provider_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -29,9 +30,6 @@
 
 /* Begin PBXFileReference section */
 		0BAFF5979F4CF4129608BAB4 /* Pods-trust-web3-provider_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-trust-web3-provider_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-trust-web3-provider_Tests/Pods-trust-web3-provider_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		15BA45519C46027C97F76BBD /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		1784D6B42C08B790A30AE663 /* trust-web3-provider.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = "trust-web3-provider.podspec"; path = "../trust-web3-provider.podspec"; sourceTree = "<group>"; };
-		576A236B8001D68B6632257A /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* trust-web3-provider_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "trust-web3-provider_Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -42,6 +40,7 @@
 		607FACE51AFB9204008FA782 /* trust-web3-provider_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "trust-web3-provider_Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		77E81D8D203594FF00534C99 /* trust-web3-provider.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "trust-web3-provider.podspec"; path = "../../trust-web3-provider.podspec"; sourceTree = "<group>"; };
 		D0D9A5C1ECA3E8B65BB18C74 /* Pods_trust_web3_provider_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_trust_web3_provider_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8A5C61CAFBEF32C5B6136D6 /* Pods-trust-web3-provider_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-trust-web3-provider_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-trust-web3-provider_Example/Pods-trust-web3-provider_Example.release.xcconfig"; sourceTree = "<group>"; };
 		DB77EA5DCFB7DE835F4C4F9A /* Pods-trust-web3-provider_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-trust-web3-provider_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-trust-web3-provider_Tests/Pods-trust-web3-provider_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -141,9 +140,7 @@
 		607FACF51AFB993E008FA782 /* Podspec Metadata */ = {
 			isa = PBXGroup;
 			children = (
-				1784D6B42C08B790A30AE663 /* trust-web3-provider.podspec */,
-				15BA45519C46027C97F76BBD /* README.md */,
-				576A236B8001D68B6632257A /* LICENSE */,
+				77E81D8D203594FF00534C99 /* trust-web3-provider.podspec */,
 			);
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
@@ -251,6 +248,7 @@
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
+				77E81D8E203594FF00534C99 /* trust-web3-provider.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

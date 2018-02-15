@@ -34,7 +34,7 @@ TODO: Add long description of the pod here.
   
   s.resource_bundles = {
     'trust-web3-provider' => [
-      '../JS/dist/trust-min.js',
+      'JS/dist/trust-min.js',
       'trust-web3-provider/trust-web3-provider/Assets/*.png'
       ]
   }
