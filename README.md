@@ -12,7 +12,6 @@ If trust provider injected properly `isTrust` will be `true`
 ```javascript
  web3.currentProvider.isTrust
 ```
-## Requirements
 
 ## Installation
 
