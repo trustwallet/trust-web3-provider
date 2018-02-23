@@ -33341,7 +33341,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/viktor/Documents/GitHub/trust-web3-provider/JS"
+      "/Users/mishochu/Source/trust-wallet/trust-web3-provider/JS"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -33367,7 +33367,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/viktor/Documents/GitHub/trust-web3-provider/JS",
+  "_where": "/Users/mishochu/Source/trust-wallet/trust-web3-provider/JS",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -57448,10 +57448,20 @@ ProviderEngine.prototype.send = function (payload) {
       result = globalSyncOptions.networkVersion || null;
       break;
 
+    case 'net_listening':
+      try {
+        self._providers.filter(function (p) {
+          return p.provider !== undefined;
+        })[0].provider.send(payload);
+        result = true;
+      } catch (e) {
+        result = false;
+      }
+      break;
+
     // throw not-supported Error
     default:
-      var link = 'https://github.com/MetaMask/faq/blob/master/DEVELOPERS.md#dizzy-all-async---think-of-metamask-as-a-light-client';
-      var message = 'The MetaMask Web3 object does not support synchronous methods like ' + payload.method + ' without a callback parameter. See ' + link + ' for details.';
+      var message = 'The Trust Web3 object does not support synchronous methods like ' + payload.method + ' without a callback parameter.';
       throw new Error(message);
   }
   // return the result
@@ -57460,6 +57470,15 @@ ProviderEngine.prototype.send = function (payload) {
     jsonrpc: payload.jsonrpc,
     result: result
   };
+};
+
+ProviderEngine.prototype.isConnected = function () {
+  return this.send({
+    id: 9999999999,
+    jsonrpc: '2.0',
+    method: 'net_listening',
+    params: []
+  }).result;
 };
 
 module.exports = Trust;
