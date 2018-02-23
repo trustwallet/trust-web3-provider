@@ -82,6 +82,15 @@ ProviderEngine.prototype.send = function (payload) {
       result = globalSyncOptions.networkVersion || null
       break
 
+    case 'net_listening':
+      try {
+        self._providers.filter(p => p.provider !== undefined)[0].provider.send(payload)
+        result = true
+      } catch (e) {
+        result = false
+      }
+      break
+
     // throw not-supported Error
     default:
       var message = `The Trust Web3 object does not support synchronous methods like ${payload.method} without a callback parameter.`
@@ -93,6 +102,15 @@ ProviderEngine.prototype.send = function (payload) {
     jsonrpc: payload.jsonrpc,
     result: result,
   }
+}
+
+ProviderEngine.prototype.isConnected = function () {
+    return this.send({
+        id: 9999999999,
+        jsonrpc: '2.0',
+        method: 'net_listening',
+        params: []
+    }).result
 }
 
 module.exports = Trust
