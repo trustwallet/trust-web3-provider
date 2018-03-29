@@ -3,6 +3,8 @@ const ProviderEngine = require('web3-provider-engine')
 const HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js')
 const FilterSubprovider = require('web3-provider-engine/subproviders/filters.js')
 const Web3Subprovider = require("web3-provider-engine/subproviders/web3.js")
+const CacheSubprovider = require('web3-provider-engine/subproviders/cache.js')
+const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker.js')
 
 const context = window || global
 
@@ -23,6 +25,8 @@ const Trust = {
     engine.addProvider(hookedSubProvider = new HookedWalletSubprovider(options))
     engine.addProvider(new FilterSubprovider())
     engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(rpcUrl)))
+    engine.addProvider(new CacheSubprovider())
+    engine.addProvider(new NonceSubprovider())
 
     engine.on('error', err => console.error(err.stack))
     engine.isTrust = true
