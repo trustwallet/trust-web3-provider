@@ -1,6 +1,6 @@
 {
   "name": "trust-wallet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "web3 injection",
   "main": "index.js",
   "scripts": {
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "babel-core": "^6.26.0",
-    "web3": "^0.20.4",
-    "web3-provider-engine": "^13.6.0"
+    "web3": "^0.20.6",
+    "web3-provider-engine": "^14.0.2"
   }
 }
