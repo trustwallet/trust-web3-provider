@@ -1,6 +1,6 @@
 {
   "name": "trust-wallet",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "web3 injection",
   "main": "index.js",
   "scripts": {

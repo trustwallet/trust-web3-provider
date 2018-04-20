@@ -57063,11 +57063,11 @@ var Trust = {
     context.web3 = web3;
     globalSyncOptions = syncOptions;
 
-    engine.addProvider(hookedSubProvider = new HookedWalletSubprovider(options));
-    engine.addProvider(new FilterSubprovider());
-    engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(rpcUrl)));
     engine.addProvider(new CacheSubprovider());
     engine.addProvider(new SubscriptionsSubprovider());
+    engine.addProvider(new FilterSubprovider());
+    engine.addProvider(hookedSubProvider = new HookedWalletSubprovider(options));
+    engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(rpcUrl)));
     engine.on('error', function (err) {
       return console.error(err.stack);
     });
