@@ -1,0 +1,37 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.trustwalletapp.web3jprovider'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+}
+
+task copyJSProvider(type: Copy)
+
+copyJSProvider{
+    from '../../JS/dist/trust-min.js'
+    rename 'trust-min.js', 'trust.js'
+    into 'src/main/res/raw'
+}
+
+preBuild.dependsOn copyJSProvider
