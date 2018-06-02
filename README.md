@@ -1,12 +1,11 @@
 # TrustWeb3Provider
 
-[![CI Status](http://img.shields.io/travis/hewigovens/TrustWeb3Provider.svg?style=flat)](https://travis-ci.org/hewigovens/TrustWeb3Provider)
-[![Version](https://img.shields.io/cocoapods/v/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
+[![Pod Version](https://img.shields.io/cocoapods/v/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
+[![Jitpack Version](https://jitpack.io/v/TrustWallet/trust-web3-provider.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.1.7)
 [![License](https://img.shields.io/cocoapods/l/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
-[![](https://jitpack.io/v/TrustWallet/trust-web3-provider.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.1.7)
 
-## How to Identify Trust Provider?
+## How to Identify Trust Provider
 
 If trust provider injected properly `isTrust` will be `true`
 
@@ -16,6 +15,8 @@ If trust provider injected properly `isTrust` will be `true`
 
 ## Installation
 
+### iOS
+
 TrustWeb3Provider is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
@@ -23,9 +24,33 @@ it, simply add the following line to your Podfile:
 pod 'TrustWeb3Provider'
 ```
 
-## Author
+### Android
 
+TrustWeb3Provider is available through [Jitpack](https://jitpack.io). To install it:
+
+Step 1. Add jitpack in your root build.gradle at the end of repositories:
+
+```groovy
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Step 2. Add the dependency
+
+```groovy
+dependencies {
+    implementation 'com.github.TrustWallet:trust-web3-provider:0.1.7'
+}
+```
+
+## Authors
+
+vikmeup, vikmeup@gmail.com
 hewigovens, hewigovens@gmail.com
+madcake, wdiabloster@gmail.com
 
 ## License
 
