@@ -4,6 +4,7 @@
 [![Jitpack Version](https://jitpack.io/v/TrustWallet/trust-web3-provider.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.1.7)
 [![License](https://img.shields.io/cocoapods/l/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
+[![Platform](https://img.shields.io/badge/platform-android-lightgrey.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.1.7)
 
 ## How to Identify Trust Provider
 
@@ -48,9 +49,9 @@ dependencies {
 
 ## Authors
 
-vikmeup, vikmeup@gmail.com
-hewigovens, hewigovens@gmail.com
-madcake, wdiabloster@gmail.com
+vikmeup, vikmeup@gmail.com  
+hewigovens, hewigovens@gmail.com  
+madcake, wdiabloster@gmail.com  
 
 ## License
 
