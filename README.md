@@ -47,6 +47,53 @@ dependencies {
 }
 ```
 
+Step 3. Add web3 to your app
+
+This can be done either in the layout:
+```
+ <trust.web3.Web3View
+        android:id="@+id/web3view"
+        android:layout_below="@+id/go"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+```
+
+Or in code:
+```
+web3 = new Web3View(context);
+```
+
+Step 4. Configure network and wallet
+```
+web3.setChainId(1);
+web3.setRpcUrl("https://mainnet.infura.io/llyrtzQ3YhkdESt2Fzrk");
+web3.setWalletAddress(new Address("0xaa3cc54d7f10fa3a1737e4997ba27c34f330ce16"));
+```
+
+Step 5. Implement listeners
+```
+web3.setOnSignMessageListener(message -> {
+    Toast.makeText(this, "Message: " + message.value, Toast.LENGTH_LONG).show();
+    web3.onSignCancel(message);
+});
+web3.setOnSignPersonalMessageListener(message -> {
+    Toast.makeText(this, "Personal message: " + message.value, Toast.LENGTH_LONG).show();
+});
+web3.setOnSignTransactionListener(transaction -> {
+    Toast.makeText(this, "Transaction: " + transaction.value, Toast.LENGTH_LONG).show();
+});
+```
+
+Feedback
+```
+web3.onSignCancel(Message|Transaction)(); // message/transaction canceled
+web3.onSignMessageSuccessful(message, "0x...."); // message successfully signed
+web3.onSignPersonalMessageSuccessful(message, "0x..."); // personal message successfully signed
+web3.onSignTransactionSuccessful(transaction, "0x..."); // transaction successfully signed
+web3.onSignError(Message|Transaction, "some_error"); // error during signing message/transaction
+```
+
 ## Authors
 
 vikmeup, vikmeup@gmail.com  
