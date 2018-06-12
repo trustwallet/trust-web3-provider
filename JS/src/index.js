@@ -16,9 +16,11 @@ let hookedSubProvider
 let globalSyncOptions = {}
 
 const Trust = {
-  init (rpcUrl, options, syncOptions) { 
-    const engine = new ProviderEngine()
-    const web3 = new Web3(engine)
+  init (options, syncOptions) { 
+    const engine = new ProviderEngine(),
+          web3 = new Web3(engine),
+          { rpcUrl } = options
+
     context.web3 = web3
     globalSyncOptions = syncOptions
 
