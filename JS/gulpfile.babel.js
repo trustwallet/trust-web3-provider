@@ -58,10 +58,9 @@ gulp.task('bundle:javascript', ['javascript', ], function () {
   .pipe(buffer())
   .pipe(minify({
     mangle: {
-      reserved: [ 'Web3ProviderEngine' ]
+      reserved: [ 'TrustWeb3Provider' ]
     }
   }))
-  .pipe(replace('Web3ProviderEngine', 'TrustWeb3Provider'))
   .pipe(size())
   .pipe(gulp.dest(distributionDir));
 });
