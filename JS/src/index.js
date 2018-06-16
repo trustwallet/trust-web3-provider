@@ -18,7 +18,7 @@ let globalSyncOptions = {}
 class TrustWeb3Provider extends ProviderEngine {
   constructor(options, syncOptions) {
     super();
-    const engine = this,
+    const engine = this
     const web3 = new Web3(this)
     const { rpcUrl } = options
 

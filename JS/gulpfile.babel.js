@@ -7,7 +7,6 @@ const gulp            = require('gulp'),
       runSequence     = require('run-sequence'),
       size            = require('gulp-size'),
       source          = require('vinyl-source-stream'),
-      replace         = require('gulp-replace'),
       config = {
           name: 'trust',
           fileTypes: {
