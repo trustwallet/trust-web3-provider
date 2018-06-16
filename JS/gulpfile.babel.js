@@ -7,6 +7,7 @@ const gulp            = require('gulp'),
       runSequence     = require('run-sequence'),
       size            = require('gulp-size'),
       source          = require('vinyl-source-stream'),
+      replace         = require('gulp-replace'),
       config = {
           name: 'trust',
           fileTypes: {
@@ -55,7 +56,12 @@ gulp.task('bundle:javascript', ['javascript', ], function () {
   .bundle()
   .pipe(source(config.name + '.js'))
   .pipe(buffer())
-  .pipe(minify())
+  .pipe(minify({
+    mangle: {
+      reserved: [ 'Web3ProviderEngine' ]
+    }
+  }))
+  .pipe(replace('Web3ProviderEngine', 'TrustWeb3Provider'))
   .pipe(size())
   .pipe(gulp.dest(distributionDir));
 });
@@ -64,4 +70,4 @@ gulp.task('build', function (callback) {
   runSequence('clean:dist', 'clean:stage', ['bundle:javascript'],
     callback);
 });
- 
+

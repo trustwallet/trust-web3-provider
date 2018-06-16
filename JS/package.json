@@ -34,6 +34,7 @@
     "gulp": "^3.9.1",
     "gulp-minify": "^2.1.0",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^1.0.0",
     "gulp-size": "^3.0.0",
     "run-sequence": "^2.2.1",
     "vinyl-buffer": "^1.0.1",
