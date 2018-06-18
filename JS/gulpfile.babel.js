@@ -55,7 +55,11 @@ gulp.task('bundle:javascript', ['javascript', ], function () {
   .bundle()
   .pipe(source(config.name + '.js'))
   .pipe(buffer())
-  .pipe(minify())
+  .pipe(minify({
+    mangle: {
+      reserved: [ 'TrustWeb3Provider' ]
+    }
+  }))
   .pipe(size())
   .pipe(gulp.dest(distributionDir));
 });
@@ -64,4 +68,4 @@ gulp.task('build', function (callback) {
   runSequence('clean:dist', 'clean:stage', ['bundle:javascript'],
     callback);
 });
- 
+
