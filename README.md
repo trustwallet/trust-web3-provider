@@ -1,10 +1,10 @@
 # TrustWeb3Provider
 
 [![Pod Version](https://img.shields.io/cocoapods/v/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
-[![Jitpack Version](https://jitpack.io/v/TrustWallet/trust-web3-provider.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.1.7)
+[![Jitpack Version](https://jitpack.io/v/TrustWallet/trust-web3-provider.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.2.0)
 [![License](https://img.shields.io/cocoapods/l/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
-[![Platform](https://img.shields.io/badge/platform-android-lightgrey.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.1.7)
+[![Platform](https://img.shields.io/badge/platform-android-lightgrey.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.2.0)
 
 ## How to Identify Trust Provider
 
@@ -43,7 +43,7 @@ Step 2. Add the dependency
 
 ```groovy
 dependencies {
-    implementation 'com.github.TrustWallet:trust-web3-provider:0.1.7'
+    implementation 'com.github.TrustWallet:trust-web3-provider:0.2.0'
 }
 ```
 
@@ -52,6 +52,7 @@ dependencies {
 vikmeup, vikmeup@gmail.com  
 hewigovens, hewigovens@gmail.com  
 madcake, wdiabloster@gmail.com  
+[Mish Ochu](https://github.com/mishfit)
 
 ## License
 
