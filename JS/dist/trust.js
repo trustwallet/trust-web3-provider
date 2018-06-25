@@ -31127,7 +31127,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/viktorradchenko/Documents/iOSProjects/trust-web3-provider/JS"
+      "/Users/mishochu/Source/trust-wallet/trust-web3-provider/JS"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -31153,7 +31153,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/viktorradchenko/Documents/iOSProjects/trust-web3-provider/JS",
+  "_where": "/Users/mishochu/Source/trust-wallet/trust-web3-provider/JS",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -53844,6 +53844,14 @@ function extend() {
 (function (global){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var Web3 = require('web3');
 var ProviderEngine = require('web3-provider-engine');
 var HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js');
@@ -53861,10 +53869,19 @@ var callbacks = {};
 var hookedSubProvider = void 0;
 var globalSyncOptions = {};
 
-var Trust = {
-  init: function init(rpcUrl, options, syncOptions) {
-    var engine = new ProviderEngine();
-    var web3 = new Web3(engine);
+var TrustWeb3Provider = function (_ProviderEngine) {
+  _inherits(TrustWeb3Provider, _ProviderEngine);
+
+  function TrustWeb3Provider(options, syncOptions) {
+    _classCallCheck(this, TrustWeb3Provider);
+
+    var _this = _possibleConstructorReturn(this, (TrustWeb3Provider.__proto__ || Object.getPrototypeOf(TrustWeb3Provider)).call(this));
+
+    var engine = _this;
+    var web3 = new Web3(_this);
+    var rpcUrl = options.rpcUrl;
+
+
     context.web3 = web3;
     globalSyncOptions = syncOptions;
 
@@ -53878,95 +53895,94 @@ var Trust = {
     });
     engine.isTrust = true;
     engine.start();
-
-    return engine;
-  },
-  addCallback: function addCallback(id, cb, isRPC) {
-    cb.isRPC = isRPC;
-    callbacks[id] = cb;
-  },
-  executeCallback: function executeCallback(id, error, value) {
-    console.log('executing callback: \nid: ' + id + '\nvalue: ' + value + '\nerror: ' + error + '\n');
-
-    var callback = callbacks[id];
-
-    if (callback.isRPC) {
-      var response = { 'id': id, jsonrpc: '2.0', result: value, error: { message: error } };
-
-      if (error) {
-        callback(response, null);
-      } else {
-        callback(null, response);
-      }
-    } else {
-      callback(error, value);
-    }
-    delete callbacks[id];
+    return _this;
   }
-};
+
+  _createClass(TrustWeb3Provider, [{
+    key: 'addCallback',
+    value: function addCallback(id, cb, isRPC) {
+      cb.isRPC = isRPC;
+      callbacks[id] = cb;
+    }
+  }, {
+    key: 'executeCallback',
+    value: function executeCallback(id, error, value) {
+      console.log('executing callback: \nid: ' + id + '\nvalue: ' + value + '\nerror: ' + error + '\n');
+      var callback = callbacks[id];
+      if (callback.isRPC) {
+        var response = { 'id': id, jsonrpc: '2.0', result: value, error: { message: error } };
+        if (error) {
+          callback(response, null);
+        } else {
+          callback(null, response);
+        }
+      } else {
+        callback(error, value);
+      }
+      delete callbacks[id];
+    }
+  }, {
+    key: 'send',
+    value: function send(payload) {
+      var self = this;
+      var result = null;
+      switch (payload.method) {
+        case 'eth_accounts':
+          var address = globalSyncOptions.address;
+          result = address ? [address] : [];
+          break;
+        case 'eth_coinbase':
+          result = globalSyncOptions.address || null;
+          break;
+        case 'eth_uninstallFilter':
+          self.sendAsync(payload, noop);
+          result = true;
+          break;
+        case 'net_version':
+          result = globalSyncOptions.networkVersion || null;
+          break;
+        case 'net_listening':
+          try {
+            self._providers.filter(function (p) {
+              return p.provider !== undefined;
+            })[0].provider.send(payload);
+            result = true;
+          } catch (e) {
+            result = false;
+          }
+          break;
+        // throw not-supported Error
+        default:
+          var message = 'The Trust Web3 object does not support synchronous methods like ' + payload.method + ' without a callback parameter.';
+          throw new Error(message);
+      }
+      // return the result
+      return {
+        id: payload.id,
+        jsonrpc: payload.jsonrpc,
+        result: result
+      };
+    }
+  }, {
+    key: 'isConnected',
+    value: function isConnected() {
+      return this.send({
+        id: 9999999999,
+        jsonrpc: '2.0',
+        method: 'net_listening',
+        params: []
+      }).result;
+    }
+  }]);
+
+  return TrustWeb3Provider;
+}(ProviderEngine);
 
 if (typeof context.Trust === 'undefined') {
-  context.Trust = Trust;
+  context.Trust = TrustWeb3Provider;
 }
 
-ProviderEngine.prototype.send = function (payload) {
-  var self = this;
-
-  var result = null;
-  switch (payload.method) {
-
-    case 'eth_accounts':
-      var address = globalSyncOptions.address;
-      result = address ? [address] : [];
-      break;
-
-    case 'eth_coinbase':
-      result = globalSyncOptions.address || null;
-      break;
-
-    case 'eth_uninstallFilter':
-      self.sendAsync(payload, noop);
-      result = true;
-      break;
-
-    case 'net_version':
-      result = globalSyncOptions.networkVersion || null;
-      break;
-
-    case 'net_listening':
-      try {
-        self._providers.filter(function (p) {
-          return p.provider !== undefined;
-        })[0].provider.send(payload);
-        result = true;
-      } catch (e) {
-        result = false;
-      }
-      break;
-
-    // throw not-supported Error
-    default:
-      var message = 'The Trust Web3 object does not support synchronous methods like ' + payload.method + ' without a callback parameter.';
-      throw new Error(message);
-  }
-  // return the result
-  return {
-    id: payload.id,
-    jsonrpc: payload.jsonrpc,
-    result: result
-  };
-};
-
-ProviderEngine.prototype.isConnected = function () {
-  return this.send({
-    id: 9999999999,
-    jsonrpc: '2.0',
-    method: 'net_listening',
-    params: []
-  }).result;
-};
-
-module.exports = Trust;
+module.exports = TrustWeb3Provider;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"web3":295,"web3-provider-engine":279,"web3-provider-engine/subproviders/cache.js":282,"web3-provider-engine/subproviders/filters.js":283,"web3-provider-engine/subproviders/hooked-wallet.js":284,"web3-provider-engine/subproviders/provider.js":285,"web3-provider-engine/subproviders/subscriptions.js":287}]},{},[347]);
