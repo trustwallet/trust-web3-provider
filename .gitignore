@@ -39,9 +39,9 @@ Carthage/Build
 
 
 # JS
-JS/node_modules/
-JS/jspm_packages/
-JS/staging/
+node_modules/
+jspm_packages/
+staging/
 *.swp
 *.swo
 

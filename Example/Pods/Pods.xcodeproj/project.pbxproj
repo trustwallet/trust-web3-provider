@@ -53,10 +53,10 @@
 		C8C9921A2385FFDA87447F8B159130C1 /* Pods-TrustWeb3Provider_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TrustWeb3Provider_Example.release.xcconfig"; sourceTree = "<group>"; };
 		CC750E48D80AB4A837C270AAFF17B053 /* Pods-TrustWeb3Provider_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-TrustWeb3Provider_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
 		CF2663F3A1BD9A193ABA8DE82392E2D4 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
-		D615F7FB9355CBB7B983FE1947543908 /* trust.js */ = {isa = PBXFileReference; includeInIndex = 1; name = trust.js; path = JS/dist/trust.js; sourceTree = "<group>"; };
+		D615F7FB9355CBB7B983FE1947543908 /* trust.js */ = {isa = PBXFileReference; includeInIndex = 1; name = trust.js; path = dist/trust.js; sourceTree = "<group>"; };
 		E5840D9AD803C868F5069AB5769ED30E /* Pods-TrustWeb3Provider_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-TrustWeb3Provider_Tests-dummy.m"; sourceTree = "<group>"; };
 		ED935736EC84650C6C27077FC8C11200 /* Pods-TrustWeb3Provider_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-TrustWeb3Provider_Example-dummy.m"; sourceTree = "<group>"; };
-		EE40D6807D60F3A405C84ED3A14A6A15 /* trust-min.js */ = {isa = PBXFileReference; includeInIndex = 1; name = "trust-min.js"; path = "JS/dist/trust-min.js"; sourceTree = "<group>"; };
+		EE40D6807D60F3A405C84ED3A14A6A15 /* trust-min.js */ = {isa = PBXFileReference; includeInIndex = 1; name = "trust-min.js"; path = "dist/trust-min.js"; sourceTree = "<group>"; };
 		F2C2960D07699AA868CBBBB26F36C8A7 /* Pods-TrustWeb3Provider_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-TrustWeb3Provider_Example.modulemap"; sourceTree = "<group>"; };
 		FA1195FD2AFF4C3787F56BF85E1CF7EF /* TrustWeb3Provider.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = TrustWeb3Provider.bundle; path = "TrustWeb3Provider-TrustWeb3Provider.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
