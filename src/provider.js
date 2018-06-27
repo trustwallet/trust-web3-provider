@@ -22,11 +22,12 @@ function ProviderSubprovider(provider){
 
 ProviderSubprovider.prototype.handleRequest = function(payload, next, end){
 
-  const send = this.provider.sendAsync || this.provider.send
+  const send = this.provider.sendAsync || this.provider.send,
+        callback = function(err, response) {
+          if (err) return end(err)
+          if (response.error) return end(new Error(response.error.message))
+          end(null, response.result)
+        }
 
-  send(payload, function(err, response) {
-    if (err) return end(err)
-    if (response.error) return end(new Error(response.error.message))
-    end(null, response.result)
-  })
+  send.apply(this.provider, [ payload, callback])
 }

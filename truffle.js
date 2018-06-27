@@ -1,4 +1,4 @@
-const Web3One = require('web3')
+const Trust = require('./src/index')
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // for more about customizing your Truffle configuration!
@@ -16,9 +16,9 @@ module.exports = {
       port: 7545, // ganache runs on 7545 by default
       network_id: '5777'
     },
-    one: {
+    trust: {
       provider: function () {
-        return new Web3One.providers.HttpProvider('http://localhost:9545')
+        return new Trust('http://localhost:9545')
       },
       network_id: '4447' // Match any network id
     }

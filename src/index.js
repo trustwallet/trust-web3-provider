@@ -1,58 +1,49 @@
 const context = window || global,
       debug = require('debug')('TrustWeb3Provider'),
-      FilterSubprovider = require('web3-provider-engine/subproviders/filters.js'),
+      eachSeries = require('async/eachSeries'),
       HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js'),
       map = require('async/map'),
-      ProviderEngine = require('web3-provider-engine'),
       Provider = require('./provider'),
       Web3 = require('web3')
 
 context.chrome = { webstore: true }
 context.Web3 = Web3
 
-let callbacks = {},
-    websocketProvider,
-    globalSyncOptions = {}
-
-class TrustWeb3Provider extends ProviderEngine {
+class TrustWeb3Provider {
   constructor (options) {
-    super()
-    const engine = this,
-          web3 = new Web3(this),
-          { rpcUrl } = options
+    const { rpcUrl } = options
 
-    context.web3 = web3
-    globalSyncOptions = options
+    this.options = options
+    this.isTrust = true
+    this._providers = []
+    this.callbacks = {}
 
-    engine.addProvider(new HookedWalletSubprovider(options))
+    this.addProvider(new HookedWalletSubprovider(options))
 
     if (options.wssUrl) {
-      engine.addProvider(new Provider(websocketProvider = new Web3.providers.WebsocketProvider(options.wssUrl)))
+      this.addProvider(new Provider(this.websocketProvider = new Web3.providers.WebsocketProvider(options.wssUrl)))
     } else {
-      engine.addProvider(new FilterSubprovider())
-      engine.addProvider(new Provider(new Web3.providers.HttpProvider(rpcUrl)))
+      this.addProvider(new Provider(new Web3.providers.HttpProvider(rpcUrl)))
     }
 
-    if (websocketProvider) {
-      websocketProvider.on('data', () => {
-        engine.emit('data', arguments)
-      })
-    }
+    const web3 = new Web3(this)
 
-    engine.on('error', err => debug(err.stack))
-    engine.isTrust = true
-    engine._ready.go()
-    return engine
+    context.web3 = web3
+  }
+
+  addProvider (source) {
+    this._providers.push(source)
+    source.setEngine(this)
   }
 
   addCallback (id, cb, isRPC) {
     cb.isRPC = isRPC
-    callbacks[id] = cb
+    this.callbacks[id] = cb
   }
 
   executeCallback (id, error, value) {
     debug(`executing callback: \nid: ${id}\nvalue: ${value}\nerror: ${error}\n`)
-    let callback = callbacks[id]
+    let callback = this.callbacks[id]
     if (callback.isRPC) {
         const response = {'id': id, jsonrpc: '2.0', result: value, error: {message: error} }
       if (error) {
@@ -63,7 +54,7 @@ class TrustWeb3Provider extends ProviderEngine {
     } else {
       callback(error, value)
     }
-    delete callbacks[id]
+    delete this.callbacks[id]
   }
 
   sendAsync (payload, callback) {
@@ -71,21 +62,21 @@ class TrustWeb3Provider extends ProviderEngine {
 
     switch (payload.method) {
       case 'eth_accounts': {
-        const { address } = globalSyncOptions,
+        const { address } = this.options,
               { id, jsonrpc } = payload
 
         callback(null, { id, jsonrpc, result: [address] })
         break
       }
       case 'eth_coinbase': {
-        const { address: result } = globalSyncOptions,
+        const { address: result } = this.options,
               { id, jsonrpc } = payload
 
         callback(null, { id, jsonrpc, result })
         break
       }
       case 'net_version': {
-        const { networkVersion: result } = globalSyncOptions,
+        const { networkVersion: result } = this.options,
               { id, jsonrpc } = payload
 
         callback(null, { id, jsonrpc, result })
@@ -117,7 +108,83 @@ class TrustWeb3Provider extends ProviderEngine {
     this.sendAsync(payload, callback)
   }
 
+  _handleAsync (payload, finished) {
+    const self = this
+    let currentProvider = -1,
+        stack = []
+
+    next()
+
+    function next (after) {
+      currentProvider += 1
+
+      stack.unshift(after)
+
+      // bubbled down as far as we could go, and the request wasn't
+      // handled return an error
+      if (currentProvider >= self._providers.length) {
+        end(new Error(`Request for method '${payload.method}' not handled by any Subprovider. Please check your subprovider configuration to ensure this method is handled.`))
+      } else {
+        try {
+          const provider = self._providers[currentProvider]
+          provider.handleRequest(payload, next, end)
+        } catch (e) {
+          end(e)
+        }
+      }
+    }
+
+    function end (error, result) {
+      eachSeries(stack, function (fn, callback) {
+        if (fn) {
+          fn(error, result, callback)
+        } else {
+          callback()
+        }
+      }, function () {
+        const { id, jsonrpc } = payload
+
+        if (error) {
+          finished(error, { error, message: error.stack || error.message || error, id, jsonrpc, code: -32000 })
+        } else {
+          finished(null, { id, jsonrpc, result })
+        }
+      })
+    }
+  }
+
   isConnected() { return true }
+
+  addDefaultEvents () {
+    if (this.websocketProvider) {
+      this.websocketProvider.addDefaultEvents()
+    }
+  }
+
+  on (type, callback) {
+    if (this.websocketProvider) {
+      this.websocketProvider.on(type, callback)
+    }
+  }
+
+
+  removeListener (type, callback) {
+    if (this.websocketProvider) {
+      this.websocketProvider.removeListener(type, callback)
+    }
+  }
+
+  removeAllListeners (type) {
+    if (this.websocketProvider) {
+      this.websocketProvider.removeAllListeners(type)
+    }
+  }
+
+  reset () {
+    if (this.websocketProvider) {
+      this.websocketProvider.reset()
+    }
+  }
 }
 
 if (typeof context.Trust === 'undefined') {
