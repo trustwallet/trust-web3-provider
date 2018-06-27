@@ -3,55 +3,73 @@
 /* globals beforeEach */
 /* globals contract */
 /* globals it */
+/* globals web3 */
+
 const Ownable = artifacts.require('Ownable')
 
 let ownable
 
 
 contract('Ownable', function (accounts) {
-  const ownerCandidate = accounts[1]
+  const ownerCandidate = accounts[1],
+        shouldTest = web3.version && typeof web3.version === 'object' && /0\.20/.test(web3.version.api)
 
   beforeEach(async function () {
-    ownable = await Ownable.new()
+    const shouldRun = web3.toBigNumber && typeof web3.toBigNumber === 'function'
+
+    if (shouldTest && shouldRun) {
+      ownable = await Ownable.new()
+    }
   })
 
   it('allows the owner to change ownership', async function () {
-    const ownerBefore = await ownable.owner.call()
+    if (shouldTest) {
+      const ownerBefore = await ownable.owner.call()
 
-    assert.equal(ownerBefore, accounts[0])
+      assert.equal(ownerBefore, accounts[0])
 
-    await ownable.setOwner(ownerCandidate)
+      await ownable.setOwner(ownerCandidate)
 
-    const ownerAfter = await ownable.owner.call()
+      const ownerAfter = await ownable.owner.call()
 
-    assert.equal(ownerCandidate, ownerAfter)
+      assert.equal(ownerCandidate, ownerAfter)
+    } else {
+      this.skip()
+    }
   })
 
   it('prevents ownership changes to address(0)', async function () {
-    const ownerBefore = await ownable.owner.call()
+    if (shouldTest) {
+      const ownerBefore = await ownable.owner.call()
 
-    assert.equal(ownerBefore, accounts[0])
+      assert.equal(ownerBefore, accounts[0])
 
-    await reverts(ownable.setOwner('0x0000000000000000000000000000000000000000'))
+      await reverts(ownable.setOwner('0x0000000000000000000000000000000000000000'))
 
-    const ownerAfter = await ownable.owner.call()
+      const ownerAfter = await ownable.owner.call()
 
-    assert.equal(ownerBefore, accounts[0])
-    assert.equal(ownerBefore, ownerAfter)
+      assert.equal(ownerBefore, accounts[0])
+      assert.equal(ownerBefore, ownerAfter)
+    } else {
+      this.skip()
+    }
   })
 
   it('prevents non-owners from making ownership changes', async function () {
-    
-    const ownerBefore = await ownable.owner.call()
+    if (shouldTest) {
+      const ownerBefore = await ownable.owner.call()
 
-    assert.equal(ownerBefore, accounts[0])
+      assert.equal(ownerBefore, accounts[0])
 
-    await reverts(ownable.setOwner(ownerCandidate, { from: accounts[2] }))
+      await reverts(ownable.setOwner(ownerCandidate, { from: accounts[2] }))
 
-    const ownerAfter = await ownable.owner.call()
+      const ownerAfter = await ownable.owner.call()
 
-    assert.equal(ownerBefore, accounts[0])
-    assert.equal(ownerBefore, ownerAfter)
+      assert.equal(ownerBefore, accounts[0])
+      assert.equal(ownerBefore, ownerAfter)
+    } else {
+      this.skip()
+    }
   })
 })
 

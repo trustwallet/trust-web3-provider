@@ -51434,22 +51434,29 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var context = window || global,
-    debug = require('debug')('TrustWeb3Provider'),
+var debug = require('debug')('TrustWeb3Provider'),
     eachSeries = require('async/eachSeries'),
     HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js'),
     map = require('async/map'),
     Provider = require('./provider'),
     Web3 = require('web3');
 
+var context = void 0;
+if (typeof window === 'undefined') {
+  context = global;
+} else {
+  context = window;
+}
+
 context.chrome = { webstore: true };
-context.Web3 = Web3;
 
 var TrustWeb3Provider = function () {
   function TrustWeb3Provider(options) {
     _classCallCheck(this, TrustWeb3Provider);
 
-    var rpcUrl = options.rpcUrl;
+    var rpcUrl = options.rpcUrl,
+        bypassHooks = options.bypassHooks,
+        noConflict = options.noConflict;
 
 
     this.options = options;
@@ -51457,17 +51464,26 @@ var TrustWeb3Provider = function () {
     this._providers = [];
     this.callbacks = {};
 
-    this.addProvider(new HookedWalletSubprovider(options));
+    if (!bypassHooks) {
+      this.addProvider(new HookedWalletSubprovider(options));
+    }
 
     if (options.wssUrl) {
       this.addProvider(new Provider(this.websocketProvider = new Web3.providers.WebsocketProvider(options.wssUrl)));
+      this.addDefaultEvents = this.websocketProvider.addDefaultEvents.bind(this.websocketProvider);
+      this.removeListener = this.websocketProvider.removeListener.bind(this.websocketProvider);
+      this.removeAllListeners = this.websocketProvider.removeAllListeners.bind(this.websocketProvider);
+      this.reset = this.websocketProvider.reset.bind(this.websocketProvider);
     } else {
       this.addProvider(new Provider(new Web3.providers.HttpProvider(rpcUrl)));
     }
 
-    var web3 = new Web3(this);
-
-    context.web3 = web3;
+    if (!noConflict) {
+      var web3 = new Web3(this);
+      context.Web3 = Web3;
+      web3.sha3 = web3.utils.sha3;
+      context.web3 = web3;
+    }
   }
 
   _createClass(TrustWeb3Provider, [{
@@ -51502,68 +51518,78 @@ var TrustWeb3Provider = function () {
   }, {
     key: 'sendAsync',
     value: function sendAsync(payload, callback) {
-      var self = this;
-
-      switch (payload.method) {
-        case 'eth_accounts':
-          {
-            var address = this.options.address,
-                id = payload.id,
-                jsonrpc = payload.jsonrpc;
+      var bypassHooks = this.options.bypassHooks;
 
 
-            callback(null, { id: id, jsonrpc: jsonrpc, result: [address] });
-            break;
-          }
-        case 'eth_coinbase':
-          {
-            var result = this.options.address,
-                _id = payload.id,
-                _jsonrpc = payload.jsonrpc;
+      if (!bypassHooks) {
+        switch (payload.method) {
+          case 'eth_accounts':
+            {
+              var address = this.options.address,
+                  id = payload.id,
+                  jsonrpc = payload.jsonrpc;
 
 
-            callback(null, { id: _id, jsonrpc: _jsonrpc, result: result });
-            break;
-          }
-        case 'net_version':
-          {
-            var _result = this.options.networkVersion,
-                _id2 = payload.id,
-                _jsonrpc2 = payload.jsonrpc;
-
-
-            callback(null, { id: _id2, jsonrpc: _jsonrpc2, result: _result });
-            break;
-          }
-        case 'net_listening':
-          {
-            var _id3 = payload.id,
-                _jsonrpc3 = payload.jsonrpc;
-
-            callback(null, { id: _id3, jsonrpc: _jsonrpc3, result: true });
-            break;
-          }
-        default:
-          {
-            if (!callback) {
-              throw new Error('Trust web3 provider does not support synchronous requests.');
-            } else {
-              if (Array.isArray(payload)) {
-                // handle batch
-                map(payload, self._handleAsync.bind(self), callback);
-              } else {
-                // handle single
-                self._handleAsync(payload, callback);
-              }
+              callback(null, { id: id, jsonrpc: jsonrpc, result: [address] });
+              break;
             }
-            break;
-          }
+          case 'eth_coinbase':
+            {
+              var result = this.options.address,
+                  _id = payload.id,
+                  _jsonrpc = payload.jsonrpc;
+
+
+              callback(null, { id: _id, jsonrpc: _jsonrpc, result: result });
+              break;
+            }
+          case 'net_version':
+            {
+              var _result = this.options.networkVersion,
+                  _id2 = payload.id,
+                  _jsonrpc2 = payload.jsonrpc;
+
+
+              callback(null, { id: _id2, jsonrpc: _jsonrpc2, result: _result });
+              break;
+            }
+          case 'net_listening':
+            {
+              var _id3 = payload.id,
+                  _jsonrpc3 = payload.jsonrpc;
+
+              callback(null, { id: _id3, jsonrpc: _jsonrpc3, result: true });
+              break;
+            }
+          default:
+            {
+              this.mapToHandler(payload, callback);
+              break;
+            }
+        }
+      } else {
+        this.mapToHandler(payload, callback);
       }
     }
   }, {
     key: 'send',
     value: function send(payload, callback) {
       this.sendAsync(payload, callback);
+    }
+  }, {
+    key: 'mapToHandler',
+    value: function mapToHandler(payload, callback) {
+      if (!callback) {
+        throw new Error('Trust web3 provider does not support synchronous requests.');
+      } else {
+        if (Array.isArray(payload)) {
+          // handle batch
+          map(payload, this._handleAsync.bind(this), callback);
+        } else {
+          // handle single
+          this._handleAsync(payload, callback);
+        }
+      }
     }
   }, {
     key: '_handleAsync',
@@ -51614,18 +51640,6 @@ var TrustWeb3Provider = function () {
       }
     }
   }, {
-    key: 'isConnected',
-    value: function isConnected() {
-      return true;
-    }
-  }, {
-    key: 'addDefaultEvents',
-    value: function addDefaultEvents() {
-      if (this.websocketProvider) {
-        this.websocketProvider.addDefaultEvents();
-      }
-    }
-  }, {
     key: 'on',
     value: function on(type, callback) {
       if (this.websocketProvider) {
@@ -51633,25 +51647,9 @@ var TrustWeb3Provider = function () {
       }
     }
   }, {
-    key: 'removeListener',
-    value: function removeListener(type, callback) {
-      if (this.websocketProvider) {
-        this.websocketProvider.removeListener(type, callback);
-      }
-    }
-  }, {
-    key: 'removeAllListeners',
-    value: function removeAllListeners(type) {
-      if (this.websocketProvider) {
-        this.websocketProvider.removeAllListeners(type);
-      }
-    }
-  }, {
-    key: 'reset',
-    value: function reset() {
-      if (this.websocketProvider) {
-        this.websocketProvider.reset();
-      }
+    key: 'isConnected',
+    value: function isConnected() {
+      return true;
     }
   }]);
 
