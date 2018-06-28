@@ -20,7 +20,7 @@
   },
   "resource_bundles": {
     "TrustWeb3Provider": [
-      "JS/dist/*.js"
+      "dist/*.js"
     ]
   }
 }

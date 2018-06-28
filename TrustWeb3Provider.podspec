@@ -25,6 +25,6 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
 
   s.resource_bundles = {
-    'TrustWeb3Provider' => ['JS/dist/trust-min.js']
+    'TrustWeb3Provider' => ['dist/trust-min.js']
   }
 end

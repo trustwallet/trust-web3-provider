@@ -39,11 +39,9 @@ Carthage/Build
 
 
 # JS
-JS/node_modules/
-JS/jspm_packages/
-JS/staging/
-*.swp
-*.swo
+node_modules/
+jspm_packages/
+staging/
 
 # Android
 .idea
@@ -96,3 +94,11 @@ gen-external-apklibs
 
 
 tn/trustnative.aar
+
+# Solidity Coverage fiels
+coverage/
+coverage.json
+
+# Vim swap files
+*.swp
+*.swo
