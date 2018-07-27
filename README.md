@@ -49,9 +49,9 @@ dependencies {
 
 ## Authors
 
-vikmeup, vikmeup@gmail.com  
-hewigovens, hewigovens@gmail.com  
-madcake, wdiabloster@gmail.com  
+[vikmeup](https://github.com/vikmeup)
+[hewigovens](https://github.com/hewigovens)
+[madcake](https://github.com/madcake)
 [Mish Ochu](https://github.com/mishfit)
 
 ## License
