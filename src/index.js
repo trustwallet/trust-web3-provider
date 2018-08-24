@@ -2,20 +2,13 @@ import Web3 from "web3";
 
 class TrustWeb3Provider {
   constructor(config) {
-    this.callbacks = new Map;
-    this.isTrust = true;
     this.address = config.address;
     this.chainId = config.chainId;
     this.rpcUrl = config.rpcUrl;
-  }
 
-  postMessage(handler, payload) {
-    let data = payload.params[0];
-    window.webkit.messageHandlers[handler].postMessage({
-        "name": handler,
-        "object": handler === "signTransaction" ? data : {data},
-        "id": payload.id
-      });
+    this.callbacks = new Map;
+    this.intIds = new Map;
+    this.isTrust = true;
   }
 
   isConnected() {
@@ -44,6 +37,7 @@ class TrustWeb3Provider {
   }
 
   sendAsync(payload, callback) {
+    this.intifyId(payload);
     this.callbacks.set(payload.id, callback);
     switch(payload.method) {
       case "eth_accounts":
@@ -78,27 +72,52 @@ class TrustWeb3Provider {
   }
 
   eth_sign(payload) {
-    this.postMessage("signMessage", payload);
+    this.postMessage("signMessage", payload.id, {data: payload.params[1]});
   }
 
   personal_sign(payload) {
-    this.postMessage("signPersonalMessage", payload);
+    this.postMessage("signPersonalMessage", payload.id, {data: payload.params[0]});
   }
 
   eth_signTypedData(payload) {
-    this.postMessage("signTypedMessage", payload);
+    this.postMessage("signTypedMessage", payload.id, {data: payload.params[0]});
   }
 
   eth_sendTransaction(payload) {
-    this.postMessage("signTransaction", payload);
+    this.postMessage("signTransaction", payload.id, payload.params[0]);
+  }
+
+  intifyId(payload) {
+    if (!payload.id) {
+      payload.id = this.genId();
+      return;
+    }
+    if (typeof payload.id !== "number") {
+      let newId = this.genId();
+      this.intIds.set(newId, payload.id);
+      payload.id = newId;
+    }
+  }
+
+  genId() {
+    return new Date().getTime() + Math.floor(Math.random() * 1000);
+  }
+
+  postMessage(handler, id, data) {
+    window.webkit.messageHandlers[handler].postMessage({
+        "name": handler,
+        "object": data,
+        "id": id
+      });
   }
 
   sendResponse(id, result) {
     let callback = this.callbacks.get(id);
-    let data = {jsonrpc: "2.0", id, result};
+    let data = {jsonrpc: "2.0", id: this.intIds.get(id) || id, result};
     if (callback) {
       callback(null, data);
       this.callbacks.delete(id);
+      this.intIds.delete(id);
     }
     return data;
   }
@@ -108,6 +127,7 @@ class TrustWeb3Provider {
     if (callback) {
       callback(error, null);
       this.callbacks.delete(id);
+      this.intIds.delete(id);
     }
   }
 
