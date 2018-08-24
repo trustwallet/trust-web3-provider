@@ -1,191 +1,134 @@
-const debug = require('debug')('TrustWeb3Provider'),
-      eachSeries = require('async/eachSeries'),
-      HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js'),
-      map = require('async/map'),
-      Provider = require('./provider'),
-      Web3 = require('web3')
-
-let context
-if (typeof window === 'undefined') {
-  context = global
-} else {
-  context = window
-}
-
-context.chrome = { webstore: true }
+import Web3 from "web3";
 
 class TrustWeb3Provider {
-  constructor (options) {
-    const { rpcUrl, bypassHooks,  noConflict } = options
-
-    this.options = options
-    this.isTrust = true
-    this._providers = []
-    this.callbacks = {}
-
-    if (!bypassHooks) {
-      this.addProvider(new HookedWalletSubprovider(options))
-    }
-
-    if (options.wssUrl) {
-      this.addProvider(new Provider(this.websocketProvider = new Web3.providers.WebsocketProvider(options.wssUrl)))
-      this.addDefaultEvents = this.websocketProvider.addDefaultEvents.bind(this.websocketProvider)
-      this.removeListener = this.websocketProvider.removeListener.bind(this.websocketProvider)
-      this.removeAllListeners = this.websocketProvider.removeAllListeners.bind(this.websocketProvider)
-      this.reset = this.websocketProvider.reset.bind(this.websocketProvider)
-    } else {
-      this.addProvider(new Provider(new Web3.providers.HttpProvider(rpcUrl)))
-    }
-
-    if (!noConflict) {
-      const web3 = new Web3(this)
-      context.Web3 = Web3
-      web3.sha3 = web3.utils.sha3
-      context.web3 = web3
-    }
+  constructor(config) {
+    this.callbacks = new Map;
+    this.isTrust = true;
+    this.address = config.address;
+    this.chainId = config.chainId;
+    this.rpcUrl = config.rpcUrl;
   }
 
-  addProvider (source) {
-    this._providers.push(source)
-    source.setEngine(this)
+  postMessage(handler, payload) {
+    let data = payload.params[0];
+    window.webkit.messageHandlers[handler].postMessage({
+        "name": handler,
+        "object": handler === "signTransaction" ? data : {data},
+        "id": payload.id
+      });
   }
 
-  addCallback (id, cb, isRPC) {
-    cb.isRPC = isRPC
-    this.callbacks[id] = cb
+  isConnected() {
+    return true;
   }
 
-  executeCallback (id, error, value) {
-    debug(`executing callback: \nid: ${id}\nvalue: ${value}\nerror: ${error}\n`)
-    let callback = this.callbacks[id]
-    if (callback.isRPC) {
-        const response = {'id': id, jsonrpc: '2.0', result: value, error: {message: error} }
-      if (error) {
-        callback(response, null)
-      } else {
-        callback(null, response)
-      }
-    } else {
-      callback(error, value)
+  send(payload) {
+    var response = {
+      jsonrpc: "2.0",
+      id: payload.id
+    };
+    switch(payload.method) {
+      case "eth_accounts":
+        response.result = this.eth_accounts();
+        break;
+      case "eth_coinbase":
+        response.result = this.eth_coinbase();
+        break;
+      case "net_version":
+        response.result = this.net_version();
+        break;
+      default:
+        throw new Error("Trust does not support calling " + payload.method + " synchronously without a callback. Please provide a callback parameter to call " + payload.method + " asynchronously.");
     }
-    delete this.callbacks[id]
+    return response;
   }
 
-  sendAsync (payload, callback) {
-    const { bypassHooks } = this.options
-
-    if (!bypassHooks) {
-      switch (payload.method) {
-        case 'eth_accounts': {
-          const { address } = this.options,
-                { id, jsonrpc } = payload
-
-          callback(null, { id, jsonrpc, result: [address] })
-          break
-        }
-        case 'eth_coinbase': {
-          const { address: result } = this.options,
-                { id, jsonrpc } = payload
-
-          callback(null, { id, jsonrpc, result })
-          break
-        }
-        case 'net_version': {
-          const { networkVersion: result } = this.options,
-                { id, jsonrpc } = payload
-
-          callback(null, { id, jsonrpc, result })
-          break
-        }
-        case 'net_listening': {
-          const { id, jsonrpc } = payload
-          callback(null, { id, jsonrpc, result: true })
-          break
-        }
-        default: {
-          this.mapToHandler(payload, callback)
-          break
-        }
-      }
-    } else {
-      this.mapToHandler(payload, callback)
+  sendAsync(payload, callback) {
+    this.callbacks.set(payload.id, callback);
+    switch(payload.method) {
+      case "eth_accounts":
+        return this.sendResponse(payload.id, this.eth_accounts());
+      case "eth_coinbase":
+        return this.sendResponse(payload.id, this.eth_coinbase());
+      case "net_version":
+        return this.sendResponse(payload.id, this.net_version());
+      case "eth_sign":
+        return this.eth_sign(payload);
+      case "personal_sign":
+        return this.personal_sign(payload);
+      case "eth_signTypedData":
+        return this.eth_signTypedData(payload);
+      case "eth_sendTransaction":
+        return this.eth_sendTransaction(payload);
+      default:
+        return this.doRemoteRPC(payload, callback);
     }
   }
 
-  send (payload, callback) {
-    this.sendAsync(payload, callback)
+  eth_accounts() {
+    return this.address ? [this.address] : [];
   }
 
-  mapToHandler (payload, callback) {
-    if (!callback) {
-      throw new Error('Trust web3 provider does not support synchronous requests.')
-    } else {
-      if (Array.isArray(payload)) {
-        // handle batch
-        map(payload, this._handleAsync.bind(this), callback)
-      } else {
-        // handle single
-        this._handleAsync(payload, callback)
-      }
+  eth_coinbase() {
+    return this.address;
+  }
+
+  net_version() {
+    return this.chainId.toString(10) || null;
+  }
+
+  eth_sign(payload) {
+    this.postMessage("signMessage", payload);
+  }
+
+  personal_sign(payload) {
+    this.postMessage("signPersonalMessage", payload);
+  }
+
+  eth_signTypedData(payload) {
+    this.postMessage("signTypedMessage", payload);
+  }
+
+  eth_sendTransaction(payload) {
+    this.postMessage("signTransaction", payload);
+  }
+
+  sendResponse(id, result) {
+    let callback = this.callbacks.get(id);
+    let data = {jsonrpc: "2.0", id, result};
+    if (callback) {
+      callback(null, data);
+      this.callbacks.delete(id);
+    }
+    return data;
+  }
+
+  sendError(id, error) {
+    let callback = this.callbacks.get(id);
+    if (callback) {
+      callback(error, null);
+      this.callbacks.delete(id);
     }
   }
 
-  _handleAsync (payload, finished) {
-    const self = this
-    let currentProvider = -1,
-        stack = []
-
-    next()
-
-    function next (after) {
-      currentProvider += 1
-
-      stack.unshift(after)
-
-      // bubbled down as far as we could go, and the request wasn't
-      // handled return an error
-      if (currentProvider >= self._providers.length) {
-        end(new Error(`Request for method '${payload.method}' not handled by any Subprovider. Please check your subprovider configuration to ensure this method is handled.`))
-      } else {
-        try {
-          const provider = self._providers[currentProvider]
-          provider.handleRequest(payload, next, end)
-        } catch (e) {
-          end(e)
-        }
-      }
-    }
-
-    function end (error, result) {
-      eachSeries(stack, function (fn, callback) {
-        if (fn) {
-          fn(error, result, callback)
-        } else {
-          callback()
-        }
-      }, function () {
-        const { id, jsonrpc } = payload
-
-        if (error) {
-          finished(error, { error, message: error.stack || error.message || error, id, jsonrpc, code: -32000 })
-        } else {
-          finished(null, { id, jsonrpc, result })
-        }
-      })
-    }
+  doRemoteRPC(payload, callback) {
+    fetch(this.rpcUrl, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(json => {
+      callback(null, json);
+    })
+    .catch(error => {
+      callback(error, null);
+    });
   }
-
-  on (type, callback) {
-    if (this.websocketProvider) {
-      this.websocketProvider.on(type, callback)
-    }
-  }
-
-  isConnected() { return true }
 }
 
-if (typeof context.Trust === 'undefined') {
-  context.Trust = TrustWeb3Provider
-}
-
-module.exports = TrustWeb3Provider
+window.Trust = TrustWeb3Provider;
+window.Web3 = Web3;

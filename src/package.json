@@ -1,0 +1,24 @@
+{
+  "name": "trust-web3-provider",
+  "version": "0.3.0",
+  "description": "Trust Web3 Provider",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf ../dist && parcel build index.js -o trust-min.js -d ../dist",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/TrustWallet/trust-web3-provider.git"
+  },
+  "keywords": [],
+  "author": "Trust <support@trustwalletapp.com>",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "web3": "^0.20.7"
+  },
+  "devDependencies": {
+    "eslint": "^5.4.0",
+    "parcel-bundler": "^1.9.7"
+  }
+}
