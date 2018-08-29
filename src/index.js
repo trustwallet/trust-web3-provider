@@ -1,13 +1,18 @@
+"use strict";
+
 import Web3 from "web3";
+import FilterMgr from "./filter";
+import RPCServer from "./rpc";
+import Utils from "./utils";
 
 class TrustWeb3Provider {
   constructor(config) {
     this.address = config.address;
     this.chainId = config.chainId;
-    this.rpcUrl = config.rpcUrl;
+    this.rpc = new RPCServer(config.rpcUrl);
+    this.filterMgr = new FilterMgr(this.rpc);
 
     this.callbacks = new Map;
-    this.intIds = new Map;
     this.isTrust = true;
   }
 
@@ -16,7 +21,7 @@ class TrustWeb3Provider {
   }
 
   send(payload) {
-    var response = {
+    let response = {
       jsonrpc: "2.0",
       id: payload.id
     };
@@ -30,6 +35,14 @@ class TrustWeb3Provider {
       case "net_version":
         response.result = this.net_version();
         break;
+      case "eth_uninstallFilter":
+        this.sendAsync(payload, (error) => {
+          if (error) {
+            console.log(error);
+          }
+        });
+        response.result = true;
+        break;
       default:
         throw new Error("Trust does not support calling " + payload.method + " synchronously without a callback. Please provide a callback parameter to call " + payload.method + " asynchronously.");
     }
@@ -37,26 +50,62 @@ class TrustWeb3Provider {
   }
 
   sendAsync(payload, callback) {
-    this.intifyId(payload);
-    this.callbacks.set(payload.id, callback);
-    switch(payload.method) {
-      case "eth_accounts":
-        return this.sendResponse(payload.id, this.eth_accounts());
-      case "eth_coinbase":
-        return this.sendResponse(payload.id, this.eth_coinbase());
-      case "net_version":
-        return this.sendResponse(payload.id, this.net_version());
-      case "eth_sign":
-        return this.eth_sign(payload);
-      case "personal_sign":
-        return this.personal_sign(payload);
-      case "eth_signTypedData":
-        return this.eth_signTypedData(payload);
-      case "eth_sendTransaction":
-        return this.eth_sendTransaction(payload);
-      default:
-        return this.doRemoteRPC(payload, callback);
+    if (Array.isArray(payload)) {
+      Promise.all(payload.map(this._sendAsync.bind(this)))
+      .then(data => callback(null, data))
+      .catch(error => callback(error, null));
+    } else {
+      this._sendAsync(payload)
+      .then(data => callback(null, data))
+      .catch(error => callback(error, null));
     }
+  }
+
+  _sendAsync(payload) {
+    return new Promise((resolve, reject) => {
+      if (!payload.id) {
+        payload.id = Utils.genId();
+      }
+      this.callbacks.set(payload.id, (error, data) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
+      });
+
+      switch(payload.method) {
+        case "eth_accounts":
+          return this.sendResponse(payload.id, this.eth_accounts());
+        case "eth_coinbase":
+          return this.sendResponse(payload.id, this.eth_coinbase());
+        case "net_version":
+          return this.sendResponse(payload.id, this.net_version());
+        case "eth_sign":
+          return this.eth_sign(payload);
+        case "personal_sign":
+          return this.personal_sign(payload);
+        case "eth_signTypedData":
+          return this.eth_signTypedData(payload);
+        case "eth_sendTransaction":
+          return this.eth_sendTransaction(payload);
+        case "eth_newFilter":
+          return this.eth_newFilter(payload);
+        case "eth_newBlockFilter":
+          return this.eth_newBlockFilter(payload);
+        case "eth_newPendingTransactionFilter":
+          return this.eth_newPendingTransactionFilter(payload);
+        case "eth_uninstallFilter":
+          return this.eth_uninstallFilter(payload);
+        case "eth_getFilterChanges":
+          return this.eth_getFilterChanges(payload);
+        case "eth_getFilterLogs":
+          return this.eth_getFilterLogs(payload);
+        default:
+          this.callbacks.delete(payload.id);
+          return this.rpc.call(payload).then(resolve).catch(reject);
+      }
+    });
   }
 
   eth_accounts() {
@@ -87,20 +136,40 @@ class TrustWeb3Provider {
     this.postMessage("signTransaction", payload.id, payload.params[0]);
   }
 
-  intifyId(payload) {
-    if (!payload.id) {
-      payload.id = this.genId();
-      return;
-    }
-    if (typeof payload.id !== "number") {
-      let newId = this.genId();
-      this.intIds.set(newId, payload.id);
-      payload.id = newId;
-    }
+  eth_newFilter(payload) {
+    this.filterMgr.newFilter(payload)
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
   }
 
-  genId() {
-    return new Date().getTime() + Math.floor(Math.random() * 1000);
+  eth_newBlockFilter(payload) {
+    this.filterMgr.newBlockFilter()
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_newPendingTransactionFilter(payload) {
+    this.filterMgr.newPendingTransactionFilter()
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_uninstallFilter(payload) {
+    this.filterMgr.uninstallFilter(payload.params[0])
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_getFilterChanges(payload) {
+    this.filterMgr.getFilterChanges(payload.params[0])
+    .then(data => this.sendResponse(payload.id, data))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_getFilterLogs(payload) {
+    this.filterMgr.getFilterLogs(payload.params[0])
+    .then(data => this.sendResponse(payload.id, data))
+    .catch(error => this.sendError(payload.id, error));
   }
 
   postMessage(handler, id, data) {
@@ -113,40 +182,25 @@ class TrustWeb3Provider {
 
   sendResponse(id, result) {
     let callback = this.callbacks.get(id);
-    let data = {jsonrpc: "2.0", id: this.intIds.get(id) || id, result};
+    let data = {jsonrpc: "2.0", id: id};
+    if (typeof result === "object" && result.jsonrpc && result.result) {
+      data.result = result.result;
+    } else {
+      data.result = result;
+    }
     if (callback) {
       callback(null, data);
       this.callbacks.delete(id);
-      this.intIds.delete(id);
     }
-    return data;
   }
 
   sendError(id, error) {
+    console.log("<== sendError ", id, error);
     let callback = this.callbacks.get(id);
     if (callback) {
       callback(error, null);
       this.callbacks.delete(id);
-      this.intIds.delete(id);
     }
-  }
-
-  doRemoteRPC(payload, callback) {
-    fetch(this.rpcUrl, {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(response => response.json())
-    .then(json => {
-      callback(null, json);
-    })
-    .catch(error => {
-      callback(error, null);
-    });
   }
 }
 
