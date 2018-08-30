@@ -1,191 +1,208 @@
-const debug = require('debug')('TrustWeb3Provider'),
-      eachSeries = require('async/eachSeries'),
-      HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js'),
-      map = require('async/map'),
-      Provider = require('./provider'),
-      Web3 = require('web3')
+"use strict";
 
-let context
-if (typeof window === 'undefined') {
-  context = global
-} else {
-  context = window
-}
-
-context.chrome = { webstore: true }
+import Web3 from "web3";
+import FilterMgr from "./filter";
+import RPCServer from "./rpc";
+import Utils from "./utils";
 
 class TrustWeb3Provider {
-  constructor (options) {
-    const { rpcUrl, bypassHooks,  noConflict } = options
+  constructor(config) {
+    this.address = config.address;
+    this.chainId = config.chainId;
+    this.rpc = new RPCServer(config.rpcUrl);
+    this.filterMgr = new FilterMgr(this.rpc);
 
-    this.options = options
-    this.isTrust = true
-    this._providers = []
-    this.callbacks = {}
+    this.callbacks = new Map;
+    this.isTrust = true;
+  }
 
-    if (!bypassHooks) {
-      this.addProvider(new HookedWalletSubprovider(options))
+  isConnected() {
+    return true;
+  }
+
+  send(payload) {
+    let response = {
+      jsonrpc: "2.0",
+      id: payload.id
+    };
+    switch(payload.method) {
+      case "eth_accounts":
+        response.result = this.eth_accounts();
+        break;
+      case "eth_coinbase":
+        response.result = this.eth_coinbase();
+        break;
+      case "net_version":
+        response.result = this.net_version();
+        break;
+      case "eth_uninstallFilter":
+        this.sendAsync(payload, (error) => {
+          if (error) {
+            console.log(error);
+          }
+        });
+        response.result = true;
+        break;
+      default:
+        throw new Error("Trust does not support calling " + payload.method + " synchronously without a callback. Please provide a callback parameter to call " + payload.method + " asynchronously.");
     }
+    return response;
+  }
 
-    if (options.wssUrl) {
-      this.addProvider(new Provider(this.websocketProvider = new Web3.providers.WebsocketProvider(options.wssUrl)))
-      this.addDefaultEvents = this.websocketProvider.addDefaultEvents.bind(this.websocketProvider)
-      this.removeListener = this.websocketProvider.removeListener.bind(this.websocketProvider)
-      this.removeAllListeners = this.websocketProvider.removeAllListeners.bind(this.websocketProvider)
-      this.reset = this.websocketProvider.reset.bind(this.websocketProvider)
+  sendAsync(payload, callback) {
+    if (Array.isArray(payload)) {
+      Promise.all(payload.map(this._sendAsync.bind(this)))
+      .then(data => callback(null, data))
+      .catch(error => callback(error, null));
     } else {
-      this.addProvider(new Provider(new Web3.providers.HttpProvider(rpcUrl)))
-    }
-
-    if (!noConflict) {
-      const web3 = new Web3(this)
-      context.Web3 = Web3
-      web3.sha3 = web3.utils.sha3
-      context.web3 = web3
+      this._sendAsync(payload)
+      .then(data => callback(null, data))
+      .catch(error => callback(error, null));
     }
   }
 
-  addProvider (source) {
-    this._providers.push(source)
-    source.setEngine(this)
-  }
-
-  addCallback (id, cb, isRPC) {
-    cb.isRPC = isRPC
-    this.callbacks[id] = cb
-  }
-
-  executeCallback (id, error, value) {
-    debug(`executing callback: \nid: ${id}\nvalue: ${value}\nerror: ${error}\n`)
-    let callback = this.callbacks[id]
-    if (callback.isRPC) {
-        const response = {'id': id, jsonrpc: '2.0', result: value, error: {message: error} }
-      if (error) {
-        callback(response, null)
-      } else {
-        callback(null, response)
+  _sendAsync(payload) {
+    return new Promise((resolve, reject) => {
+      if (!payload.id) {
+        payload.id = Utils.genId();
       }
-    } else {
-      callback(error, value)
-    }
-    delete this.callbacks[id]
-  }
-
-  sendAsync (payload, callback) {
-    const { bypassHooks } = this.options
-
-    if (!bypassHooks) {
-      switch (payload.method) {
-        case 'eth_accounts': {
-          const { address } = this.options,
-                { id, jsonrpc } = payload
-
-          callback(null, { id, jsonrpc, result: [address] })
-          break
-        }
-        case 'eth_coinbase': {
-          const { address: result } = this.options,
-                { id, jsonrpc } = payload
-
-          callback(null, { id, jsonrpc, result })
-          break
-        }
-        case 'net_version': {
-          const { networkVersion: result } = this.options,
-                { id, jsonrpc } = payload
-
-          callback(null, { id, jsonrpc, result })
-          break
-        }
-        case 'net_listening': {
-          const { id, jsonrpc } = payload
-          callback(null, { id, jsonrpc, result: true })
-          break
-        }
-        default: {
-          this.mapToHandler(payload, callback)
-          break
-        }
-      }
-    } else {
-      this.mapToHandler(payload, callback)
-    }
-  }
-
-  send (payload, callback) {
-    this.sendAsync(payload, callback)
-  }
-
-  mapToHandler (payload, callback) {
-    if (!callback) {
-      throw new Error('Trust web3 provider does not support synchronous requests.')
-    } else {
-      if (Array.isArray(payload)) {
-        // handle batch
-        map(payload, this._handleAsync.bind(this), callback)
-      } else {
-        // handle single
-        this._handleAsync(payload, callback)
-      }
-    }
-  }
-
-  _handleAsync (payload, finished) {
-    const self = this
-    let currentProvider = -1,
-        stack = []
-
-    next()
-
-    function next (after) {
-      currentProvider += 1
-
-      stack.unshift(after)
-
-      // bubbled down as far as we could go, and the request wasn't
-      // handled return an error
-      if (currentProvider >= self._providers.length) {
-        end(new Error(`Request for method '${payload.method}' not handled by any Subprovider. Please check your subprovider configuration to ensure this method is handled.`))
-      } else {
-        try {
-          const provider = self._providers[currentProvider]
-          provider.handleRequest(payload, next, end)
-        } catch (e) {
-          end(e)
-        }
-      }
-    }
-
-    function end (error, result) {
-      eachSeries(stack, function (fn, callback) {
-        if (fn) {
-          fn(error, result, callback)
-        } else {
-          callback()
-        }
-      }, function () {
-        const { id, jsonrpc } = payload
-
+      this.callbacks.set(payload.id, (error, data) => {
         if (error) {
-          finished(error, { error, message: error.stack || error.message || error, id, jsonrpc, code: -32000 })
+          reject(error);
         } else {
-          finished(null, { id, jsonrpc, result })
+          resolve(data);
         }
-      })
+      });
+
+      switch(payload.method) {
+        case "eth_accounts":
+          return this.sendResponse(payload.id, this.eth_accounts());
+        case "eth_coinbase":
+          return this.sendResponse(payload.id, this.eth_coinbase());
+        case "net_version":
+          return this.sendResponse(payload.id, this.net_version());
+        case "eth_sign":
+          return this.eth_sign(payload);
+        case "personal_sign":
+          return this.personal_sign(payload);
+        case "eth_signTypedData":
+          return this.eth_signTypedData(payload);
+        case "eth_sendTransaction":
+          return this.eth_sendTransaction(payload);
+        case "eth_newFilter":
+          return this.eth_newFilter(payload);
+        case "eth_newBlockFilter":
+          return this.eth_newBlockFilter(payload);
+        case "eth_newPendingTransactionFilter":
+          return this.eth_newPendingTransactionFilter(payload);
+        case "eth_uninstallFilter":
+          return this.eth_uninstallFilter(payload);
+        case "eth_getFilterChanges":
+          return this.eth_getFilterChanges(payload);
+        case "eth_getFilterLogs":
+          return this.eth_getFilterLogs(payload);
+        default:
+          this.callbacks.delete(payload.id);
+          return this.rpc.call(payload).then(resolve).catch(reject);
+      }
+    });
+  }
+
+  eth_accounts() {
+    return this.address ? [this.address] : [];
+  }
+
+  eth_coinbase() {
+    return this.address;
+  }
+
+  net_version() {
+    return this.chainId.toString(10) || null;
+  }
+
+  eth_sign(payload) {
+    this.postMessage("signMessage", payload.id, {data: payload.params[1]});
+  }
+
+  personal_sign(payload) {
+    this.postMessage("signPersonalMessage", payload.id, {data: payload.params[0]});
+  }
+
+  eth_signTypedData(payload) {
+    this.postMessage("signTypedMessage", payload.id, {data: payload.params[0]});
+  }
+
+  eth_sendTransaction(payload) {
+    this.postMessage("signTransaction", payload.id, payload.params[0]);
+  }
+
+  eth_newFilter(payload) {
+    this.filterMgr.newFilter(payload)
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_newBlockFilter(payload) {
+    this.filterMgr.newBlockFilter()
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_newPendingTransactionFilter(payload) {
+    this.filterMgr.newPendingTransactionFilter()
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_uninstallFilter(payload) {
+    this.filterMgr.uninstallFilter(payload.params[0])
+    .then(filterId => this.sendResponse(payload.id, filterId))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_getFilterChanges(payload) {
+    this.filterMgr.getFilterChanges(payload.params[0])
+    .then(data => this.sendResponse(payload.id, data))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  eth_getFilterLogs(payload) {
+    this.filterMgr.getFilterLogs(payload.params[0])
+    .then(data => this.sendResponse(payload.id, data))
+    .catch(error => this.sendError(payload.id, error));
+  }
+
+  postMessage(handler, id, data) {
+    window.webkit.messageHandlers[handler].postMessage({
+        "name": handler,
+        "object": data,
+        "id": id
+      });
+  }
+
+  sendResponse(id, result) {
+    let callback = this.callbacks.get(id);
+    let data = {jsonrpc: "2.0", id: id};
+    if (typeof result === "object" && result.jsonrpc && result.result) {
+      data.result = result.result;
+    } else {
+      data.result = result;
+    }
+    if (callback) {
+      callback(null, data);
+      this.callbacks.delete(id);
     }
   }
 
-  on (type, callback) {
-    if (this.websocketProvider) {
-      this.websocketProvider.on(type, callback)
+  sendError(id, error) {
+    console.log("<== sendError ", id, error);
+    let callback = this.callbacks.get(id);
+    if (callback) {
+      callback(error, null);
+      this.callbacks.delete(id);
     }
   }
-
-  isConnected() { return true }
 }
 
-if (typeof context.Trust === 'undefined') {
-  context.Trust = TrustWeb3Provider
-}
-
-module.exports = TrustWeb3Provider
+window.Trust = TrustWeb3Provider;
+window.Web3 = Web3;
