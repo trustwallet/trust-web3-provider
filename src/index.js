@@ -85,6 +85,8 @@ class TrustWeb3Provider {
           return this.eth_sign(payload);
         case "personal_sign":
           return this.personal_sign(payload);
+        case "personal_ecRecover":
+          return this.personal_ecRecover(payload);
         case "eth_signTypedData":
           return this.eth_signTypedData(payload);
         case "eth_sendTransaction":
@@ -126,6 +128,10 @@ class TrustWeb3Provider {
 
   personal_sign(payload) {
     this.postMessage("signPersonalMessage", payload.id, {data: payload.params[0]});
+  }
+
+  personal_ecRecover(payload) {
+    this.postMessage("ecRecover", payload.id, {signature: payload.params[1], message: payload.params[0]});
   }
 
   eth_signTypedData(payload) {
