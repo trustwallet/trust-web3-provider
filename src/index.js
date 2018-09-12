@@ -204,7 +204,7 @@ class TrustWeb3Provider {
     console.log("<== sendError ", id, error);
     let callback = this.callbacks.get(id);
     if (callback) {
-      callback(error, null);
+      callback(error instanceof Error ? error : new Error(error), null);
       this.callbacks.delete(id);
     }
   }
