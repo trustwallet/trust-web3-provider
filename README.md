@@ -14,6 +14,14 @@ If trust provider injected properly `isTrust` will be `true`
  web3.currentProvider.isTrust
 ```
 
+## Projects [probably] using TrustWeb3Provider
+
+- [Trust Wallet](https://trustwalletapp.com/)
+- [TokenPocket](https://tokenpocket.jp/)
+- [DappGo](https://www.cmcmbc.com/en-us/)
+- [Vault](https://vault.io)
+- Add your app here
+
 ## Installation
 
 ### iOS
