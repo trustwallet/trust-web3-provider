@@ -87,7 +87,8 @@ class TrustWeb3Provider {
           return this.personal_sign(payload);
         case "personal_ecRecover":
           return this.personal_ecRecover(payload);
-        case "eth_signTypedData", "eth_signTypedData_v3":
+        case "eth_signTypedData":
+        case "eth_signTypedData_v3":
           return this.eth_signTypedData(payload);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
