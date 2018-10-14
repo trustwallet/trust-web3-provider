@@ -4,6 +4,7 @@ import Web3 from "web3";
 import FilterMgr from "./filter";
 import RPCServer from "./rpc";
 import Utils from "./utils";
+import IdMapping from "./id_mapping";
 
 class TrustWeb3Provider {
   constructor(config) {
@@ -11,6 +12,7 @@ class TrustWeb3Provider {
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
     this.filterMgr = new FilterMgr(this.rpc);
+    this.idMapping = new IdMapping();
 
     this.callbacks = new Map;
     this.isTrust = true;
@@ -38,7 +40,7 @@ class TrustWeb3Provider {
       case "eth_uninstallFilter":
         this.sendAsync(payload, (error) => {
           if (error) {
-            console.log(error);
+            console.log("<== uninstallFilter error", error);
           }
         });
         response.result = true;
@@ -62,6 +64,7 @@ class TrustWeb3Provider {
   }
 
   _sendAsync(payload) {
+    this.idMapping.tryIntifyId(payload);
     return new Promise((resolve, reject) => {
       if (!payload.id) {
         payload.id = Utils.genId();
@@ -188,8 +191,9 @@ class TrustWeb3Provider {
   }
 
   sendResponse(id, result) {
+    let originId = this.idMapping.tryPopId(id) || id;
     let callback = this.callbacks.get(id);
-    let data = {jsonrpc: "2.0", id: id};
+    let data = {jsonrpc: "2.0", id: originId};
     if (typeof result === "object" && result.jsonrpc && result.result) {
       data.result = result.result;
     } else {
