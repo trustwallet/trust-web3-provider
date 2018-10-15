@@ -1,31 +1,11 @@
 "use strict";
 
-import Utils from "./utils";
+import IdMapping from "./id_mapping";
 
 class RPCServer {
   constructor(rpcUrl) {
     this.rpcUrl = rpcUrl;
-    this.intIds = new Map;
-  }
-
-  _intifyId(payload) {
-    if (!payload.id) {
-      payload.id = Utils.genId();
-      return;
-    }
-    if (typeof payload.id !== "number") {
-      let newId = Utils.genId();
-      this.intIds.set(newId, payload.id);
-      payload.id = newId;
-    }
-  }
-
-  _restoreId(payload) {
-    let id = this.intIds.get(payload.id);
-    if (id) {
-      this.intIds.delete(payload.id);
-      payload.id = id;
-    }
+    this.idMapping = new IdMapping();
   }
 
   getBlockNumber() {
@@ -44,7 +24,7 @@ class RPCServer {
 
   call(payload) {
     // console.log("==> call rpc ", payload);
-    this._intifyId(payload);
+    this.idMapping.tryIntifyId(payload);
     return fetch(this.rpcUrl, {
       method: "POST",
       headers: {
@@ -60,7 +40,7 @@ class RPCServer {
         console.log("<== rpc error", json.error);
         throw new Error(json.error.message || "rpc error");
       }
-      this._restoreId(json);
+      this.idMapping.tryRestoreId(json);
       return json;
     });
   }
