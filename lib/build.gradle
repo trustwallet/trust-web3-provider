@@ -29,7 +29,7 @@ dependencies {
 task copyJSProvider(type: Copy)
 
 copyJSProvider{
-    from '../../dist/trust-min.js'
+    from "../dist/trust-min.js"
     rename 'trust-min.js', 'trust.js'
     into 'src/main/res/raw'
 }
