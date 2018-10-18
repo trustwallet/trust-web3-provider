@@ -139,7 +139,7 @@ class TrustWeb3Provider {
   }
 
   eth_signTypedData(payload) {
-    this.postMessage("signTypedMessage", payload.id, {data: payload.params[0]});
+    this.postMessage("signTypedMessage", payload.id, {data: payload.params[1]});
   }
 
   eth_sendTransaction(payload) {
