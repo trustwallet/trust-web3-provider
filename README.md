@@ -21,6 +21,7 @@ If trust provider injected properly `isTrust` will be `true`
 - [DappGo](https://www.cmcmbc.com/en-us/)
 - [Vault](https://vault.io)
 - [Kcash](https://www.kcash.com/)
+- [ChainBow](https://ChainBow.io/)
 - Add your app here
 
 ## Installation
