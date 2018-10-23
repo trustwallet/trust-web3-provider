@@ -91,8 +91,9 @@ class TrustWeb3Provider {
         case "personal_ecRecover":
           return this.personal_ecRecover(payload);
         case "eth_signTypedData":
-        case "eth_signTypedData_v3":
           return this.eth_signTypedData(payload);
+        case "eth_signTypedData_v3":
+          return this.eth_signTypedDataV3(payload);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
         case "eth_newFilter":
@@ -139,7 +140,11 @@ class TrustWeb3Provider {
   }
 
   eth_signTypedData(payload) {
-    this.postMessage("signTypedMessage", payload.id, {data: payload.params[1]});
+    this.postMessage("signTypedMessage", payload.id, {data: payload.params[0]});
+  }
+
+  eth_signTypedDataV3(payload) {
+    this.postMessage("signTypedMessageV3", payload.id, {data: payload.params[1]});
   }
 
   eth_sendTransaction(payload) {
@@ -184,10 +189,10 @@ class TrustWeb3Provider {
 
   postMessage(handler, id, data) {
     window.webkit.messageHandlers[handler].postMessage({
-        "name": handler,
-        "object": data,
-        "id": id
-      });
+      "name": handler,
+      "object": data,
+      "id": id
+    });
   }
 
   sendResponse(id, result) {
