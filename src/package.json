@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rm -rf ../dist && parcel build index.js -o trust-min.js -d ../dist",
     "watch": "rm -rf ../dist && parcel watch index.js -o trust-min.js -d ../dist",
-    "lint": "eslint ."
+    "lint": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   },
   "keywords": [],
   "author": "Trust <support@trustwalletapp.com>",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "dependencies": {
     "web3": "^0.20.7"
   },
