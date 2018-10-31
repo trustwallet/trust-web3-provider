@@ -19,7 +19,8 @@
     "web3": "^0.20.7"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
     "eslint": "^5.4.0",
-    "parcel-bundler": "^1.9.7"
+    "parcel-bundler": ">=1.10.0"
   }
 }
