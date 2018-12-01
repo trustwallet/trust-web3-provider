@@ -9,6 +9,7 @@ import IdMapping from "./id_mapping";
 class TrustWeb3Provider {
   constructor(config) {
     this.address = config.address;
+    this.readonly = !!config.address;
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
     this.filterMgr = new FilterMgr(this.rpc);
@@ -20,6 +21,18 @@ class TrustWeb3Provider {
 
   isConnected() {
     return true;
+  }
+
+  setAddress(address) {
+    this.address = address;
+    this.readonly = !!address;
+  }
+
+  enable() {
+    return this._sendAsync({
+      method: "eth_requestAccounts",
+      params: []
+    });
   }
 
   send(payload) {
@@ -95,6 +108,8 @@ class TrustWeb3Provider {
           return this.eth_signTypedData(payload);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
+        case "eth_requestAccounts":
+          return this.eth_requestAccounts(payload);
         case "eth_newFilter":
           return this.eth_newFilter(payload);
         case "eth_newBlockFilter":
@@ -146,6 +161,10 @@ class TrustWeb3Provider {
     this.postMessage("signTransaction", payload.id, payload.params[0]);
   }
 
+  eth_requestAccounts(payload) {
+    this.postMessage("requestAccounts", payload.id, {});
+  }
+
   eth_newFilter(payload) {
     this.filterMgr.newFilter(payload)
     .then(filterId => this.sendResponse(payload.id, filterId))
@@ -183,6 +202,10 @@ class TrustWeb3Provider {
   }
 
   postMessage(handler, id, data) {
+    if (this.readonly && handler !== "requestAccounts") {
+      // don't forget to verify in the app
+      this.sendError(id, new Error("provider is readonly"));
+    }
     window.webkit.messageHandlers[handler].postMessage({
         "name": handler,
         "object": data,
