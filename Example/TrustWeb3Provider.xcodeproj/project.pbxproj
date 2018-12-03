@@ -54,7 +54,7 @@
 		C21C2822FF502C70248CBED9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		CA8DB6877E5830513FA359AD /* Pods-TrustWeb3Provider_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D91A7C4513C7274B3809282D /* Pods_TrustWeb3Provider_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TrustWeb3Provider_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F08F82901B708D284118EFFB /* TrustWeb3Provider.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TrustWeb3Provider.podspec; path = ../TrustWeb3Provider.podspec; sourceTree = "<group>"; };
+		F08F82901B708D284118EFFB /* TrustWeb3Provider.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TrustWeb3Provider.podspec; path = ../TrustWeb3Provider.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		F44112CD5DC8ACEC377D2F75 /* Pods-TrustWeb3Provider_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

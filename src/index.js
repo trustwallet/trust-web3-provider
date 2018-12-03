@@ -32,6 +32,9 @@ class TrustWeb3Provider {
     return this._sendAsync({
       method: "eth_requestAccounts",
       params: []
+    })
+    .then(result => {
+      return result.result;
     });
   }
 
