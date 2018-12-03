@@ -9,7 +9,7 @@ import IdMapping from "./id_mapping";
 class TrustWeb3Provider {
   constructor(config) {
     this.address = config.address;
-    this.readonly = !!config.address;
+    this.ready = !!config.address;
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
     this.filterMgr = new FilterMgr(this.rpc);
@@ -25,7 +25,7 @@ class TrustWeb3Provider {
 
   setAddress(address) {
     this.address = address;
-    this.readonly = !!address;
+    this.ready = !!address;
   }
 
   enable() {
@@ -202,15 +202,16 @@ class TrustWeb3Provider {
   }
 
   postMessage(handler, id, data) {
-    if (this.readonly && handler !== "requestAccounts") {
-      // don't forget to verify in the app
-      this.sendError(id, new Error("provider is readonly"));
-    }
-    window.webkit.messageHandlers[handler].postMessage({
+    if (this.ready || handler === "requestAccounts") {
+      window.webkit.messageHandlers[handler].postMessage({
         "name": handler,
         "object": data,
         "id": id
       });
+    } else {
+      // don't forget to verify in the app
+      this.sendError(id, new Error("provider is not ready"));
+    }
   }
 
   sendResponse(id, result) {
