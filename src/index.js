@@ -8,11 +8,8 @@ import IdMapping from "./id_mapping";
 
 class TrustWeb3Provider {
   constructor(config) {
-    this.address = config.address;
-    this.ready = !!config.address;
-    this.chainId = config.chainId;
-    this.rpc = new RPCServer(config.rpcUrl);
-    this.filterMgr = new FilterMgr(this.rpc);
+    this.setConfig(config);
+
     this.idMapping = new IdMapping();
 
     this.callbacks = new Map;
@@ -24,8 +21,16 @@ class TrustWeb3Provider {
   }
 
   setAddress(address) {
-    this.address = address;
+    this.address = (address || "").toLowerCase();
     this.ready = !!address;
+  }
+
+  setConfig(config) {
+    this.setAddress(config.address);
+
+    this.chainId = config.chainId;
+    this.rpc = new RPCServer(config.rpcUrl);
+    this.filterMgr = new FilterMgr(config.rpcUrl);
   }
 
   enable() {
