@@ -37,9 +37,11 @@ describe("TrustWeb3Provider constructor tests", () => {
     };
     let provider = new Trust(ropsten);
     let web3 = new Web3(provider);
+
     expect(web3.currentProvider.chainId).toEqual(3);
 
     web3.currentProvider.setConfig(mainnet);
+    expect(web3.currentProvider.chainId).toEqual(1);
     expect(web3.currentProvider.rpc.rpcUrl).toBe("https://mainnet.infura.io/apikey");
 
     web3.version.getNetwork((error, id) => {
