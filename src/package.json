@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rm -rf ../dist && parcel build index.js -o trust-min.js -d ../dist",
     "watch": "rm -rf ../dist && parcel watch index.js -o trust-min.js -d ../dist",
-    "lint": "eslint ."
+    "lint": "eslint . --fix",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,9 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "eslint": "^5.4.0",
+    "jest": "^23.6.0",
     "parcel-bundler": ">=1.10.0"
   }
 }
