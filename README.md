@@ -16,7 +16,7 @@ If trust provider injected properly `isTrust` will be `true`
 
 ## Projects [probably] using TrustWeb3Provider
 
-- [Trust Wallet](https://trustwalletapp.com/)
+- [Trust Wallet](https://trustwallet.com/)
 - [TokenPocket](https://tokenpocket.jp/)
 - [DappGo](https://www.cmcmbc.com/en-us/)
 - [Vault](https://vault.io)
