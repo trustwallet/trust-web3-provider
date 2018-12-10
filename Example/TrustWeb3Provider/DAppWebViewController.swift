@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://eth2.io"
+        return "https://js-eth-sign.surge.sh"
     }
 
     var infuraApiKey: String? {
@@ -26,7 +26,7 @@ class DAppWebViewController: UIViewController {
             address: "0x5Ee066cc1250E367423eD4Bad3b073241612811f",
             chainId: 1,
             rpcUrl: "https://mainnet.infura.io/v3/\(infuraApiKey!)",
-            privacyMode: true
+            privacyMode: false
         )
     }()
 
@@ -108,12 +108,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 preferredStyle: .alert
             )
             let address = scriptConfig.address
+            alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
+                webview?.evaluateJavaScript("window.ethereum.sendError(\(id), \"Canceled\")", completionHandler: nil)
+            }))
             alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
                 webview?.evaluateJavaScript("window.ethereum.setAddress(\"\(address)\");", completionHandler: nil)
                 webview?.evaluateJavaScript("window.ethereum.sendResponse(\(id), [\"\(address)\"])", completionHandler: nil)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.evaluateJavaScript("window.ethereum.sendError(\(id), \"Canceled\")", completionHandler: nil)
             }))
             present(alert, animated: true, completion: nil)
         default:
