@@ -34,7 +34,9 @@ class TrustWeb3Provider {
   }
 
   enable() {
-    return this._sendAsync({
+    // this may be undefined somehow
+    var that = this || window.ethereum;
+    return that._sendAsync({
       method: "eth_requestAccounts",
       params: []
     })
@@ -61,13 +63,13 @@ class TrustWeb3Provider {
       case "eth_uninstallFilter":
         this.sendAsync(payload, (error) => {
           if (error) {
-            console.log("<== uninstallFilter error", error);
+            console.log(`<== uninstallFilter ${error}`);
           }
         });
         response.result = true;
         break;
       default:
-        throw new Error("Trust does not support calling " + payload.method + " synchronously without a callback. Please provide a callback parameter to call " + payload.method + " asynchronously.");
+        throw new Error(`Trust does not support calling ${payload.method} synchronously without a callback. Please provide a callback parameter to call ${payload.method} asynchronously.`);
     }
     return response;
   }
@@ -238,7 +240,7 @@ class TrustWeb3Provider {
   }
 
   sendError(id, error) {
-    console.log("<== sendError ", id, error);
+    console.log(`<== ${id} sendError ${error}`, id, error);
     let callback = this.callbacks.get(id);
     if (callback) {
       callback(error instanceof Error ? error : new Error(error), null);
