@@ -43,6 +43,7 @@ describe("TrustWeb3Provider constructor tests", () => {
     web3.currentProvider.setConfig(mainnet);
     expect(web3.currentProvider.chainId).toEqual(1);
     expect(web3.currentProvider.rpc.rpcUrl).toBe(mainnet.rpcUrl);
+    expect(web3.currentProvider.filterMgr.rpc.rpcUrl).toBe(mainnet.rpcUrl);
 
     web3.version.getNetwork((error, id) => {
       expect(id).toBe("1");

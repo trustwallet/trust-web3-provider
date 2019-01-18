@@ -30,7 +30,7 @@ class TrustWeb3Provider {
 
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
-    this.filterMgr = new FilterMgr(config.rpcUrl);
+    this.filterMgr = new FilterMgr(this.rpc);
   }
 
   enable() {
