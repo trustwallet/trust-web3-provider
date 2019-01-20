@@ -17,6 +17,7 @@ class FilterMgr {
       options: this._normalizeFilter(payload.params[0])
     };
     let filterId = this._installFilter(filter);
+    // console.log("newFilter installed", payload, filterId);
     return this._getBlockNumber().then(blockNumber => {
       this.blockNumbers.set(filterId, blockNumber);
       return Utils.intToHex(filterId);
@@ -151,8 +152,8 @@ class FilterMgr {
       toBlock : this._normalizeParamBlock(filter.toBlock),
       topics : filter.topics
     };
-    if (filter.addresses) {
-      params.address = filter.addresses;
+    if (filter.address) {
+      params.address = filter.address;
     }
     return params;
   }
@@ -161,7 +162,7 @@ class FilterMgr {
     return {
       fromBlock : this._normalizeFilterBlock(params.fromBlock),
       toBlock : this._normalizeFilterBlock(params.toBlock),
-      addresses : undefined === params.address ? null : Array.isArray(params.address) ? params.address : [params.address],
+      address : undefined === params.address ? null : Array.isArray(params.address) ? params.address : [params.address],
       topics : params.topics || []
     };
   }
