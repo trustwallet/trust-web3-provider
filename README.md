@@ -23,6 +23,7 @@ If trust provider injected properly `isTrust` will be `true`
 - [DappGo](https://www.cmcmbc.com/en-us/)
 - [Vault](https://vault.io)
 - [Kcash](https://www.kcash.com/)
+- [WeiWallet](https://github.com/popshootjapan/WeiWallet-iOS/)
 - Add your app here
 
 ## Installation
