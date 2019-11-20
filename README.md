@@ -24,6 +24,7 @@ If trust provider injected properly `isTrust` will be `true`
 - [Vault](https://vault.io)
 - [Kcash](https://www.kcash.com/)
 - [WeiWallet](https://github.com/popshootjapan/WeiWallet-iOS/)
+- [Alice Wallet](https://github.com/alicedapp/AliceX)
 - Add your app here
 
 ## Installation
