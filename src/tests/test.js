@@ -55,6 +55,29 @@ describe("TrustWeb3Provider constructor tests", () => {
       done();
     });
   });
+
+  test("test eth_chainId", done => {
+    const ropsten = {
+      address: "0xbE74f965AC1BAf5Cc4cB89E6782aCE5AFf5Bd4db",
+      chainId: 3,
+      rpcUrl: "https://ropsten.infura.io/apikey",
+    };
+    const provider = new Trust(ropsten);
+    const web3 = new Web3(provider);
+
+    let request = {
+      jsonrpc: "2.0",
+      method: "eth_chainId",
+      id: 123
+    };
+    const response = web3.currentProvider.send(request);
+    expect(response.result).toBe("0x3");
+
+    web3.currentProvider.sendAsync(request, (error, result) => {
+      expect(result.result).toEqual("0x3");
+      done();
+    });
+  });
 });
 
 describe("TrustWeb3Provider FilterMgr tests", () => {

@@ -60,6 +60,9 @@ class TrustWeb3Provider {
       case "net_version":
         response.result = this.net_version();
         break;
+      case "eth_chainId":
+        response.result = this.eth_chainId();
+        break;
       case "eth_uninstallFilter":
         this.sendAsync(payload, (error) => {
           if (error) {
@@ -107,6 +110,8 @@ class TrustWeb3Provider {
           return this.sendResponse(payload.id, this.eth_coinbase());
         case "net_version":
           return this.sendResponse(payload.id, this.net_version());
+        case "eth_chainId":
+          return this.sendResponse(payload.id, this.eth_chainId());
         case "eth_sign":
           return this.eth_sign(payload);
         case "personal_sign":
@@ -149,6 +154,10 @@ class TrustWeb3Provider {
 
   net_version() {
     return this.chainId.toString(10) || null;
+  }
+
+  eth_chainId() {
+    return "0x" + this.chainId.toString(16);
   }
 
   eth_sign(payload) {
