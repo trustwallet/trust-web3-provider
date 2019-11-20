@@ -1,0 +1,2 @@
+dist/trust-min.js filter=lfs diff=lfs merge=lfs -text
+dist/trust-min.js.map filter=lfs diff=lfs merge=lfs -text
