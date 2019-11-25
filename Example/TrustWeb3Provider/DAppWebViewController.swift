@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://js-eth-sign.surge.sh"
+        return "https://migrate.makerdao.com"
     }
 
     var infuraApiKey: String? {
@@ -25,8 +25,7 @@ class DAppWebViewController: UIViewController {
         return WKUserScriptConfig(
             address: "0x5Ee066cc1250E367423eD4Bad3b073241612811f",
             chainId: 1,
-            rpcUrl: "https://mainnet.infura.io/v3/\(infuraApiKey!)",
-            privacyMode: false
+            rpcUrl: "https://mainnet.infura.io/\(infuraApiKey!)"
         )
     }()
 
@@ -41,6 +40,7 @@ class DAppWebViewController: UIViewController {
         config.userContentController = controller
         let webview = WKWebView(frame: .zero, configuration: config)
         webview.translatesAutoresizingMaskIntoConstraints = false
+        webview.uiDelegate = self
         return webview
     }()
 
@@ -58,7 +58,7 @@ class DAppWebViewController: UIViewController {
             let alert = UIAlertController(title: "No infura api key found", message: "Please set INFURA_API_KEY", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
-            return false
+            return true
         }
         return true
     }
@@ -109,15 +109,29 @@ extension DAppWebViewController: WKScriptMessageHandler {
             )
             let address = scriptConfig.address
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.evaluateJavaScript("window.ethereum.sendError(\(id), \"Canceled\")", completionHandler: nil)
+                webview?.evaluateJavaScript("window.ethereum._reject(\(id), \"Canceled\")", completionHandler: { (_, error) in
+                    print(error.debugDescription)
+                })
             }))
             alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
                 webview?.evaluateJavaScript("window.ethereum.setAddress(\"\(address)\");", completionHandler: nil)
-                webview?.evaluateJavaScript("window.ethereum.sendResponse(\(id), [\"\(address)\"])", completionHandler: nil)
+                webview?.evaluateJavaScript("window.ethereum._resolve(\(id), [\"\(address)\"])", completionHandler: { (_, error) in
+                    print(error.debugDescription)
+                })
             }))
             present(alert, animated: true, completion: nil)
         default:
             break
         }
+    }
+}
+
+extension DAppWebViewController: WKUIDelegate {
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        guard navigationAction.request.url != nil else {
+           return nil
+        }
+        _ = webView.load(navigationAction.request)
+        return nil
     }
 }
