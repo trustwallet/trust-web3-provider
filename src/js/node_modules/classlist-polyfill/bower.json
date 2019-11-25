@@ -1,0 +1,24 @@
+{
+  "name": "classlist-polyfill",
+  "description": "MDN's ClassList Polyfill",
+  "main": "src/index.js",
+  "authors": [
+    "Eli Grey <me@eligrey.com>",
+    "Yola Engineering <engineers@yola.com> (https://www.yola.com/)"
+  ],
+  "license": "Unlicense",
+  "keywords": [
+    "classList",
+    "polyfill",
+    "shim",
+    "cross-browser"
+  ],
+  "homepage": "https://github.com/yola/classlist-polyfill",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
