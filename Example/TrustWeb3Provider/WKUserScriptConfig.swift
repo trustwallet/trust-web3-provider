@@ -13,13 +13,7 @@ struct WKUserScriptConfig {
 
     let address: String
     let chainId: Int
-    let rpcUrl: String
-
-    var providerJsBundleUrl: URL {
-        let bundlePath = Bundle.main.path(forResource: "TrustWeb3Provider", ofType: "bundle")
-        let bundle = Bundle(path: bundlePath!)!
-        return bundle.url(forResource: "trust-min", withExtension: "js")!
-    }
+    let jsonRpcUrl: String
 
     var providerJsUrl: URL {
         return Bundle.main.url(forResource: "trust-min", withExtension: "js", subdirectory: "dist")!
@@ -34,13 +28,19 @@ struct WKUserScriptConfig {
     var injectedScript: WKUserScript {
         let source = """
         (function() {
-            var config = {
-                chainId: \(chainId),
-                rpcUrl: "\(rpcUrl)"
-            };
-            const provider = new window.Trust(config);
-            window.ethereum = provider;
-
+            var trustRelay = new TrustRelay();
+            var walletLink = new WalletLink({
+              relay: trustRelay,
+              appName: 'Trust',
+              appLogoUrl: ''
+            });
+            var ethereum = walletLink.makeWeb3Provider(
+                "\(jsonRpcUrl)",
+                \(chainId),
+                trustRelay
+            );
+            window.ethereum = ethereum;
+        
             window.chrome = {webstore: {}};
         })();
         """

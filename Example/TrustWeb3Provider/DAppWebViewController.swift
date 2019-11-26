@@ -25,7 +25,7 @@ class DAppWebViewController: UIViewController {
         return WKUserScriptConfig(
             address: "0x5Ee066cc1250E367423eD4Bad3b073241612811f",
             chainId: 1,
-            rpcUrl: "https://mainnet.infura.io/\(infuraApiKey!)"
+            jsonRpcUrl: "https://mainnet.infura.io/\(infuraApiKey!)"
         )
     }()
 
@@ -95,13 +95,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let json = message.json
         print(json)
-        guard let name = json["name"] as? String,
+        guard let name = (json["request"] as! [String: Any])["method"] as? String,
             let method = DAppMethod(rawValue: name),
-            let id = json["id"] as? Int64 else {
+            let id = json["id"] as? String else {
             return
         }
         switch method {
-        case .requestAccounts:
+        case .requestAccounts, .requestEthereumAccounts:
             let alert = UIAlertController(
                 title: webview.title,
                 message: "\(webview.url?.host! ?? "Website") would like to connect your account",
@@ -109,15 +109,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
             )
             let address = scriptConfig.address
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.evaluateJavaScript("window.ethereum._reject(\(id), \"Canceled\")", completionHandler: { (_, error) in
-                    print(error.debugDescription)
-                })
+                webview?.evaluateJavaScript("window.trustMessage({\"data\":{\"id\": \"\(id)\", \"response\": {\"errorMessage\": \"rejected\"}}});", completionHandler: nil)
             }))
             alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
-                webview?.evaluateJavaScript("window.ethereum.setAddress(\"\(address)\");", completionHandler: nil)
-                webview?.evaluateJavaScript("window.ethereum._resolve(\(id), [\"\(address)\"])", completionHandler: { (_, error) in
-                    print(error.debugDescription)
-                })
+                webview?.evaluateJavaScript("window.trustMessage({\"data\":{\"id\": \"\(id)\", \"response\": {\"result\": [\"\(address)\"]}}});", completionHandler: nil)
             }))
             present(alert, animated: true, completion: nil)
         default:
