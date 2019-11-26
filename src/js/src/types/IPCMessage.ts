@@ -14,4 +14,5 @@ export enum IPCMessageType {
 
 export interface IPCMessage<T extends IPCMessageType = any> {
   type: T
+  request?: any
 }

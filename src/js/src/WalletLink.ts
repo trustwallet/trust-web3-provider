@@ -16,6 +16,7 @@ export interface WalletLinkOptions {
   appName?: string
   appLogoUrl?: string | null
   walletLinkUrl?: string
+  relay?: WalletLinkRelay
 }
 
 export class WalletLink {
@@ -26,7 +27,7 @@ export class WalletLink {
   private _relay: WalletLinkRelay
 
   constructor(options: Readonly<WalletLinkOptions>) {
-    this._relay = new WalletLinkRelay({
+    this._relay = options.relay || new WalletLinkRelay({
       walletLinkUrl: options.walletLinkUrl || WALLETLINK_URL
     })
     this.setAppInfo(options.appName, options.appLogoUrl)
@@ -36,10 +37,12 @@ export class WalletLink {
 
   public makeWeb3Provider(
     jsonRpcUrl: string,
-    chainId: number = 1
+    chainId: number = 1,
+    relay?: WalletLinkRelay
   ): WalletLinkProvider {
+    relay = relay || this._relay;
     return new WalletLinkProvider({
-      relay: this._relay,
+      relay: relay,
       jsonRpcUrl,
       chainId
     })
