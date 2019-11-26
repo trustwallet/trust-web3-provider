@@ -6,16 +6,6 @@
 [![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/badge/platform-android-lightgrey.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.2.1)
 
-TrustWeb3Provider currently bundles [web3 0.20.x](https://github.com/TrustWallet/trust-web3-provider/blob/master/src/package.json#L21).
-
-## How to Identify Trust Provider
-
-If trust provider injected properly `isTrust` will be `true`
-
-```javascript
- web3.currentProvider.isTrust
-```
-
 ## Projects [probably] using TrustWeb3Provider
 
 - [Trust Wallet](https://trustwallet.com/)
