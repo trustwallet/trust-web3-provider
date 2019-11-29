@@ -109,10 +109,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
             )
             let address = scriptConfig.address
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.evaluateJavaScript("window.trustMessage({\"data\":{\"id\": \"\(id)\", \"response\": {\"errorMessage\": \"rejected\"}}});", completionHandler: nil)
+                webview?.evaluateJavaScript("window.ethereum.sendError(\"\(id)\", \"rejected\")", completionHandler: nil)
             }))
             alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
-                webview?.evaluateJavaScript("window.trustMessage({\"data\":{\"id\": \"\(id)\", \"response\": {\"result\": [\"\(address)\"]}}});", completionHandler: nil)
+                webview?.evaluateJavaScript("window.ethereum.sendResponse(\"\(id)\", [\"\(address)\"])", completionHandler: nil)
             }))
             present(alert, animated: true, completion: nil)
         default:
