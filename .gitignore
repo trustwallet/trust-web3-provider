@@ -36,7 +36,6 @@ Pods/
 
 # JS
 node_modules/
-src/js/node_modules/
 jspm_packages/
 staging/
 
