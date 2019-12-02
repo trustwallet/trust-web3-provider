@@ -9,5 +9,8 @@ cd  walletlink/js
 echo '\nInstalling dependencies...'
 npm install
 
+echo '\nRunning tests...'
+npm run test
+
 echo '\nBuilding project...'
 npm run build
