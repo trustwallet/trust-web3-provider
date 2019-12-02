@@ -2,7 +2,7 @@ echo '\ngetting Trust WalletLink...'
 if [ -d walletlink ]; then
     git submodule foreach git pull origin master
 else
-    git submodule add git@github.com:dpereskokov/walletlink.git
+    git submodule add git@github.com:trustwallet/walletlink.git
 fi
 cd  walletlink/js
 
