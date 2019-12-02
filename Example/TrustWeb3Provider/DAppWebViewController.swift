@@ -95,7 +95,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let json = message.json
         print(json)
-        guard let name = (json["request"] as! [String: Any])["method"] as? String,
+        guard let name = json["name"] as? String,
             let method = DAppMethod(rawValue: name),
             let id = json["id"] as? String else {
             return
