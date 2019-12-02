@@ -28,16 +28,9 @@ struct WKUserScriptConfig {
     var injectedScript: WKUserScript {
         let source = """
         (function() {
-            var trustRelay = new TrustRelay();
-            var walletLink = new WalletLink({
-              relay: trustRelay,
-              appName: 'Trust',
-              appLogoUrl: ''
-            });
-            var ethereum = walletLink.makeWeb3Provider(
+            var ethereum = TrustWeb3Provider(
                 "\(jsonRpcUrl)",
-                \(chainId),
-                trustRelay
+                \(chainId)
             );
             window.ethereum = ethereum;
         
