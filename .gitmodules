@@ -1,0 +1,3 @@
+[submodule "walletlink"]
+	path = walletlink
+	url = git@github.com:dpereskokov/walletlink.git

@@ -1,15 +1,10 @@
 echo '\ngetting Trust WalletLink...'
-if [ -d src ]; then
-    cd  src
-
-    git pull git@github.com:dpereskokov/walletlink.git
+if [ -d walletlink ]; then
+    git submodule foreach git pull origin master
 else
-    mkdir -p src
-    cd  src
-
-    git clone git@github.com:dpereskokov/walletlink.git .
+    git submodule add git@github.com:dpereskokov/walletlink.git
 fi
-cd  js
+cd  walletlink/js
 
 echo '\nInstalling dependencies...'
 npm install
