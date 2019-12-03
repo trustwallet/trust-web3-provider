@@ -15,6 +15,12 @@ struct WKUserScriptConfig {
     let chainId: Int
     let jsonRpcUrl: String
 
+    var providerJsBundleUrl: URL {
+        let bundlePath = Bundle.main.path(forResource: "TrustWeb3Provider", ofType: "bundle")
+        let bundle = Bundle(path: bundlePath!)!
+        return bundle.url(forResource: "trust-min", withExtension: "js")!
+    }
+
     var providerJsUrl: URL {
         return Bundle.main.url(forResource: "trust-min", withExtension: "js", subdirectory: "dist")!
     }

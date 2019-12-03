@@ -60,11 +60,10 @@ dependencies {
 
 ## Authors
 
-[vikmeup](https://github.com/vikmeup)
-[hewigovens](https://github.com/hewigovens)
-[madcake](https://github.com/madcake)
-[Mish Ochu](https://github.com/mishfit)
-[dpereskokov](https://github.com/dpereskokov)
+[vikmeup](https://github.com/vikmeup)  
+[hewigovens](https://github.com/hewigovens)  
+[madcake](https://github.com/madcake)  
+[dpereskokov](https://github.com/dpereskokov)  
 
 ## License
 
