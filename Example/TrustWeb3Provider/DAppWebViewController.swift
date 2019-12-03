@@ -101,7 +101,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             return
         }
         switch method {
-        case .requestAccounts, .requestEthereumAccounts:
+        case .requestEthereumAccounts:
             let alert = UIAlertController(
                 title: webview.title,
                 message: "\(webview.url?.host! ?? "Website") would like to connect your account",

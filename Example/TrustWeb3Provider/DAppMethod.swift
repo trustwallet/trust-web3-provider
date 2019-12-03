@@ -13,6 +13,5 @@ enum DAppMethod: String, CaseIterable {
     case signTypedMessage
     case signPersonalMessage
     case signMessage
-    case requestAccounts
     case requestEthereumAccounts
 }
