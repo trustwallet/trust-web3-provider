@@ -76,14 +76,14 @@ public struct Web3Request: Decodable {
 
     public struct TransactionSign {
         public let chainId: Int
-        public let data: String?
+        public let data: String
         public let fromAddress: String
         public let gasLimit: String?
-        public let gasPriceInWei: String
+        public let gasPriceInWei: String?
         public let nonce: String?
         public let shouldSubmit: Bool
         public let toAddress: String?
-        public let weiValue: String
+        public let weiValue: String?
     }
 
     public struct TransactionSend {
