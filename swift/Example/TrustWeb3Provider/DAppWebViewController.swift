@@ -9,6 +9,7 @@
 import UIKit
 import WebKit
 import TrustWalletCore
+import TrustWeb3Provider
 
 class DAppWebViewController: UIViewController {
 
@@ -16,6 +17,7 @@ class DAppWebViewController: UIViewController {
 
     var homepage: String {
         return "https://js-eth-sign-2.surge.sh"
+//        return "http://127.0.0.1:8000"
     }
 
     var infuraApiKey: String? {
@@ -39,7 +41,7 @@ class DAppWebViewController: UIViewController {
     lazy var webview: WKWebView = {
         let config = WKWebViewConfiguration()
         let controller = WKUserContentController()
-        controller.addUserScript(scriptConfig.providerScript)
+        controller.addUserScript(scriptConfig.providerScript(url: scriptConfig.providerJsUrl))
         controller.addUserScript(scriptConfig.injectedScript)
         controller.add(self, name: Web3Request.id)
         config.userContentController = controller
@@ -98,10 +100,9 @@ extension DAppWebViewController: UITextFieldDelegate {
 
 extension DAppWebViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print(message.json)
+        print(String(data: message.jsonData, encoding: .utf8) ?? "error!!")
         do {
-            let request = try JSONDecoder().decode(Web3Request.self, from: message.jsonData)
-            print(request)
+            let request = try message.decode()
             let method = request.request.method
             let id = request.id
             switch method {
@@ -112,11 +113,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     preferredStyle: .alert
                 )
                 let address = scriptConfig.address
-                alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                    webview?.evaluateJavaScript("ethereum.sendError(\"\(id)\", \"rejected\")")
+                alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [unowned webview] _ in
+                    webview.sendResults([address], to: id)
                 }))
-                alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
-                    webview?.evaluateJavaScript("ethereum.sendResponse(\"\(id)\", [\"\(address)\"])")
+                alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [unowned webview] _ in
+                    webview.sendError("user rejected", to: id)
                 }))
                 present(alert, animated: true, completion: nil)
             case .signEthereumMessage:
@@ -130,7 +131,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 }
                 var signed = privateKey.sign(digest: data, curve: .secp256k1)!
                 signed[64] += 27
-                webview.evaluateJavaScript("ethereum.sendResponse(\"\(id)\", \"\("0x" + signed.hexString)\")")
+                webview.sendResult("0x" + signed.hexString, to: id)
             case .ethereumAddressFromSignedMessage:
                 guard case Web3Request.ParamsType.ecRecover(let params) = request.request.params else {
                     return
@@ -143,9 +144,9 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 let message = Hash.keccak256(data: data)
                 let publicKey = privateKey.getPublicKeySecp256k1(compressed: false)
                 if (publicKey.verify(signature: signature, message: message)) {
-                    webview.evaluateJavaScript("ethereum.sendResponse(\"\(id)\", \"\(address)\")")
+                    webview.sendResult(address, to: id)
                 } else {
-                    webview.evaluateJavaScript("ethereum.sendError(\"\(id)\", \"failed\")")
+                    webview.sendError("recover failed", to: id)
                 }
                 break
             case .signEthereumTransaction:
@@ -158,7 +159,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
-    func ecRecover(signature: Data, message: Data) -> String? {
+    private func ecRecover(signature: Data, message: Data) -> String? {
         let data = ethereumMessage(for: message)
         let hash = Hash.keccak256(data: data)
         guard let publicKey = PublicKey.recover(signature: signature, message: hash),

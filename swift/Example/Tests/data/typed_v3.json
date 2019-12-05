@@ -1,0 +1,13 @@
+{
+    "type": "WEB3_REQUEST",
+    "id": "a5d5bbb107011a31",
+    "request": {
+        "method": "signEthereumMessage",
+        "params": {
+            "message": "0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2",
+            "address": "0xa429de9ff8a825d06d672332f3fcba962e6b14b2",
+            "addPrefix": false,
+            "typedDataJson": "{\n  \"types\": {\n    \"EIP712Domain\": [\n      {\n        \"name\": \"name\",\n        \"type\": \"string\"\n      },\n      {\n        \"name\": \"version\",\n        \"type\": \"string\"\n      },\n      {\n        \"name\": \"chainId\",\n        \"type\": \"uint256\"\n      },\n      {\n        \"name\": \"verifyingContract\",\n        \"type\": \"address\"\n      }\n    ],\n    \"Person\": [\n      {\n        \"name\": \"name\",\n        \"type\": \"string\"\n      },\n      {\n        \"name\": \"wallet\",\n        \"type\": \"address\"\n      }\n    ],\n    \"Mail\": [\n      {\n        \"name\": \"from\",\n        \"type\": \"Person\"\n      },\n      {\n        \"name\": \"to\",\n        \"type\": \"Person\"\n      },\n      {\n        \"name\": \"contents\",\n        \"type\": \"string\"\n      }\n    ]\n  },\n  \"primaryType\": \"Mail\",\n  \"domain\": {\n    \"name\": \"Ether Mail\",\n    \"version\": \"1\",\n    \"chainId\": \"1\",\n    \"verifyingContract\": \"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\"\n  },\n  \"message\": {\n    \"from\": {\n      \"name\": \"Cow\",\n      \"wallet\": \"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"\n    },\n    \"to\": {\n      \"name\": \"Bob\",\n      \"wallet\": \"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"\n    },\n    \"contents\": \"Hello, Bob!\"\n  }\n}"
+        }
+    }
+}

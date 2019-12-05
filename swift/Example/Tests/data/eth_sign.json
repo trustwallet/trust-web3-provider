@@ -1,0 +1,13 @@
+{
+    "type": "WEB3_REQUEST",
+    "id": "7686df80dc2f5e22",
+    "request": {
+        "method": "signEthereumMessage",
+        "params": {
+            "message": "0x879a053d4800c6354e76c7985a865d2922c82fb5b3f4577b2fe08b998954f2e0",
+            "address": "0xa429de9ff8a825d06d672332f3fcba962e6b14b2",
+            "addPrefix": false,
+            "typedDataJson": null
+        }
+    }
+}

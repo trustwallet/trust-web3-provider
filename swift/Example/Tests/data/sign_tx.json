@@ -1,0 +1,18 @@
+{
+  "request" : {
+    "method" : "signEthereumTransaction",
+    "params" : {
+      "chainId" : 1,
+      "shouldSubmit" : true,
+      "data" : "0x",
+      "gasPriceInWei" : "6000000000",
+      "gasLimit" : null,
+      "toAddress" : "0x11f4d0a3c12e86b4b5f39b213f7e19d048276dae",
+      "weiValue" : "1000000000000000",
+      "fromAddress" : "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
+      "nonce" : null
+    }
+  },
+  "type" : "WEB3_REQUEST",
+  "id" : "8371f1bf6c3476bd"
+}

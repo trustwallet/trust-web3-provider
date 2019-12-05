@@ -1,0 +1,11 @@
+{
+    "request": {
+        "method": "requestEthereumAccounts",
+        "params": {
+            "appName": "Trust",
+            "appLogoUrl": null
+        }
+    },
+    "id": "4b86361b8449873c",
+    "type": "WEB3_REQUEST"
+}

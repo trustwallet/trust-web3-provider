@@ -1,0 +1,12 @@
+{
+    "type": "WEB3_REQUEST",
+    "id": "f46503cd6978a37d",
+    "request": {
+        "method": "ethereumAddressFromSignedMessage",
+        "params": {
+            "message": "0x68656c6c6f21",
+            "signature": "0x0498139312b7a9a46a76467b4b9555033f3e19baa07787e20a067a0fe39020ed2e87af421bbb1b5aa303fc8fe7aa5c37ece13ed7bc39973d1e76f44eacf9d5ac1b",
+            "addPrefix": true
+        }
+    }
+}
