@@ -1,16 +1,31 @@
 PODS:
+  - SwiftProtobuf (1.7.0)
+  - TrustWalletCore (0.12.28):
+    - TrustWalletCore/Core (= 0.12.28)
+  - TrustWalletCore/Core (0.12.28):
+    - TrustWalletCore/Types
+  - TrustWalletCore/Types (0.12.28):
+    - SwiftProtobuf
   - TrustWeb3Provider (0.3.3)
 
 DEPENDENCIES:
+  - TrustWalletCore
   - TrustWeb3Provider (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - SwiftProtobuf
+    - TrustWalletCore
 
 EXTERNAL SOURCES:
   TrustWeb3Provider:
     :path: "../"
 
 SPEC CHECKSUMS:
+  SwiftProtobuf: 4fd9645e69b72cbae6ec8da5be0cdd20ca6565dd
+  TrustWalletCore: b7629820c443a4ae8c436bc8bc2196224610ac9e
   TrustWeb3Provider: 24e6a91dbb8d761b160e7ed8cdbce4547740ba47
 
-PODFILE CHECKSUM: 829efc8647d0ee01b26b2be3792300457edd14cd
+PODFILE CHECKSUM: 2264a1157e5115be2492b2af3c4b70701faf2a45
 
 COCOAPODS: 1.8.4

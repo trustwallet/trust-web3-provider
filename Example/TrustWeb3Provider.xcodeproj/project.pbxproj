@@ -15,7 +15,7 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		BB544C0521B230BE00E8C525 /* dist in Resources */ = {isa = PBXBuildFile; fileRef = BB544C0421B230BE00E8C525 /* dist */; };
-		BB544C0721B2381C00E8C525 /* DAppMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0621B2381C00E8C525 /* DAppMethod.swift */; };
+		BB544C0721B2381C00E8C525 /* Web3Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0621B2381C00E8C525 /* Web3Request.swift */; };
 		BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */; };
 		BB544C0B21B24E0400E8C525 /* WKUserScriptConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */; };
 		FDDE2BAA1C0D200991CE0EA4 /* Pods_TrustWeb3Provider_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960FF95B0B6171E298739B73 /* Pods_TrustWeb3Provider_Example.framework */; };
@@ -48,7 +48,7 @@
 		9DAA0C45AA8BFEFF95137B87 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		BB544C0221B2124500E8C525 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		BB544C0421B230BE00E8C525 /* dist */ = {isa = PBXFileReference; lastKnownFileType = folder; name = dist; path = ../../dist; sourceTree = "<group>"; };
-		BB544C0621B2381C00E8C525 /* DAppMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppMethod.swift; sourceTree = "<group>"; };
+		BB544C0621B2381C00E8C525 /* Web3Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Web3Request.swift; sourceTree = "<group>"; };
 		BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKScriptMessage+JSON.swift"; sourceTree = "<group>"; };
 		BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKUserScriptConfig.swift; sourceTree = "<group>"; };
 		C21C2822FF502C70248CBED9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -115,7 +115,7 @@
 				BB544C0421B230BE00E8C525 /* dist */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* DAppWebViewController.swift */,
-				BB544C0621B2381C00E8C525 /* DAppMethod.swift */,
+				BB544C0621B2381C00E8C525 /* Web3Request.swift */,
 				BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */,
 				BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -185,6 +185,7 @@
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
 				9B817E892CA041381AC440F9 /* [CP] Copy Pods Resources */,
+				C6B2290AF72E0698A05825EA /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -312,6 +313,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		C6B2290AF72E0698A05825EA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		DA5CA147B5E6FFAF7D4DA3D2 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -337,7 +355,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB544C0721B2381C00E8C525 /* DAppMethod.swift in Sources */,
+				BB544C0721B2381C00E8C525 /* Web3Request.swift in Sources */,
 				607FACD81AFB9204008FA782 /* DAppWebViewController.swift in Sources */,
 				BB544C0B21B24E0400E8C525 /* WKUserScriptConfig.swift in Sources */,
 				BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */,
@@ -430,7 +448,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -478,7 +496,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
