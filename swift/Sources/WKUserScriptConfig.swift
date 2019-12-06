@@ -38,7 +38,7 @@ public struct WKUserScriptConfig {
     public var injectedScript: WKUserScript {
         let source = """
         (function() {
-            window.ethereum = TrustWeb3Provider("\(jsonRpcUrl)", \(chainId));
+            window.ethereum = TrustWeb3Provider("\(jsonRpcUrl)", \(chainId), "\("Trust iOS")");
             window.chrome = {webstore: {}};
         })();
         """
