@@ -64,7 +64,7 @@ class Tests: XCTestCase {
         let request = try JSONDecoder().decode(Web3Request.self, from: data)
 
         XCTAssertNotNil(request)
-        guard case Web3Request.ParamsType.sendTx(let tx) = request.request.params else {
+        guard case Web3Request.ParamsType.sendTx = request.request.params else {
             throw Web3Request.Error.decodeError
         }
     }
