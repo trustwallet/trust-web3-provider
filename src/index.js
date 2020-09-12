@@ -1,18 +1,20 @@
 "use strict";
 
 import Web3 from "web3";
-import FilterMgr from "./filter";
 import RPCServer from "./rpc";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
+import {EventEmitter} from "events";
 
-class TrustWeb3Provider {
+class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
+    super();
     this.setConfig(config);
 
     this.idMapping = new IdMapping();
 
     this.callbacks = new Map;
+    this.wrapResults = new Map;
     this.isTrust = true;
   }
 
@@ -30,26 +32,16 @@ class TrustWeb3Provider {
 
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
-    this.filterMgr = new FilterMgr(this.rpc);
   }
 
   enable() {
     // this may be undefined somehow
     var that = this || window.ethereum;
-    return that._sendAsync({
-      method: "eth_requestAccounts",
-      params: []
-    })
-    .then(result => {
-      return result.result;
-    });
+    return that.request({ method: "eth_requestAccounts", params: [] });
   }
 
   send(payload) {
-    let response = {
-      jsonrpc: "2.0",
-      id: payload.id
-    };
+    let response = {jsonrpc: "2.0", id: payload.id};
     switch(payload.method) {
       case "eth_accounts":
         response.result = this.eth_accounts();
@@ -63,14 +55,6 @@ class TrustWeb3Provider {
       case "eth_chainId":
         response.result = this.eth_chainId();
         break;
-      case "eth_uninstallFilter":
-        this.sendAsync(payload, (error) => {
-          if (error) {
-            console.log(`<== uninstallFilter ${error}`);
-          }
-        });
-        response.result = true;
-        break;
       default:
         throw new Error(`Trust does not support calling ${payload.method} synchronously without a callback. Please provide a callback parameter to call ${payload.method} asynchronously.`);
     }
@@ -79,17 +63,22 @@ class TrustWeb3Provider {
 
   sendAsync(payload, callback) {
     if (Array.isArray(payload)) {
-      Promise.all(payload.map(this._sendAsync.bind(this)))
+      Promise.all(payload.map(this._request.bind(this)))
       .then(data => callback(null, data))
       .catch(error => callback(error, null));
     } else {
-      this._sendAsync(payload)
+      this._request(payload)
       .then(data => callback(null, data))
       .catch(error => callback(error, null));
     }
   }
 
-  _sendAsync(payload) {
+  request(payload) {
+    var that = this || window.ethereum;
+    return that._request(payload, false);
+  }
+
+  _request(payload, wrapResult = true) {
     this.idMapping.tryIntifyId(payload);
     return new Promise((resolve, reject) => {
       if (!payload.id) {
@@ -102,6 +91,7 @@ class TrustWeb3Provider {
           resolve(data);
         }
       });
+      this.wrapResults.set(payload.id, wrapResult);
 
       switch(payload.method) {
         case "eth_accounts":
@@ -126,20 +116,25 @@ class TrustWeb3Provider {
         case "eth_requestAccounts":
           return this.eth_requestAccounts(payload);
         case "eth_newFilter":
-          return this.eth_newFilter(payload);
         case "eth_newBlockFilter":
-          return this.eth_newBlockFilter(payload);
         case "eth_newPendingTransactionFilter":
-          return this.eth_newPendingTransactionFilter(payload);
         case "eth_uninstallFilter":
-          return this.eth_uninstallFilter(payload);
         case "eth_getFilterChanges":
-          return this.eth_getFilterChanges(payload);
         case "eth_getFilterLogs":
-          return this.eth_getFilterLogs(payload);
+        case "eth_subscribe":
+          throw new Error(`Trust does not support calling ${payload.method}. Please use your own solution`);
         default:
+          // no need to save
           this.callbacks.delete(payload.id);
-          return this.rpc.call(payload).then(resolve).catch(reject);
+          this.wrapResults.delete(payload.id);
+          return this.rpc.call(payload)
+            .then((response) => {
+              if (!wrapResult) {
+                return response.result;
+              }
+              return response;
+            })
+            .catch(reject);
       }
     });
   }
@@ -184,42 +179,6 @@ class TrustWeb3Provider {
     this.postMessage("requestAccounts", payload.id, {});
   }
 
-  eth_newFilter(payload) {
-    this.filterMgr.newFilter(payload)
-    .then(filterId => this.sendResponse(payload.id, filterId))
-    .catch(error => this.sendError(payload.id, error));
-  }
-
-  eth_newBlockFilter(payload) {
-    this.filterMgr.newBlockFilter()
-    .then(filterId => this.sendResponse(payload.id, filterId))
-    .catch(error => this.sendError(payload.id, error));
-  }
-
-  eth_newPendingTransactionFilter(payload) {
-    this.filterMgr.newPendingTransactionFilter()
-    .then(filterId => this.sendResponse(payload.id, filterId))
-    .catch(error => this.sendError(payload.id, error));
-  }
-
-  eth_uninstallFilter(payload) {
-    this.filterMgr.uninstallFilter(payload.params[0])
-    .then(filterId => this.sendResponse(payload.id, filterId))
-    .catch(error => this.sendError(payload.id, error));
-  }
-
-  eth_getFilterChanges(payload) {
-    this.filterMgr.getFilterChanges(payload.params[0])
-    .then(data => this.sendResponse(payload.id, data))
-    .catch(error => this.sendError(payload.id, error));
-  }
-
-  eth_getFilterLogs(payload) {
-    this.filterMgr.getFilterLogs(payload.params[0])
-    .then(data => this.sendResponse(payload.id, data))
-    .catch(error => this.sendError(payload.id, error));
-  }
-
   postMessage(handler, id, data) {
     if (this.ready || handler === "requestAccounts") {
       window.webkit.messageHandlers[handler].postMessage({
@@ -236,6 +195,7 @@ class TrustWeb3Provider {
   sendResponse(id, result) {
     let originId = this.idMapping.tryPopId(id) || id;
     let callback = this.callbacks.get(id);
+    let wrapResult = this.wrapResults.get(id);
     let data = {jsonrpc: "2.0", id: originId};
     if (typeof result === "object" && result.jsonrpc && result.result) {
       data.result = result.result;
@@ -243,7 +203,7 @@ class TrustWeb3Provider {
       data.result = result;
     }
     if (callback) {
-      callback(null, data);
+      wrapResult ? callback(null, data) : callback(null, result);
       this.callbacks.delete(id);
     }
   }

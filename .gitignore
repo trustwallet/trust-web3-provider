@@ -31,6 +31,9 @@ Carthage/Build
 
 Pods/
 
+.vscode/
+.settings/
+
 
 
 # JS
