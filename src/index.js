@@ -3,19 +3,31 @@
 import Web3 from "web3";
 import RPCServer from "./rpc";
 import Utils from "./utils";
-import IdMapping from "./id_mapping";
-import {EventEmitter} from "events";
+import { EventEmitter } from "events";
+
+class ProviderRpcError extends Error {
+  constructor(code, message) {
+    super();
+    this.code = code;
+    this.message = message;
+  }
+
+  toString() {
+    return `${this.message} (${this.code})`;
+  }
+}
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
     super();
     this.setConfig(config);
 
-    this.idMapping = new IdMapping();
-
     this.callbacks = new Map;
     this.wrapResults = new Map;
     this.isTrust = true;
+    this.isDebug = false;
+
+    this._emitConnect(config.chainId);
   }
 
   isConnected() {
@@ -56,7 +68,10 @@ class TrustWeb3Provider extends EventEmitter {
         response.result = this.eth_chainId();
         break;
       default:
-        throw new Error(`Trust does not support calling ${payload.method} synchronously without a callback. Please provide a callback parameter to call ${payload.method} asynchronously.`);
+        throw new ProviderRpcError(
+          4200, 
+          `Trust does not support calling ${payload.method} synchronously without a callback. Please provide a callback parameter to call ${payload.method} asynchronously.`
+        );
     }
     return response;
   }
@@ -79,7 +94,9 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   _request(payload, wrapResult = true) {
-    this.idMapping.tryIntifyId(payload);
+    if (this.isDebug) {
+      console.log(`==> _request payload ${JSON.stringify(payload)}`);
+    }
     return new Promise((resolve, reject) => {
       if (!payload.id) {
         payload.id = Utils.genId();
@@ -122,21 +139,28 @@ class TrustWeb3Provider extends EventEmitter {
         case "eth_getFilterChanges":
         case "eth_getFilterLogs":
         case "eth_subscribe":
-          throw new Error(`Trust does not support calling ${payload.method}. Please use your own solution`);
+          throw new ProviderRpcError(
+            4200, 
+            `Trust does not support calling ${payload.method}. Please use your own solution`
+          );
         default:
-          // no need to save
+          // call upstream rpc
           this.callbacks.delete(payload.id);
           this.wrapResults.delete(payload.id);
           return this.rpc.call(payload)
             .then((response) => {
-              if (!wrapResult) {
-                return response.result;
-              }
-              return response;
+                if (this.isDebug) {
+                  console.log(`<== rpc response ${JSON.stringify(response)}`);
+                }
+                wrapResult ? resolve(response) : resolve(response.result);
             })
             .catch(reject);
       }
     });
+  }
+
+  _emitConnect(chainId) {
+	  this.emit("connect", {chainId: chainId});
   }
 
   eth_accounts() {
@@ -188,19 +212,21 @@ class TrustWeb3Provider extends EventEmitter {
       });
     } else {
       // don't forget to verify in the app
-      this.sendError(id, new Error("provider is not ready"));
+      this.sendError(id, new ProviderRpcError(4100, "provider is not ready"));
     }
   }
 
   sendResponse(id, result) {
-    let originId = this.idMapping.tryPopId(id) || id;
     let callback = this.callbacks.get(id);
     let wrapResult = this.wrapResults.get(id);
-    let data = {jsonrpc: "2.0", id: originId};
+    let data = {jsonrpc: "2.0", id: id};
     if (typeof result === "object" && result.jsonrpc && result.result) {
       data.result = result.result;
     } else {
       data.result = result;
+    }
+    if (this.isDebug) {
+      console.log(`<== sendResponse id: ${id}, result: ${result}, data: ${JSON.stringify(data)}`);
     }
     if (callback) {
       wrapResult ? callback(null, data) : callback(null, result);

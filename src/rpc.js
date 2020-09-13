@@ -1,11 +1,8 @@
 "use strict";
 
-import IdMapping from "./id_mapping";
-
 class RPCServer {
   constructor(rpcUrl) {
     this.rpcUrl = rpcUrl;
-    this.idMapping = new IdMapping();
   }
 
   getBlockNumber() {
@@ -24,7 +21,6 @@ class RPCServer {
 
   call(payload) {
     // console.log("==> call rpc ", payload);
-    this.idMapping.tryIntifyId(payload);
     return fetch(this.rpcUrl, {
       method: "POST",
       headers: {
@@ -40,7 +36,6 @@ class RPCServer {
         console.log("<== rpc error", json.error);
         throw new Error(json.error.message || "rpc error");
       }
-      this.idMapping.tryRestoreId(json);
       return json;
     });
   }

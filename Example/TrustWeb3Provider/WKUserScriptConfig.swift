@@ -56,6 +56,7 @@ struct WKUserScriptConfig {
                     rpcUrl: "\(rpcUrl)"
                 };
                 const provider = new window.Trust(config);
+                provider.isDebug = true;
                 window.ethereum = provider;
                 window.web3 = new window.Web3(provider);
                 window.web3.eth.defaultAccount = config.address;
