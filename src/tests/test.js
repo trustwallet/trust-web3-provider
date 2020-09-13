@@ -67,16 +67,33 @@ describe("TrustWeb3Provider constructor tests", () => {
     const provider = new Trust(ropsten);
     const web3 = new Web3(provider);
 
-    let request = {
-      jsonrpc: "2.0",
-      method: "eth_chainId",
-      id: 123
-    };
+    let request = {jsonrpc: "2.0", method: "eth_chainId", id: 123};
+
+    provider.request(request).then((chainId) => {
+      expect(chainId).toEqual("0x3");
+      done();
+    })
+
     const response = web3.currentProvider.send(request);
     expect(response.result).toBe("0x3");
 
     web3.currentProvider.sendAsync(request, (error, result) => {
       expect(result.result).toEqual("0x3");
+      done();
+    });
+  });
+
+  test("test eth_accounts", done => {
+    const provider = new Trust(config);
+    const web3 = new Web3(provider);
+
+    provider.request({method: "eth_accounts"}).then((accounts) => {
+      expect(accounts).toEqual(["0x5ee066cc1250e367423ed4bad3b073241612811f"]);
+      done();
+    })
+
+    web3.currentProvider.sendAsync({method: "eth_accounts"}, (error, data) => {
+      expect(data.result).toEqual(["0x5ee066cc1250e367423ed4bad3b073241612811f"]);
       done();
     });
   });
