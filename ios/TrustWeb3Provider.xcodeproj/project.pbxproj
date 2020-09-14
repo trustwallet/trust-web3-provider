@@ -18,6 +18,7 @@
 		BB544C0721B2381C00E8C525 /* DAppMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0621B2381C00E8C525 /* DAppMethod.swift */; };
 		BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */; };
 		BB544C0B21B24E0400E8C525 /* WKUserScriptConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */; };
+		BBD19299250F1DF500E313BA /* WKWebView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD19298250F1DF500E313BA /* WKWebView+Extensions.swift */; };
 		FDDE2BAA1C0D200991CE0EA4 /* Pods_TrustWeb3Provider_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960FF95B0B6171E298739B73 /* Pods_TrustWeb3Provider_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 		BB544C0621B2381C00E8C525 /* DAppMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppMethod.swift; sourceTree = "<group>"; };
 		BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKScriptMessage+JSON.swift"; sourceTree = "<group>"; };
 		BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKUserScriptConfig.swift; sourceTree = "<group>"; };
+		BBD19298250F1DF500E313BA /* WKWebView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Extensions.swift"; sourceTree = "<group>"; };
 		C21C2822FF502C70248CBED9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		CA8DB6877E5830513FA359AD /* Pods-TrustWeb3Provider_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D91A7C4513C7274B3809282D /* Pods_TrustWeb3Provider_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TrustWeb3Provider_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,8 +93,8 @@
 			isa = PBXGroup;
 			children = (
 				BB544C0221B2124500E8C525 /* README.md */,
-				607FACF51AFB993E008FA782 /* Podspec Metadata */,
-				607FACD21AFB9204008FA782 /* Example for TrustWeb3Provider */,
+				607FACF51AFB993E008FA782 /* Podspec */,
+				607FACD21AFB9204008FA782 /* Example */,
 				607FACE81AFB9204008FA782 /* Tests */,
 				607FACD11AFB9204008FA782 /* Products */,
 				8B5580A260F8CFEF1414545F /* Pods */,
@@ -109,7 +111,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		607FACD21AFB9204008FA782 /* Example for TrustWeb3Provider */ = {
+		607FACD21AFB9204008FA782 /* Example */ = {
 			isa = PBXGroup;
 			children = (
 				BB544C0421B230BE00E8C525 /* dist */,
@@ -118,12 +120,13 @@
 				BB544C0621B2381C00E8C525 /* DAppMethod.swift */,
 				BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */,
 				BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */,
+				BBD19298250F1DF500E313BA /* WKWebView+Extensions.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
-			name = "Example for TrustWeb3Provider";
+			name = Example;
 			path = TrustWeb3Provider;
 			sourceTree = "<group>";
 		};
@@ -152,14 +155,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		607FACF51AFB993E008FA782 /* Podspec Metadata */ = {
+		607FACF51AFB993E008FA782 /* Podspec */ = {
 			isa = PBXGroup;
 			children = (
 				F08F82901B708D284118EFFB /* TrustWeb3Provider.podspec */,
 				9DAA0C45AA8BFEFF95137B87 /* README.md */,
 				C21C2822FF502C70248CBED9 /* LICENSE */,
 			);
-			name = "Podspec Metadata";
+			name = Podspec;
 			sourceTree = "<group>";
 		};
 		8B5580A260F8CFEF1414545F /* Pods */ = {
@@ -185,6 +188,7 @@
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
 				9B817E892CA041381AC440F9 /* [CP] Copy Pods Resources */,
+				18F19AD2B2E6FCC4FDC02A1A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -221,26 +225,25 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1170;
 				ORGANIZATIONNAME = CocoaPods;
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1170;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1170;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
 				};
 			};
 			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "TrustWeb3Provider" */;
 			compatibilityVersion = "Xcode 11.0";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -277,6 +280,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		18F19AD2B2E6FCC4FDC02A1A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		6F4DDF0DB98752309D4DFBCD /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -342,6 +362,7 @@
 				BB544C0B21B24E0400E8C525 /* WKUserScriptConfig.swift in Sources */,
 				BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				BBD19299250F1DF500E313BA /* WKWebView+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -387,6 +408,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -430,7 +452,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -442,6 +464,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -478,7 +501,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -501,7 +524,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -519,7 +542,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -535,7 +558,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -547,7 +570,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
