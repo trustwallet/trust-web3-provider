@@ -3,6 +3,7 @@
 import Web3 from "web3";
 import RPCServer from "./rpc";
 import Utils from "./utils";
+import IdMapping from "./id_mapping";
 import { EventEmitter } from "events";
 
 class ProviderRpcError extends Error {
@@ -22,6 +23,7 @@ class TrustWeb3Provider extends EventEmitter {
     super();
     this.setConfig(config);
 
+    this.idMapping = new IdMapping();
     this.callbacks = new Map;
     this.wrapResults = new Map;
     this.isTrust = true;
@@ -94,6 +96,7 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   _request(payload, wrapResult = true) {
+    this.idMapping.tryIntifyId(payload);
     if (this.isDebug) {
       console.log(`==> _request payload ${JSON.stringify(payload)}`);
     }
@@ -217,9 +220,10 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   sendResponse(id, result) {
+    let originId = this.idMapping.tryPopId(id) || id;
     let callback = this.callbacks.get(id);
     let wrapResult = this.wrapResults.get(id);
-    let data = {jsonrpc: "2.0", id: id};
+    let data = {jsonrpc: "2.0", id: originId};
     if (typeof result === "object" && result.jsonrpc && result.result) {
       data.result = result.result;
     } else {
