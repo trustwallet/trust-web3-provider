@@ -1,22 +1,17 @@
+// Copyright © 2017-2020 Trust Wallet.
+//
+// This file is part of Trust. The full Trust copyright notice, including
+// terms governing use, modification, and redistribution, is contained in the
+// file LICENSE at the root of the source code distribution tree.
+
 "use strict";
 
 import Web3 from "web3";
 import RPCServer from "./rpc";
+import ProviderRpcError from "./error";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
 import { EventEmitter } from "events";
-
-class ProviderRpcError extends Error {
-  constructor(code, message) {
-    super();
-    this.code = code;
-    this.message = message;
-  }
-
-  toString() {
-    return `${this.message} (${this.code})`;
-  }
-}
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
@@ -29,11 +24,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.isTrust = true;
     this.isDebug = false;
 
-    this._emitConnect(config.chainId);
-  }
-
-  isConnected() {
-    return true;
+    this.emitConnect(config.chainId);
   }
 
   setAddress(address) {
@@ -48,12 +39,30 @@ class TrustWeb3Provider extends EventEmitter {
     this.rpc = new RPCServer(config.rpcUrl);
   }
 
+  request(payload) {
+    var that = this || window.ethereum;
+    return that._request(payload, false);
+  }
+
+  /**
+   * @deprecated Listen to "connect" event instead.
+   */
+  isConnected() {
+    return true;
+  }
+
+  /**
+   * @deprecated Use request({method: "eth_requestAccounts"}) instead.
+   */
   enable() {
     // this may be undefined somehow
     var that = this || window.ethereum;
     return that.request({ method: "eth_requestAccounts", params: [] });
   }
 
+  /**
+   * @deprecated Use request() method instead.
+   */
   send(payload) {
     let response = {jsonrpc: "2.0", id: payload.id};
     switch(payload.method) {
@@ -78,6 +87,9 @@ class TrustWeb3Provider extends EventEmitter {
     return response;
   }
 
+  /**
+   * @deprecated Use request() method instead.
+   */
   sendAsync(payload, callback) {
     if (Array.isArray(payload)) {
       Promise.all(payload.map(this._request.bind(this)))
@@ -90,11 +102,9 @@ class TrustWeb3Provider extends EventEmitter {
     }
   }
 
-  request(payload) {
-    var that = this || window.ethereum;
-    return that._request(payload, false);
-  }
-
+  /**
+   * @private Internal rpc handler
+   */
   _request(payload, wrapResult = true) {
     this.idMapping.tryIntifyId(payload);
     if (this.isDebug) {
@@ -162,8 +172,8 @@ class TrustWeb3Provider extends EventEmitter {
     });
   }
 
-  _emitConnect(chainId) {
-	  this.emit("connect", {chainId: chainId});
+  emitConnect(chainId) {
+    this.emit("connect", {chainId: chainId});
   }
 
   eth_accounts() {
@@ -206,6 +216,9 @@ class TrustWeb3Provider extends EventEmitter {
     this.postMessage("requestAccounts", payload.id, {});
   }
 
+  /**
+   * @private Internal js -> native message handler
+   */
   postMessage(handler, id, data) {
     if (this.ready || handler === "requestAccounts") {
       window.webkit.messageHandlers[handler].postMessage({
@@ -219,6 +232,9 @@ class TrustWeb3Provider extends EventEmitter {
     }
   }
 
+  /**
+   * @private Internal native result -> js 
+   */
   sendResponse(id, result) {
     let originId = this.idMapping.tryPopId(id) || id;
     let callback = this.callbacks.get(id);
@@ -238,6 +254,9 @@ class TrustWeb3Provider extends EventEmitter {
     }
   }
 
+  /**
+   * @private Internal native error -> js 
+   */
   sendError(id, error) {
     console.log(`<== ${id} sendError ${error}`);
     let callback = this.callbacks.get(id);
