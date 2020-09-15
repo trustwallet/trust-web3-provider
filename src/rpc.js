@@ -1,11 +1,14 @@
-"use strict";
+// Copyright © 2017-2020 Trust Wallet.
+//
+// This file is part of Trust. The full Trust copyright notice, including
+// terms governing use, modification, and redistribution, is contained in the
+// file LICENSE at the root of the source code distribution tree.
 
-import IdMapping from "./id_mapping";
+"use strict";
 
 class RPCServer {
   constructor(rpcUrl) {
     this.rpcUrl = rpcUrl;
-    this.idMapping = new IdMapping();
   }
 
   getBlockNumber() {
@@ -23,8 +26,6 @@ class RPCServer {
   }
 
   call(payload) {
-    // console.log("==> call rpc ", payload);
-    this.idMapping.tryIntifyId(payload);
     return fetch(this.rpcUrl, {
       method: "POST",
       headers: {
@@ -35,12 +36,10 @@ class RPCServer {
     })
     .then(response => response.json())
     .then(json => {
-      // console.log("<== rpc result", json);
       if (!json.result && json.error) {
         console.log("<== rpc error", json.error);
         throw new Error(json.error.message || "rpc error");
       }
-      this.idMapping.tryRestoreId(json);
       return json;
     });
   }

@@ -1,3 +1,9 @@
+// Copyright © 2017-2020 Trust Wallet.
+//
+// This file is part of Trust. The full Trust copyright notice, including
+// terms governing use, modification, and redistribution, is contained in the
+// file LICENSE at the root of the source code distribution tree.
+
 "use strict";
 
 require("../index");
@@ -48,7 +54,9 @@ describe("TrustWeb3Provider constructor tests", () => {
     web3.currentProvider.setConfig(mainnet);
     expect(web3.currentProvider.chainId).toEqual(1);
     expect(web3.currentProvider.rpc.rpcUrl).toBe(mainnet.rpcUrl);
-    expect(web3.currentProvider.filterMgr.rpc.rpcUrl).toBe(mainnet.rpcUrl);
+
+    expect(provider.request).not.toBeUndefined;
+    expect(provider.on).not.toBeUndefined;
 
     web3.version.getNetwork((error, id) => {
       expect(id).toBe("1");
@@ -65,11 +73,13 @@ describe("TrustWeb3Provider constructor tests", () => {
     const provider = new Trust(ropsten);
     const web3 = new Web3(provider);
 
-    let request = {
-      jsonrpc: "2.0",
-      method: "eth_chainId",
-      id: 123
-    };
+    let request = {jsonrpc: "2.0", method: "eth_chainId", id: 123};
+
+    provider.request(request).then((chainId) => {
+      expect(chainId).toEqual("0x3");
+      done();
+    });
+
     const response = web3.currentProvider.send(request);
     expect(response.result).toBe("0x3");
 
@@ -78,22 +88,19 @@ describe("TrustWeb3Provider constructor tests", () => {
       done();
     });
   });
-});
 
-describe("TrustWeb3Provider FilterMgr tests", () => {
-  test("test normalizeFilter()", () => {
+  test("test eth_accounts", done => {
     const provider = new Trust(config);
     const web3 = new Web3(provider);
-    const options = {
-      "topics":[null, null, null, null],
-      "address": "0x729d19f657bd0614b4985cf1d82531c67569197b",
-      "fromBlock": "latest"
-    };
 
-    web3.eth.filter(options);
-    const normalized = provider.filterMgr._normalizeFilter(options);
+    provider.request({method: "eth_accounts"}).then((accounts) => {
+      expect(accounts).toEqual(["0x5ee066cc1250e367423ed4bad3b073241612811f"]);
+      done();
+    });
 
-    expect(provider.filterMgr.filters.get(1)).toBeDefined();
-    expect(Array.isArray(normalized.address)).toBeTruthy();
+    web3.currentProvider.sendAsync({method: "eth_accounts"}, (error, data) => {
+      expect(data.result).toEqual(["0x5ee066cc1250e367423ed4bad3b073241612811f"]);
+      done();
+    });
   });
 });
