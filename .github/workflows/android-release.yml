@@ -1,34 +1,37 @@
 name: Android Release
 
 on:
-  push:
-    tags:
-      - '*'
-  pull_request:
-    tags:
-      - '*'
+  release:
+    types:
+      - created
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         node-version: [14.x]
+
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     - name: Build and test
       run: |
         npm install
         npm build
         npm test
       working-directory: src
+
     - name: Publish
       run: |
-        ./gradlew
+        ./gradlew assemble
+        ./gradlew publish
       env:
-        GPR_USER: ${{GITHUB_USER}}
-        GPR_API_KEY: ${{secrets.GITHUB_TOKEN}}
+        TAG_NAME: ${{ github.event.release.tag_name }}
+        GPR_USER: ${{ GITHUB_ACTOR }}
+        GPR_API_KEY: ${{ secrets.GITHUB_TOKEN }}

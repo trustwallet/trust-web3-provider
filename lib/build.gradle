@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 
-group='com.trustwalletapp.web3jprovider'
+group='com.trustwallet.web3'
 
 def getArtificatId = { ->
-    return "web3jprovider"
+    return "web3-provider"
 }
 def getVersionName = { ->
-    return "0.3.9"
+    return System.getenv('TAG_NAME') ?: "0.3.9"
 }
 
 android {
@@ -18,6 +18,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
+        project.archivesBaseName = getArtificatId()
         versionName getVersionName()
     }
 
@@ -44,7 +45,7 @@ preBuild.dependsOn copyJSProvider
 
 publishing {
     publications {
-        bar(MavenPublication) {
+        web3provider(MavenPublication) {
             groupId group
             artifactId getArtificatId()
             version getVersionName()
@@ -57,7 +58,7 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/trustwallet/trust-web3-provider")
             credentials {
-                username = System.getenv("GPR_USER")
+                username = System.getenv("GPR_USER") ?: "trust-bot"
                 password = System.getenv("GPR_API_KEY")
             }
         }
