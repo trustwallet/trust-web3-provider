@@ -101,5 +101,5 @@ coverage.json
 *.swp
 *.swo
 *~
-.vscode/
+lib/src/main/res/raw/
 

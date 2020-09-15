@@ -4,14 +4,21 @@ apply plugin: 'maven-publish'
 
 group='com.trustwalletapp.web3jprovider'
 
+def getArtificatId = { ->
+    return "web3jprovider"
+}
+def getVersionName = { ->
+    return "0.3.9"
+}
+
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
-        versionName '0.3.9'
+        versionName getVersionName()
     }
 
     buildTypes {
@@ -23,18 +30,17 @@ android {
 
 }
 
-dependencies {
-    
+dependencies {}
+
+task copyJSProvider(type: Copy)
+
+copyJSProvider{
+    from "../dist/trust-min.js"
+    rename "trust-min.js", "trust.js"
+    into "src/main/res/raw"
 }
 
 preBuild.dependsOn copyJSProvider
-
-def getArtificatId = { ->
-    return "web3jprovider"
-}
-def getVersionName = { ->
-    return "0.3.9"
-}
 
 publishing {
     publications {
