@@ -1,10 +1,8 @@
+// Copyright © 2017-2020 Trust Wallet.
 //
-//  WKScriptMessage+JSON.swift
-//  TrustWeb3Provider_Example
-//
-//  Created by hewigovens on 12/1/18.
-//  Copyright © 2018 hewigovens. All rights reserved.
-//
+// This file is part of Trust. The full Trust copyright notice, including
+// terms governing use, modification, and redistribution, is contained in the
+// file LICENSE at the root of the source code distribution tree.
 
 import Foundation
 import WebKit
