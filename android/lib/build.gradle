@@ -58,7 +58,7 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/trustwallet/trust-web3-provider")
             credentials {
-                username = System.getenv("GPR_USER") ?: "trust-bot"
+                username = System.getenv("GPR_USER")
                 password = System.getenv("GPR_API_KEY")
             }
         }

@@ -34,5 +34,5 @@ jobs:
       working-directory: android
       env:
         TAG_NAME: ${{ github.event.release.tag_name }}
-        GPR_USER: ${{ GITHUB_ACTOR }}
+        GPR_USER: ${{ secrets.BOT_GITHUB_USER }}
         GPR_API_KEY: ${{ secrets.GITHUB_TOKEN }}
