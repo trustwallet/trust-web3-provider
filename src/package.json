@@ -4,7 +4,8 @@
   "description": "Trust Web3 Provider",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf ../dist && parcel build index.js -o trust-min.js -d ../dist",
+    "build": "rm -rf ../dist && parcel build index.js --no-source-maps -o trust-min.js -d ../dist",
+    "build:android": "rm -rf ../android/lib/src/main/res/raw/trust.js && mkdir -pv ../android/lib/src/main/res/raw/ && parcel build index.js --no-source-maps -o trust.js -d ../android/lib/src/main/res/raw/",
     "watch": "rm -rf ../dist && parcel watch index.js -o trust-min.js -d ../dist",
     "lint": "eslint . --fix",
     "test": "jest"

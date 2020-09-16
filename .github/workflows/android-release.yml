@@ -23,7 +23,7 @@ jobs:
     - name: Build and test
       run: |
         npm install
-        npm build
+        npm run build:android
         npm test
       working-directory: src
 
