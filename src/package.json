@@ -3,9 +3,12 @@
   "version": "0.3.0",
   "description": "Trust Web3 Provider",
   "main": "index.js",
+  "android": {
+    "dist": "../android/lib/src/main/res/raw/"
+  },
   "scripts": {
     "build": "rm -rf ../dist && parcel build index.js --no-source-maps -o trust-min.js -d ../dist",
-    "build:android": "rm -rf ../android/lib/src/main/res/raw/trust.js && mkdir -pv ../android/lib/src/main/res/raw/ && parcel build index.js --no-source-maps -o trust.js -d ../android/lib/src/main/res/raw/",
+    "build:android": "rm -rf $npm_package_android_dist/trust.js && mkdir -pv $npm_package_android_dist && parcel build index.js --no-source-maps -o trust.js -d $npm_package_android_dist",
     "watch": "rm -rf ../dist && parcel watch index.js -o trust-min.js -d ../dist",
     "lint": "eslint . --fix",
     "test": "jest"

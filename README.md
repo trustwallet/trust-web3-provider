@@ -31,7 +31,11 @@ Here is an example project located at `ios/TrustWeb3Provider.xcworkspace` to dem
 
 ### Android
 
-TrustWeb3Provider is available through [Jitpack](https://jitpack.io). To install it:
+TrustWeb3Provider is available through [Jitpack](https://jitpack.io) and [GitHub Packages](https://github.com/trustwallet/trust-web3-provider/packages), new version will only be available in GitHub.
+
+#### Jitpack
+
+To install it:
 
 Step 1. Add jitpack in your root build.gradle at the end of repositories:
 
@@ -51,11 +55,15 @@ dependencies {
 }
 ```
 
+#### GitHub Packages
+
+[Configuring Gradle for use with GitHub Packages](https://docs.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-gradle-for-use-with-github-packages)
+
 ## Authors
 
-[vikmeup](https://github.com/vikmeup)
-[hewigovens](https://github.com/hewigovens)
-[madcake](https://github.com/madcake)
+[vikmeup](https://github.com/vikmeup)  
+[hewigovens](https://github.com/hewigovens)  
+[madcake](https://github.com/madcake)  
 
 ## License
 
