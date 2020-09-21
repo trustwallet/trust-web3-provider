@@ -40,7 +40,11 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   request(payload) {
-    var that = this || window.ethereum;
+    // this points to window in methods like web3.eth.getAccounts()
+    var that = this;
+    if (!(this instanceof TrustWeb3Provider)) {
+      that = window.ethereum
+    }
     return that._request(payload, false);
   }
 
@@ -55,9 +59,8 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request({method: "eth_requestAccounts"}) instead.
    */
   enable() {
-    // this may be undefined somehow
-    var that = this || window.ethereum;
-    return that.request({ method: "eth_requestAccounts", params: [] });
+    console.log('enable() is deprecated, please use window.ethereum.request({method: "eth_requestAccounts"}) instead.')
+    return this.request({ method: "eth_requestAccounts", params: [] });
   }
 
   /**
@@ -91,12 +94,18 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request() method instead.
    */
   sendAsync(payload, callback) {
+    console.log('sendAsync(data, callback) is deprecated, please use window.ethereum.request(data) instead.')
+    // this points to window in methods like web3.eth.getAccounts()
+    var that = this;
+    if (!(this instanceof TrustWeb3Provider)) {
+      that = window.ethereum
+    }
     if (Array.isArray(payload)) {
-      Promise.all(payload.map(this._request.bind(this)))
+      Promise.all(payload.map(that._request.bind(that)))
       .then(data => callback(null, data))
       .catch(error => callback(error, null));
     } else {
-      this._request(payload)
+      that._request(payload)
       .then(data => callback(null, data))
       .catch(error => callback(error, null));
     }
@@ -149,8 +158,6 @@ class TrustWeb3Provider extends EventEmitter {
         case "eth_newBlockFilter":
         case "eth_newPendingTransactionFilter":
         case "eth_uninstallFilter":
-        case "eth_getFilterChanges":
-        case "eth_getFilterLogs":
         case "eth_subscribe":
           throw new ProviderRpcError(
             4200, 
