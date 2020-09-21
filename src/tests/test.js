@@ -92,14 +92,20 @@ describe("TrustWeb3Provider constructor tests", () => {
   test("test eth_accounts", done => {
     const provider = new Trust(config);
     const web3 = new Web3(provider);
+    const addresses = ["0x5ee066cc1250e367423ed4bad3b073241612811f"];
+
+    web3.eth.getAccounts((error, accounts) => {
+      expect(accounts).toEqual(addresses);
+      done();
+    })
 
     provider.request({method: "eth_accounts"}).then((accounts) => {
-      expect(accounts).toEqual(["0x5ee066cc1250e367423ed4bad3b073241612811f"]);
+      expect(accounts).toEqual(addresses);
       done();
     });
 
     web3.currentProvider.sendAsync({method: "eth_accounts"}, (error, data) => {
-      expect(data.result).toEqual(["0x5ee066cc1250e367423ed4bad3b073241612811f"]);
+      expect(data.result).toEqual(addresses);
       done();
     });
   });

@@ -37,7 +37,7 @@ TrustWeb3Provider is available through [Jitpack](https://jitpack.io) and [GitHub
 
 To install it:
 
-Step 1. Add jitpack in your root build.gradle at the end of repositories:
+Step 1. Add jitpack to `repositories` in your root `build.gradle` file:
 
 ```groovy
 allprojects {
@@ -59,6 +59,31 @@ dependencies {
 
 [Configuring Gradle for use with GitHub Packages](https://docs.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-gradle-for-use-with-github-packages)
 
+Step 1. Add GitHub Packages to `repositories` in your root `build.gradle` file:
+
+```groovy
+allprojects {
+    repositories {
+        maven {
+            name = "GitHub Packages"
+            url = uri("https://maven.pkg.github.com/trustwallet/trust-web3-provider")
+            credentials {
+                username = System.getenv('GITHUB_USER')
+                password = System.getenv('GITHUB_TOKEN')
+            }
+        }
+    }
+}
+```
+
+Step 2. Add the dependency
+
+```groovy
+dependencies {
+    implementation group: 'com.trustwallet', name: 'web3-provider', version: '0.4.2'
+}
+```
+e
 ## Authors
 
 [vikmeup](https://github.com/vikmeup)  
