@@ -12,6 +12,7 @@ import ProviderRpcError from "./error";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
 import { EventEmitter } from "events";
+import isUtf8 from 'isutf8';
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
@@ -200,7 +201,13 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   eth_sign(payload) {
-    this.postMessage("signMessage", payload.id, {data: payload.params[1]});
+    const data = payload.params[1];
+    const buffer = Utils.hex2buffer(data);
+    if (isutf8(buffer)) {
+      this.postMessage("signPersonalMessage", payload.id, {data: data});
+    } else {
+      this.postMessage("signMessage", payload.id, {data: payload.params[1]});
+    }
   }
 
   personal_sign(payload) {

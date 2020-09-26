@@ -6,6 +6,8 @@
 
 "use strict";
 
+import { Buffer } from 'buffer';
+
 class Utils {
   static genId() {
     return new Date().getTime() + Math.floor(Math.random() * 1000);
@@ -35,6 +37,14 @@ class Utils {
     }
     let hexString = int.toString(16);
     return "0x" + hexString;
+  }
+
+  static hexToBuffer(str) {
+    return Buffer.from(str.replace('0x', ''), 'hex');
+  }
+
+  static bufferToHex(buf) {
+    return Buffer.from(buf).toString('hex');
   }
 }
 
