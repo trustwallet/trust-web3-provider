@@ -202,11 +202,17 @@ class TrustWeb3Provider extends EventEmitter {
 
   eth_sign(payload) {
     const data = payload.params[1];
-    const buffer = Utils.hex2buffer(data);
-    if (isutf8(buffer)) {
-      this.postMessage("signPersonalMessage", payload.id, {data: data});
+    var buffer;
+    if ((typeof (data) === "string")) {
+      buffer = Utils.hexToBuffer(data);
     } else {
-      this.postMessage("signMessage", payload.id, {data: payload.params[1]});
+      buffer = Buffer.from(data);
+    }
+    const hex = buffer.toString('hex');
+    if (isUtf8(buffer)) {
+      this.postMessage("signPersonalMessage", payload.id, {data: hex});
+    } else {
+      this.postMessage("signMessage", payload.id, {data: hex});
     }
   }
 
