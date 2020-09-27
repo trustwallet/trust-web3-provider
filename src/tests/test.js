@@ -6,13 +6,21 @@
 
 "use strict";
 
+var ethUtil = require('ethereumjs-util')
 require("../index");
 const Trust = window.Trust;
 const Web3 = require("web3");
-const config = {
-  address: "0x5Ee066cc1250E367423eD4Bad3b073241612811f",
+
+const mainnet = {
+  address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
   chainId: 1,
-  rpcUrl: process.env.INFURA_API_KEY ? `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}` : ""
+  rpcUrl: "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310"
+};
+
+const ropsten = {
+  address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
+  chainId: 3,
+  rpcUrl: "https://ropsten.infura.io/apikey",
 };
 
 describe("TrustWeb3Provider constructor tests", () => {
@@ -27,7 +35,7 @@ describe("TrustWeb3Provider constructor tests", () => {
       chainId: 1,
       rpcUrl: ""
     });
-    const address = "0x5Ee066cc1250E367423eD4Bad3b073241612811f";
+    const address = mainnet.address
     expect(provider.address).toBe("");
 
     provider.setAddress(address);
@@ -36,16 +44,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test setConfig", done => {
-    const mainnet = {
-      address: "0xbE74f965AC1BAf5Cc4cB89E6782aCE5AFf5Bd4db",
-      chainId: 1,
-      rpcUrl: "https://mainnet.infura.io/apikey"
-    };
-    const ropsten = {
-      address: "0xbE74f965AC1BAf5Cc4cB89E6782aCE5AFf5Bd4db",
-      chainId: 3,
-      rpcUrl: "https://ropsten.infura.io/apikey",
-    };
+
     const provider = new Trust(ropsten);
     const web3 = new Web3(provider);
 
@@ -65,11 +64,6 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_chainId", done => {
-    const ropsten = {
-      address: "0xbE74f965AC1BAf5Cc4cB89E6782aCE5AFf5Bd4db",
-      chainId: 3,
-      rpcUrl: "https://ropsten.infura.io/apikey",
-    };
     const provider = new Trust(ropsten);
     const web3 = new Web3(provider);
 
@@ -90,9 +84,9 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_accounts", done => {
-    const provider = new Trust(config);
+    const provider = new Trust(mainnet);
     const web3 = new Web3(provider);
-    const addresses = ["0x5ee066cc1250e367423ed4bad3b073241612811f"];
+    const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
 
     web3.eth.getAccounts((error, accounts) => {
       expect(accounts).toEqual(addresses);
@@ -109,4 +103,29 @@ describe("TrustWeb3Provider constructor tests", () => {
       done();
     });
   });
-});
+
+  test("test eth_sign", done => {
+    const provider = new Trust(mainnet);
+    const web3 = new Web3(provider);
+    const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
+    const signed = "0x730ec377cfc7090e08366fad4758aad721dbb51e187efe45426a7e56d1ff053947ab1a7b0bd7b138c48a9f3d3b92bd83f4265abbe9876930faaf7fbb980b219d1c";
+
+    window.webkit = {
+      messageHandlers: {
+        signMessage: {
+          postMessage: (message) => {
+            provider.sendResponse(message.id, signed);
+          }
+        }
+      }
+    }
+
+    var hash = ethUtil.keccak256(Buffer.from("An amazing message, for use with MetaMask!", "utf8"));
+    var hex = "0x" + hash.toString("hex");
+    web3.eth.sign(addresses[0], hex, (err, result) => {
+      expect(result).toEqual(signed);
+      done();
+    });
+  });
+
+}); // describe()
