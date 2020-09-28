@@ -6,7 +6,7 @@
 
 "use strict";
 
-var ethUtil = require('ethereumjs-util')
+var ethUtil = require("ethereumjs-util");
 require("../index");
 const Trust = window.Trust;
 const Web3 = require("web3");
@@ -35,7 +35,7 @@ describe("TrustWeb3Provider constructor tests", () => {
       chainId: 1,
       rpcUrl: ""
     });
-    const address = mainnet.address
+    const address = mainnet.address;
     expect(provider.address).toBe("");
 
     provider.setAddress(address);
@@ -91,7 +91,7 @@ describe("TrustWeb3Provider constructor tests", () => {
     web3.eth.getAccounts((error, accounts) => {
       expect(accounts).toEqual(addresses);
       done();
-    })
+    });
 
     provider.request({method: "eth_accounts"}).then((accounts) => {
       expect(accounts).toEqual(addresses);
@@ -118,7 +118,7 @@ describe("TrustWeb3Provider constructor tests", () => {
           }
         }
       }
-    }
+    };
 
     var hash = ethUtil.keccak256(Buffer.from("An amazing message, for use with MetaMask!", "utf8"));
     var hex = "0x" + hash.toString("hex");

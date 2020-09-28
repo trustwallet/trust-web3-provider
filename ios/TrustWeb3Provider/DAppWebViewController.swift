@@ -210,4 +210,23 @@ extension DAppWebViewController: WKUIDelegate {
         _ = webView.load(navigationAction.request)
         return nil
     }
+
+    func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        alert.addAction(.init(title: "OK", style: .default, handler: { _ in
+            completionHandler()
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+
+    func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        alert.addAction(.init(title: "OK", style: .default, handler: { _ in
+            completionHandler(true)
+        }))
+        alert.addAction(.init(title: "Cancel", style: .cancel, handler: { _ in
+            completionHandler(false)
+        }))
+        present(alert, animated: true, completion: nil)
+    }
 }
