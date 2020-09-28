@@ -12,7 +12,7 @@ import ProviderRpcError from "./error";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
 import { EventEmitter } from "events";
-import isUtf8 from 'isutf8';
+import isUtf8 from "isutf8";
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
@@ -44,7 +44,7 @@ class TrustWeb3Provider extends EventEmitter {
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
     if (!(this instanceof TrustWeb3Provider)) {
-      that = window.ethereum
+      that = window.ethereum;
     }
     return that._request(payload, false);
   }
@@ -60,7 +60,7 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request({method: "eth_requestAccounts"}) instead.
    */
   enable() {
-    console.log('enable() is deprecated, please use window.ethereum.request({method: "eth_requestAccounts"}) instead.')
+    console.log("enable() is deprecated, please use window.ethereum.request({method: \"eth_requestAccounts\"}) instead.");
     return this.request({ method: "eth_requestAccounts", params: [] });
   }
 
@@ -95,11 +95,11 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request() method instead.
    */
   sendAsync(payload, callback) {
-    console.log('sendAsync(data, callback) is deprecated, please use window.ethereum.request(data) instead.')
+    console.log("sendAsync(data, callback) is deprecated, please use window.ethereum.request(data) instead.");
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
     if (!(this instanceof TrustWeb3Provider)) {
-      that = window.ethereum
+      that = window.ethereum;
     }
     if (Array.isArray(payload)) {
       Promise.all(payload.map(that._request.bind(that)))
@@ -208,7 +208,7 @@ class TrustWeb3Provider extends EventEmitter {
     } else {
       buffer = Buffer.from(data);
     }
-    const hex = buffer.toString('hex');
+    const hex = buffer.toString("hex");
     if (isUtf8(buffer)) {
       this.postMessage("signPersonalMessage", payload.id, {data: hex});
     } else {
@@ -266,11 +266,20 @@ class TrustWeb3Provider extends EventEmitter {
       data.result = result;
     }
     if (this.isDebug) {
-      console.log(`<== sendResponse id: ${id}, result: ${result}, data: ${JSON.stringify(data)}`);
+      console.log(`<== sendResponse id: ${id}, result: ${JSON.stringify(result)}, data: ${JSON.stringify(data)}`);
     }
     if (callback) {
       wrapResult ? callback(null, data) : callback(null, result);
       this.callbacks.delete(id);
+    } else {
+      console.log(`callback id: ${id} not found`);
+      // check if it's iframe callback
+      for (var i = 0; i < window.frames.length; i++) {
+        const frame = window.frames[i];
+        if (frame.ethereum.callbacks.has(id)) {
+          frame.ethereum.sendResponse(id, result);
+        }
+      }
     }
   }
 

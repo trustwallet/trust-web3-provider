@@ -6,7 +6,7 @@
 
 "use strict";
 
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer";
 
 class Utils {
   static genId() {
@@ -40,11 +40,11 @@ class Utils {
   }
 
   static hexToBuffer(str) {
-    return Buffer.from(str.replace('0x', ''), 'hex');
+    return Buffer.from(str.replace("0x", ""), "hex");
   }
 
   static bufferToHex(buf) {
-    return Buffer.from(buf).toString('hex');
+    return Buffer.from(buf).toString("hex");
   }
 }
 
