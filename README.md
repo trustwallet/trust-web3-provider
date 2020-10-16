@@ -1,7 +1,6 @@
 # TrustWeb3Provider
 
-[![Pod Version](https://img.shields.io/cocoapods/v/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
-[![Jitpack Version](https://jitpack.io/v/TrustWallet/trust-web3-provider.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.2.1)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/trustwallet/trust-web3-provider)
 [![License](https://img.shields.io/cocoapods/l/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
 [![Platform](https://img.shields.io/badge/platform-android-lightgrey.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.2.1)
@@ -24,7 +23,7 @@ TrustWeb3Provider is available through [CocoaPods](http://cocoapods.org). To ins
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'TrustWeb3Provider'
+pod 'TrustWeb3Provider', git: 'https://github.com/trustwallet/trust-web3-provider', tag: '<latest_tag>'
 ```
 
 Here is an example project located at `ios/TrustWeb3Provider.xcworkspace` to demonstrate how to use this provider.
@@ -80,10 +79,10 @@ Step 2. Add the dependency
 
 ```groovy
 dependencies {
-    implementation group: 'com.trustwallet', name: 'web3-provider', version: '0.4.2'
+    implementation group: 'com.trustwallet', name: 'web3-provider', version: '<latest_tag>'
 }
 ```
-e
+
 ## Authors
 
 [vikmeup](https://github.com/vikmeup)  

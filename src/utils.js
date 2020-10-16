@@ -39,8 +39,15 @@ class Utils {
     return "0x" + hexString;
   }
 
-  static hexToBuffer(str) {
-    return Buffer.from(str.replace("0x", ""), "hex");
+  // message: Bytes | string
+  static messageToBuffer(message) {
+    var buffer;
+    if ((typeof (message) === "string")) {
+      buffer = Buffer.from(message.replace("0x", ""), "hex");
+    } else {
+      buffer = Buffer.from(message);
+    }
+    return buffer;
   }
 
   static bufferToHex(buf) {

@@ -17,7 +17,7 @@ module.exports = {
             "unix"
         ],
         "quotes": [
-            "error",
+            "warn",
             "double"
         ],
         "semi": [
@@ -25,7 +25,7 @@ module.exports = {
             "always"
         ],
         "no-console": [
-            "warn"
+            "off"
         ]
     }
 };
