@@ -201,13 +201,7 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   eth_sign(payload) {
-    const data = payload.params[1];
-    var buffer;
-    if ((typeof (data) === "string")) {
-      buffer = Utils.hexToBuffer(data);
-    } else {
-      buffer = Buffer.from(data);
-    }
+    const buffer = Utils.messageToBuffer(payload.params[1]);
     const hex = buffer.toString("hex");
     if (isUtf8(buffer)) {
       this.postMessage("signPersonalMessage", payload.id, {data: hex});
@@ -217,7 +211,15 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   personal_sign(payload) {
-    this.postMessage("signPersonalMessage", payload.id, {data: payload.params[0]});
+    const message = payload.params[0];
+    const buffer = Utils.messageToBuffer(message);
+    if (buffer.length === 0) {
+      // hex it
+      const hex = Buffer.from(message).toString("hex");
+      this.postMessage("signPersonalMessage", payload.id, {data: hex});
+    } else {
+      this.postMessage("signPersonalMessage", payload.id, {data: message});
+    }
   }
 
   personal_ecRecover(payload) {
