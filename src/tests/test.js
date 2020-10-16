@@ -23,6 +23,12 @@ const ropsten = {
   rpcUrl: "https://ropsten.infura.io/apikey",
 };
 
+const bsc = {
+  address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
+  chainId: 56,
+  rpcUrl: "https://bsc-dataseed1.binance.orge",
+}
+
 describe("TrustWeb3Provider constructor tests", () => {
   test("test constructor.name", () => {
     const provider = new Trust({});
@@ -128,4 +134,31 @@ describe("TrustWeb3Provider constructor tests", () => {
     });
   });
 
-}); // describe()
+  test("test personal_sign", done => {
+    const provider = new Trust(bsc);
+    const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
+    const signed = "0xf3a9e21a3238b025b7edf5013876548cfb2f2a838aca573de88c91ea9aecf7190cd6330a0172bd5d106841647831f30065f644eddc2f86091e1bb370c9ff833f1c";
+
+    window.webkit = {
+      messageHandlers: {
+        signPersonalMessage: {
+          postMessage: (message) => {
+            provider.sendResponse(message.id, signed);
+          }
+        }
+      }
+    };
+
+    const request = {
+      "method": "personal_sign",
+      "params": ["{\"version\":\"0.1.2\",\"timestamp\":\"1602823075\",\"token\":\"0x4b0f1812e5df2a09796481ff14017e6005508003\",\"type\":\"vote\",\"payload\":{\"proposal\":\"QmSV53XuYi28XfdNHDhBVp2ZQwzeewQNBcaDedRi9PC6eY\",\"choice\":1,\"metadata\":{}}}", "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F"],
+      "id": 1602823075454
+    };
+
+    provider.request(request).then(result => {
+      expect(result).toEqual(signed);
+      done();
+    });
+  });
+
+}); // end of top describe()
