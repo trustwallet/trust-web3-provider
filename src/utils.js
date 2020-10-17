@@ -51,7 +51,7 @@ class Utils {
   }
 
   static bufferToHex(buf) {
-    return Buffer.from(buf).toString("hex");
+    return "0x" + Buffer.from(buf).toString("hex");
   }
 }
 
