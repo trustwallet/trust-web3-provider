@@ -202,7 +202,7 @@ class TrustWeb3Provider extends EventEmitter {
 
   eth_sign(payload) {
     const buffer = Utils.messageToBuffer(payload.params[1]);
-    const hex = buffer.toString("hex");
+    const hex = Utils.bufferToHex(buffer);
     if (isUtf8(buffer)) {
       this.postMessage("signPersonalMessage", payload.id, {data: hex});
     } else {
@@ -215,7 +215,7 @@ class TrustWeb3Provider extends EventEmitter {
     const buffer = Utils.messageToBuffer(message);
     if (buffer.length === 0) {
       // hex it
-      const hex = Buffer.from(message).toString("hex");
+      const hex = Utils.bufferToHex(message);
       this.postMessage("signPersonalMessage", payload.id, {data: hex});
     } else {
       this.postMessage("signPersonalMessage", payload.id, {data: message});
