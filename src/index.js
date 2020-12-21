@@ -278,8 +278,12 @@ class TrustWeb3Provider extends EventEmitter {
       // check if it's iframe callback
       for (var i = 0; i < window.frames.length; i++) {
         const frame = window.frames[i];
-        if (frame.ethereum.callbacks.has(id)) {
-          frame.ethereum.sendResponse(id, result);
+        try {
+          if (frame.ethereum.callbacks.has(id)) {
+            frame.ethereum.sendResponse(id, result);
+          }
+        } catch (error) {
+          console.log(`send response to frame error: ${error}`);
         }
       }
     }
