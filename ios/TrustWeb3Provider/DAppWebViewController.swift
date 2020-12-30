@@ -6,7 +6,7 @@
 
 import UIKit
 import WebKit
-import TrustWalletCore
+import WalletCore
 
 class DAppWebViewController: UIViewController {
 
