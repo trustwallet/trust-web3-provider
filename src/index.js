@@ -160,8 +160,8 @@ class TrustWeb3Provider extends EventEmitter {
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
           return this.eth_requestAccounts(payload);
-        case "eth_watchAsset":
-          return this.eth_watchAsset(payload);
+        case "wallet_watchAsset":
+          return this.wallet_watchAsset(payload);
         case "eth_newFilter":
         case "eth_newBlockFilter":
         case "eth_newPendingTransactionFilter":
@@ -251,7 +251,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.postMessage("requestAccounts", payload.id, {});
   }
 
-  eth_watchAsset(payload) {
+  wallet_watchAsset(payload) {
     this.postMessage("watchAsset", payload.id, {
       type: payload.type,
       contract: payload.options.address,
