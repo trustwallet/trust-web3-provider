@@ -20,8 +20,8 @@ class TrustWeb3Provider extends EventEmitter {
     this.setConfig(config);
 
     this.idMapping = new IdMapping();
-    this.callbacks = new Map;
-    this.wrapResults = new Map;
+    this.callbacks = new Map();
+    this.wrapResults = new Map();
     this.isTrust = true;
     this.isDebug = false;
 
@@ -60,7 +60,9 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request({method: "eth_requestAccounts"}) instead.
    */
   enable() {
-    console.log("enable() is deprecated, please use window.ethereum.request({method: \"eth_requestAccounts\"}) instead.");
+    console.log(
+      'enable() is deprecated, please use window.ethereum.request({method: "eth_requestAccounts"}) instead.'
+    );
     return this.request({ method: "eth_requestAccounts", params: [] });
   }
 
@@ -68,8 +70,8 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request() method instead.
    */
   send(payload) {
-    let response = {jsonrpc: "2.0", id: payload.id};
-    switch(payload.method) {
+    let response = { jsonrpc: "2.0", id: payload.id };
+    switch (payload.method) {
       case "eth_accounts":
         response.result = this.eth_accounts();
         break;
@@ -84,7 +86,7 @@ class TrustWeb3Provider extends EventEmitter {
         break;
       default:
         throw new ProviderRpcError(
-          4200, 
+          4200,
           `Trust does not support calling ${payload.method} synchronously without a callback. Please provide a callback parameter to call ${payload.method} asynchronously.`
         );
     }
@@ -95,7 +97,9 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request() method instead.
    */
   sendAsync(payload, callback) {
-    console.log("sendAsync(data, callback) is deprecated, please use window.ethereum.request(data) instead.");
+    console.log(
+      "sendAsync(data, callback) is deprecated, please use window.ethereum.request(data) instead."
+    );
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
     if (!(this instanceof TrustWeb3Provider)) {
@@ -103,12 +107,13 @@ class TrustWeb3Provider extends EventEmitter {
     }
     if (Array.isArray(payload)) {
       Promise.all(payload.map(that._request.bind(that)))
-      .then(data => callback(null, data))
-      .catch(error => callback(error, null));
+        .then((data) => callback(null, data))
+        .catch((error) => callback(error, null));
     } else {
-      that._request(payload)
-      .then(data => callback(null, data))
-      .catch(error => callback(error, null));
+      that
+        ._request(payload)
+        .then((data) => callback(null, data))
+        .catch((error) => callback(error, null));
     }
   }
 
@@ -133,7 +138,7 @@ class TrustWeb3Provider extends EventEmitter {
       });
       this.wrapResults.set(payload.id, wrapResult);
 
-      switch(payload.method) {
+      switch (payload.method) {
         case "eth_accounts":
           return this.sendResponse(payload.id, this.eth_accounts());
         case "eth_coinbase":
@@ -155,25 +160,28 @@ class TrustWeb3Provider extends EventEmitter {
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
           return this.eth_requestAccounts(payload);
+        case "eth_watchAsset":
+          return this.eth_watchAsset(payload);
         case "eth_newFilter":
         case "eth_newBlockFilter":
         case "eth_newPendingTransactionFilter":
         case "eth_uninstallFilter":
         case "eth_subscribe":
           throw new ProviderRpcError(
-            4200, 
+            4200,
             `Trust does not support calling ${payload.method}. Please use your own solution`
           );
         default:
           // call upstream rpc
           this.callbacks.delete(payload.id);
           this.wrapResults.delete(payload.id);
-          return this.rpc.call(payload)
+          return this.rpc
+            .call(payload)
             .then((response) => {
-                if (this.isDebug) {
-                  console.log(`<== rpc response ${JSON.stringify(response)}`);
-                }
-                wrapResult ? resolve(response) : resolve(response.result);
+              if (this.isDebug) {
+                console.log(`<== rpc response ${JSON.stringify(response)}`);
+              }
+              wrapResult ? resolve(response) : resolve(response.result);
             })
             .catch(reject);
       }
@@ -181,7 +189,7 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   emitConnect(chainId) {
-    this.emit("connect", {chainId: chainId});
+    this.emit("connect", { chainId: chainId });
   }
 
   eth_accounts() {
@@ -204,9 +212,9 @@ class TrustWeb3Provider extends EventEmitter {
     const buffer = Utils.messageToBuffer(payload.params[1]);
     const hex = Utils.bufferToHex(buffer);
     if (isUtf8(buffer)) {
-      this.postMessage("signPersonalMessage", payload.id, {data: hex});
+      this.postMessage("signPersonalMessage", payload.id, { data: hex });
     } else {
-      this.postMessage("signMessage", payload.id, {data: hex});
+      this.postMessage("signMessage", payload.id, { data: hex });
     }
   }
 
@@ -216,18 +224,23 @@ class TrustWeb3Provider extends EventEmitter {
     if (buffer.length === 0) {
       // hex it
       const hex = Utils.bufferToHex(message);
-      this.postMessage("signPersonalMessage", payload.id, {data: hex});
+      this.postMessage("signPersonalMessage", payload.id, { data: hex });
     } else {
-      this.postMessage("signPersonalMessage", payload.id, {data: message});
+      this.postMessage("signPersonalMessage", payload.id, { data: message });
     }
   }
 
   personal_ecRecover(payload) {
-    this.postMessage("ecRecover", payload.id, {signature: payload.params[1], message: payload.params[0]});
+    this.postMessage("ecRecover", payload.id, {
+      signature: payload.params[1],
+      message: payload.params[0],
+    });
   }
 
   eth_signTypedData(payload) {
-    this.postMessage("signTypedMessage", payload.id, {data: payload.params[1]});
+    this.postMessage("signTypedMessage", payload.id, {
+      data: payload.params[1],
+    });
   }
 
   eth_sendTransaction(payload) {
@@ -238,15 +251,24 @@ class TrustWeb3Provider extends EventEmitter {
     this.postMessage("requestAccounts", payload.id, {});
   }
 
+  eth_watchAsset(payload) {
+    this.postMessage("watchAsset", payload.id, {
+      type: payload.type,
+      contract: payload.options.address,
+      symbol: payload.options.symbol,
+      decimals: payload.options.decimals || 0,
+    });
+  }
+
   /**
    * @private Internal js -> native message handler
    */
   postMessage(handler, id, data) {
     if (this.ready || handler === "requestAccounts") {
       window.webkit.messageHandlers[handler].postMessage({
-        "name": handler,
-        "object": data,
-        "id": id
+        name: handler,
+        object: data,
+        id: id,
       });
     } else {
       // don't forget to verify in the app
@@ -255,20 +277,24 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   /**
-   * @private Internal native result -> js 
+   * @private Internal native result -> js
    */
   sendResponse(id, result) {
     let originId = this.idMapping.tryPopId(id) || id;
     let callback = this.callbacks.get(id);
     let wrapResult = this.wrapResults.get(id);
-    let data = {jsonrpc: "2.0", id: originId};
+    let data = { jsonrpc: "2.0", id: originId };
     if (typeof result === "object" && result.jsonrpc && result.result) {
       data.result = result.result;
     } else {
       data.result = result;
     }
     if (this.isDebug) {
-      console.log(`<== sendResponse id: ${id}, result: ${JSON.stringify(result)}, data: ${JSON.stringify(data)}`);
+      console.log(
+        `<== sendResponse id: ${id}, result: ${JSON.stringify(
+          result
+        )}, data: ${JSON.stringify(data)}`
+      );
     }
     if (callback) {
       wrapResult ? callback(null, data) : callback(null, result);
@@ -290,7 +316,7 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   /**
-   * @private Internal native error -> js 
+   * @private Internal native error -> js
    */
   sendError(id, error) {
     console.log(`<== ${id} sendError ${error}`);
