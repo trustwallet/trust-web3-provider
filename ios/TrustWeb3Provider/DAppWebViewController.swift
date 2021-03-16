@@ -13,7 +13,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://js-eth-sign.surge.sh"
+        return "https://chainlist.org"
     }
 
     let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
@@ -123,6 +123,9 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 self.webview.sendResult(recovered, to: id)
             }
             break
+        case .addEthereumChain:
+            guard let (chainId, name, rpcUrls) = extractChainInfo(json: json) else { return }
+            alert(title: name, message: "chainId: \(chainId)\n \(rpcUrls.joined(separator: "\n")))")
         default:
             break
         }
@@ -161,22 +164,48 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
+    func alert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(.init(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+
     private func extractMessage(json: [String: Any]) -> Data? {
-        guard let params = json["object"] as? [String: Any],
+        guard
+            let params = json["object"] as? [String: Any],
             let string = params["data"] as? String,
-            let data = Data(hexString: string) else {
+            let data = Data(hexString: string)
+        else {
             return nil
         }
         return data
     }
 
     private func extractSignature(json: [String: Any]) -> (signature: Data, message: Data)? {
-        guard let params = json["object"] as? [String: Any],
+        guard
+            let params = json["object"] as? [String: Any],
             let signature = params["signature"] as? String,
-            let message = params["message"] as? String else {
+            let message = params["message"] as? String
+        else {
             return nil
         }
         return (Data(hexString: signature)!, Data(hexString: message)!)
+    }
+
+    private func extractChainInfo(json: [String: Any]) ->(chainId: String, name: String, rpcUrls: [String])? {
+        guard
+            let params = json["object"] as? [String: Any],
+            let string = params["chainId"] as? String,
+            let name = params["chainName"] as? String,
+            let urls = params["rpcUrls"] as? [String]
+        else {
+            return nil
+        }
+        return (chainId: string, name: name, rpcUrls: urls)
     }
 
     private func signMessage(data: Data, addPrefix: Bool = true) -> Data {
