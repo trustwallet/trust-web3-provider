@@ -254,11 +254,12 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   wallet_watchAsset(payload) {
+    let options = payload.params.options;
     this.postMessage("watchAsset", payload.id, {
       type: payload.type,
-      contract: payload.options.address,
-      symbol: payload.options.symbol,
-      decimals: payload.options.decimals || 0,
+      contract: options.address,
+      symbol: options.symbol,
+      decimals: options.decimals || 0,
     });
   }
 
