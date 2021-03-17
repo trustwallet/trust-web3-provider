@@ -272,11 +272,16 @@ class TrustWeb3Provider extends EventEmitter {
    */
   postMessage(handler, id, data) {
     if (this.ready || handler === "requestAccounts") {
-      window.webkit.messageHandlers[handler].postMessage({
+      let object = {
         name: handler,
         object: data,
         id: id,
-      });
+      };
+      if (window.tw && window.tw.postMessage) {
+        window.tw.postMessage(JSON.stringify(object));
+      } else {
+        window.webkit.messageHandlers[handler].postMessage(object);
+      }
     } else {
       // don't forget to verify in the app
       this.sendError(id, new ProviderRpcError(4100, "provider is not ready"));
