@@ -70,21 +70,21 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_chainId", done => {
-    const provider = new Trust(ropsten);
+    const provider = new Trust(bsc);
     const web3 = new Web3(provider);
 
     let request = {jsonrpc: "2.0", method: "eth_chainId", id: 123};
 
     provider.request(request).then((chainId) => {
-      expect(chainId).toEqual("0x3");
+      expect(chainId).toEqual("0x38");
       done();
     });
 
     const response = web3.currentProvider.send(request);
-    expect(response.result).toBe("0x3");
+    expect(response.result).toBe("0x38");
 
     web3.currentProvider.sendAsync(request, (error, result) => {
-      expect(result.result).toEqual("0x3");
+      expect(result.result).toEqual("0x38");
       done();
     });
   });
