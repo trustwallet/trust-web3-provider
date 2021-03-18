@@ -22,8 +22,7 @@ class DAppWebViewController: UIViewController {
         return WKUserScriptConfig(
             address: address,
             chainId: 1,
-            rpcUrl: "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310",
-            privacyMode: false
+            rpcUrl: "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310"
         )
     }()
 
@@ -37,9 +36,7 @@ class DAppWebViewController: UIViewController {
         let controller = WKUserContentController()
         controller.addUserScript(scriptConfig.providerScript)
         controller.addUserScript(scriptConfig.injectedScript)
-        for name in DAppMethod.allCases {
-            controller.add(self, name: name.rawValue)
-        }
+        controller.add(self, name: "_tw_")
 
         config.userContentController = controller
 
