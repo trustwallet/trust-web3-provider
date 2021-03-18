@@ -12,7 +12,6 @@ struct WKUserScriptConfig {
     let address: String
     let chainId: Int
     let rpcUrl: String
-    let privacyMode: Bool
 
     var providerJsBundleUrl: URL {
         let bundlePath = Bundle.main.path(forResource: "TrustWeb3Provider", ofType: "bundle")
@@ -31,38 +30,22 @@ struct WKUserScriptConfig {
     }
 
     var injectedScript: WKUserScript {
-        let source: String
-        if privacyMode {
-            source = """
-            (function() {
-                var config = {
-                    chainId: \(chainId),
-                    rpcUrl: "\(rpcUrl)"
-                };
-                const provider = new window.Trust(config);
-                window.ethereum = provider;
+        let source =
+        """
+        (function() {
+            var config = {
+                chainId: \(chainId),
+                rpcUrl: "\(rpcUrl)",
+                isDebug: true
+            };
+            window.ethereum = new trustwallet.Provider(config);
+            window.web3 = new trustwallet.Web3(window.ethereum);
+            trustwallet.postMessage = (jsonString) => {
+                webkit.messageHandlers._tw_.postMessage(jsonString)
+            };
+        })();
+        """
 
-                window.chrome = {webstore: {}};
-            })();
-            """
-        } else {
-            source = """
-            (function() {
-                var config = {
-                    address: "\(address)".toLowerCase(),
-                    chainId: \(chainId),
-                    rpcUrl: "\(rpcUrl)"
-                };
-                const provider = new window.Trust(config);
-                provider.isDebug = true;
-                window.ethereum = provider;
-                window.web3 = new window.Web3(provider);
-                window.web3.eth.defaultAccount = config.address;
-
-                window.chrome = {webstore: {}};
-            })();
-            """
-        }
         let script = WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         return script
     }

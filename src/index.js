@@ -23,7 +23,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.callbacks = new Map();
     this.wrapResults = new Map();
     this.isTrust = true;
-    this.isDebug = false;
+    this.isDebug = !!config.isDebug;
 
     this.emitConnect(config.chainId);
   }
@@ -38,6 +38,7 @@ class TrustWeb3Provider extends EventEmitter {
 
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
+    this.isDebug = !!config.isDebug;
   }
 
   request(payload) {
@@ -272,11 +273,17 @@ class TrustWeb3Provider extends EventEmitter {
    */
   postMessage(handler, id, data) {
     if (this.ready || handler === "requestAccounts") {
-      window.webkit.messageHandlers[handler].postMessage({
+      let object = {
+        id: id,
         name: handler,
         object: data,
-        id: id,
-      });
+      };
+      if (window.trustwallet.postMessage) {
+        window.trustwallet.postMessage(object);
+      } else {
+        // old clients
+        window.webkit.messageHandlers[handler].postMessage(object);
+      }
     } else {
       // don't forget to verify in the app
       this.sendError(id, new ProviderRpcError(4100, "provider is not ready"));
@@ -335,5 +342,8 @@ class TrustWeb3Provider extends EventEmitter {
   }
 }
 
-window.Trust = TrustWeb3Provider;
-window.Web3 = Web3;
+window.trustwallet = {
+  Provider: TrustWeb3Provider,
+  Web3: Web3,
+  postMessage: null
+};
