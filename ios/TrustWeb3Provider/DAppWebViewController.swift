@@ -13,7 +13,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://chainlist.org"
+        return "https://bscscan.com/address/0x05ff2b0db69458a0750badebc4f9e13add608c7f"
     }
 
     let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
@@ -21,8 +21,8 @@ class DAppWebViewController: UIViewController {
     lazy var scriptConfig: WKUserScriptConfig = {
         return WKUserScriptConfig(
             address: address,
-            chainId: 1,
-            rpcUrl: "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310"
+            chainId: 56,
+            rpcUrl: "https://bsc-dataseed2.binance.org"
         )
     }()
 

@@ -29,8 +29,16 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   setAddress(address) {
-    this.address = (address || "").toLowerCase();
+    const lowerAddress = (address || "").toLowerCase();
+    this.address = lowerAddress;
     this.ready = !!address;
+    for (var i = 0; i < window.frames.length; i++) {
+      const frame = window.frames[i];
+      if (frame.ethereum.isTrust) {
+        frame.ethereum.address = lowerAddress;
+        frame.ethereum.ready = !!address;
+      }
+    }
   }
 
   setConfig(config) {
@@ -345,5 +353,5 @@ class TrustWeb3Provider extends EventEmitter {
 window.trustwallet = {
   Provider: TrustWeb3Provider,
   Web3: Web3,
-  postMessage: null
+  postMessage: null,
 };
