@@ -188,7 +188,6 @@
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
 				9B817E892CA041381AC440F9 /* [CP] Copy Pods Resources */,
-				18F19AD2B2E6FCC4FDC02A1A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -280,23 +279,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		18F19AD2B2E6FCC4FDC02A1A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		6F4DDF0DB98752309D4DFBCD /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

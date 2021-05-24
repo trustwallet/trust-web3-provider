@@ -8,13 +8,13 @@
 
 var ethUtil = require("ethereumjs-util");
 require("../index");
-const Trust = window.Trust;
 const Web3 = require("web3");
+const trustwallet = window.trustwallet;
 
 const mainnet = {
   address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
   chainId: 1,
-  rpcUrl: "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310",
+  rpcUrl: "https://mainnet.infura.io/v3/<key>",
 };
 
 const ropsten = {
@@ -149,13 +149,30 @@ describe("TrustWeb3Provider constructor tests", () => {
     const request = {
       method: "personal_sign",
       params: [
-        '{"version":"0.1.2","timestamp":"1602823075","token":"0x4b0f1812e5df2a09796481ff14017e6005508003","type":"vote","payload":{"proposal":"QmSV53XuYi28XfdNHDhBVp2ZQwzeewQNBcaDedRi9PC6eY","choice":1,"metadata":{}}}',
+        "{\"version\":\"0.1.2\",\"timestamp\":\"1602823075\",\"token\":\"0x4b0f1812e5df2a09796481ff14017e6005508003\",\"type\":\"vote\",\"payload\":{\"proposal\":\"QmSV53XuYi28XfdNHDhBVp2ZQwzeewQNBcaDedRi9PC6eY\",\"choice\":1,\"metadata\":{}}}",
         "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
       ],
       id: 1602823075454,
     };
 
     expect(Buffer.from(request.params[0], "hex").length).toEqual(0);
+
+    provider.request(request).then((result) => {
+      expect(result).toEqual(signed);
+      done();
+    });
+  });
+
+  test("test eth_signTypedData_v4", (done) => {
+    const provider = new trustwallet.Provider(mainnet);
+    const signed =
+      "0x7aff0e37900fc2eb5e78c56b07246a0904b3ba642cab17917d7524110b83fe04296790ff076a7dd31b2a11ded9fcbe3959fe872b7c18fa79f5146807855fcce41b";
+
+    trustwallet.postMessage = (message) => {
+      provider.sendResponse(message.id, signed);
+    };
+
+    const request = require("./eth_signTypedData_v4.json");
 
     provider.request(request).then((result) => {
       expect(result).toEqual(signed);
