@@ -71,7 +71,7 @@ class TrustWeb3Provider extends EventEmitter {
    */
   enable() {
     console.log(
-      "enable() is deprecated, please use window.ethereum.request({method: \"eth_requestAccounts\"}) instead."
+      'enable() is deprecated, please use window.ethereum.request({method: "eth_requestAccounts"}) instead.'
     );
     return this.request({ method: "eth_requestAccounts", params: [] });
   }
@@ -254,7 +254,10 @@ class TrustWeb3Provider extends EventEmitter {
   eth_signTypedData(payload, useV4) {
     const message = JSON.parse(payload.params[1]);
     const hash = TypedDataUtils.sign(message, useV4);
-    this.postMessage("signMessage", payload.id, { data: "0x" + hash.toString("hex") });
+    this.postMessage("signTypedMessage", payload.id, {
+      data: "0x" + hash.toString("hex"),
+      raw: payload.params[1],
+    });
   }
 
   eth_sendTransaction(payload) {
