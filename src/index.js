@@ -13,6 +13,7 @@ import Utils from "./utils";
 import IdMapping from "./id_mapping";
 import { EventEmitter } from "events";
 import isUtf8 from "isutf8";
+import { TypedDataUtils } from "eth-sig-util";
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
@@ -162,9 +163,11 @@ class TrustWeb3Provider extends EventEmitter {
           return this.personal_sign(payload);
         case "personal_ecRecover":
           return this.personal_ecRecover(payload);
-        case "eth_signTypedData":
         case "eth_signTypedData_v3":
-          return this.eth_signTypedData(payload);
+          return this.eth_signTypedData(payload, false);
+        case "eth_signTypedData":
+        case "eth_signTypedData_v4":
+          return this.eth_signTypedData(payload, true);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
@@ -248,9 +251,12 @@ class TrustWeb3Provider extends EventEmitter {
     });
   }
 
-  eth_signTypedData(payload) {
+  eth_signTypedData(payload, useV4) {
+    const message = JSON.parse(payload.params[1]);
+    const hash = TypedDataUtils.sign(message, useV4);
     this.postMessage("signTypedMessage", payload.id, {
-      data: payload.params[1],
+      data: "0x" + hash.toString("hex"),
+      raw: payload.params[1],
     });
   }
 
