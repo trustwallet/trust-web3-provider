@@ -50,36 +50,7 @@ Step 2. Add the dependency
 
 ```groovy
 dependencies {
-    implementation 'com.github.TrustWallet:trust-web3-provider:0.3.9'
-}
-```
-
-#### GitHub Packages
-
-[Configuring Gradle for use with GitHub Packages](https://docs.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-gradle-for-use-with-github-packages)
-
-Step 1. Add GitHub Packages to `repositories` in your root `build.gradle` file:
-
-```groovy
-allprojects {
-    repositories {
-        maven {
-            name = "GitHub Packages"
-            url = uri("https://maven.pkg.github.com/trustwallet/trust-web3-provider")
-            credentials {
-                username = System.getenv('GITHUB_USER')
-                password = System.getenv('GITHUB_TOKEN')
-            }
-        }
-    }
-}
-```
-
-Step 2. Add the dependency
-
-```groovy
-dependencies {
-    implementation group: 'com.trustwallet', name: 'web3-provider', version: '<latest_tag>'
+    implementation 'com.github.TrustWallet:trust-web3-provider:1.0.4'
 }
 ```
 
