@@ -8,7 +8,7 @@ def getArtificatId = { ->
     return "web3-provider"
 }
 def getVersionName = { ->
-    return System.getenv('TAG_NAME') ?: "0.3.9"
+    return System.getenv('TAG_NAME') ?: "1.0.4"
 }
 
 android {
