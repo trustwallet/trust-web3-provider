@@ -1,25 +1,27 @@
 package com.trust.web3.demo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
         val provderJs = loadProviderJs()
         val initJs = loadInitJs(
-            1,
-            "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310"
+            56,
+            "https://bsc-dataseed2.binance.org"
         )
         println("file lenght: ${provderJs.length}")
         WebView.setWebContentsDebuggingEnabled(true)
         val webview: WebView = findViewById(R.id.webview)
         webview.settings.javaScriptEnabled = true
-        webview.addJavascriptInterface(WebAppInterface(webview), "_tw_")
+        webview.settings.domStorageEnabled = true
+        webview.addJavascriptInterface(WebAppInterface(this, webview), "_tw_")
 
         val webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadProviderJs(): String {
-        return resources.openRawResource(R.raw.trust).bufferedReader().use { it.readText() }
+        return resources.openRawResource(R.raw.trust_min).bufferedReader().use { it.readText() }
     }
 
     fun loadInitJs(chainId: Int, rpcUrl: String): String {
