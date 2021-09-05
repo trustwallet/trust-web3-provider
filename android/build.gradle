@@ -20,6 +20,16 @@ allprojects {
         mavenCentral()
 
         maven { url 'https://jitpack.io' }
+
+        maven {
+            url = uri("https://maven.pkg.github.com/trustwallet/wallet-core")
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            credentials {
+                username = properties.getProperty("gpr.user")
+                password = properties.getProperty("gpr.key")
+            }
+        }
     }
 }
 

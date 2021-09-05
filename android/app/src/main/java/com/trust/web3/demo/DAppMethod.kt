@@ -1,14 +1,14 @@
 package com.trust.web3.demo
 
-enum class DAppMethod(value: String) {
-    SIGNTRANSACTION("signTransaction"),
-    SIGNPERSONALMESSAGE("signPersonalMessage"),
-    SIGNMESSAGE("signMessage"),
-    SIGNTYPEDMESSAGE("signTypedMessage"),
-    ECRECOVER("ecRecover"),
-    REQUESTACCOUNTS("requestAccounts"),
-    WATCHASSET("watchAsset"),
-    ADDETHEREUMCHAIN("addEthereumChain");
+enum class DAppMethod {
+    SIGNTRANSACTION,
+    SIGNPERSONALMESSAGE,
+    SIGNMESSAGE,
+    SIGNTYPEDMESSAGE,
+    ECRECOVER,
+    REQUESTACCOUNTS,
+    WATCHASSET,
+    ADDETHEREUMCHAIN;
 
     companion object {
         fun fromValue(value: String): DAppMethod {

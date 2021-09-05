@@ -27,8 +27,8 @@ class WebAppInterface(
         when (method) {
             DAppMethod.REQUESTACCOUNTS -> {
                 context.materialAlertDialog {
-                    title = "require account"
-                    message = "dapp get your address"
+                    title = "Request Accounts"
+                    message = addr
                     okButton {
                         val setAddress = "window.ethereum.setAddress(\"$addr\");"
                         val callback = "window.ethereum.sendResponse($id, [\"$addr\"])"
