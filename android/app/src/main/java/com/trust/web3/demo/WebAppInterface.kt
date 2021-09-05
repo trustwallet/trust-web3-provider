@@ -3,9 +3,11 @@ package com.trust.web3.demo
 import android.content.Context
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import android.widget.Toast
 import org.json.JSONObject
-import splitties.alertdialog.appcompat.*
+import splitties.alertdialog.appcompat.cancelButton
+import splitties.alertdialog.appcompat.message
+import splitties.alertdialog.appcompat.okButton
+import splitties.alertdialog.appcompat.title
 import splitties.alertdialog.material.materialAlertDialog
 import wallet.core.jni.CoinType
 import wallet.core.jni.Curve
@@ -13,9 +15,11 @@ import wallet.core.jni.PrivateKey
 
 class WebAppInterface(
     private val context: Context,
-    private val webView: WebView
+    private val webView: WebView,
+    private val dappUrl: String
 ) {
-    private val privateKey = PrivateKey("0x4646464646464646464646464646464646464646464646464646464646464646".toHexByteArray())
+    private val privateKey =
+        PrivateKey("0x4646464646464646464646464646464646464646464646464646464646464646".toHexByteArray())
     private val addr = CoinType.ETHEREUM.deriveAddress(privateKey).toLowerCase()
 
     @JavascriptInterface
@@ -28,7 +32,7 @@ class WebAppInterface(
             DAppMethod.REQUESTACCOUNTS -> {
                 context.materialAlertDialog {
                     title = "Request Accounts"
-                    message = addr
+                    message = "DApp(${dappUrl}) need to get your address"
                     okButton {
                         val setAddress = "window.ethereum.setAddress(\"$addr\");"
                         val callback = "window.ethereum.sendResponse($id, [\"$addr\"])"
