@@ -42,7 +42,7 @@ dependencies {
     implementation "com.louiscad.splitties:splitties-alertdialog-material:3.0.0"
     implementation "com.trustwallet:wallet-core:2.6.23"
 
-    implementation 'com.github.trustwallet:trust-web3-provider:1.0.4'
+    implementation 'com.github.trustwallet:trust-web3-provider:1.0.5'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

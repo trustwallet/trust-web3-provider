@@ -32,7 +32,7 @@ class WebAppInterface(
             DAppMethod.REQUESTACCOUNTS -> {
                 context.materialAlertDialog {
                     title = "Request Accounts"
-                    message = "DApp(${dappUrl}) need to get your address"
+                    message = "${dappUrl} requests your address"
                     okButton {
                         val setAddress = "window.ethereum.setAddress(\"$addr\");"
                         val callback = "window.ethereum.sendResponse($id, [\"$addr\"])"
@@ -50,43 +50,77 @@ class WebAppInterface(
             }
             DAppMethod.SIGNMESSAGE -> {
                 val data = extractMessage(obj)
-                handleSignMessage(id = id, data = data, addPrefix = false)
+                handleSignMessage(id, data, addPrefix = false)
             }
-
-            // handle other methods here
-            // signTransaction, signMessage, ecRecover, watchAsset, addEthereumChain
+            DAppMethod.SIGNPERSONALMESSAGE -> {
+                val data = extractMessage(obj)
+                handleSignMessage(id, data, addPrefix = true)
+            }
+            DAppMethod.SIGNTYPEDMESSAGE -> {
+                val data = extractMessage(obj)
+                val raw = extractRaw(obj)
+                handleSignTypedMessage(id, data, raw)
+            }
+            else -> {
+                context.materialAlertDialog {
+                    title = "Error"
+                    message = "$method not implemented"
+                    okButton {
+                    }
+                }.show()
+            }
         }
     }
 
-    private fun extractMessage(json: JSONObject): String {
+    private fun extractMessage(json: JSONObject): ByteArray {
         val param = json.getJSONObject("object")
         val data = param.getString("data")
-        return data
+        return Numeric.hexStringToByteArray(data)
     }
 
-    private fun handleSignMessage(id: Long, data: String, addPrefix: Boolean) {
+    private fun extractRaw(json: JSONObject): String {
+        val param = json.getJSONObject("object")
+        return param.getString("raw")
+    }
+
+    private fun handleSignMessage(id: Long, data: ByteArray, addPrefix: Boolean) {
         context.materialAlertDialog {
             title = "Sign Message"
-            message = if (addPrefix) "0x$data" else data
+            message = if (addPrefix) String(data, Charsets.UTF_8) else Numeric.toHexString(data)
             cancelButton {
                 webView.sendError("Cancel", id)
             }
             okButton {
-                webView.sendResult(signEthereumMessage(data), id)
+                webView.sendResult(signEthereumMessage(data, addPrefix), id)
             }
         }.show()
     }
 
-    private fun signEthereumMessage(message: String): String {
-        val messagePrefix = "\u0019Ethereum Signed Message:\n"
-        val byteArrayMsg = message.toByteArray()
-        val prefix = (messagePrefix + byteArrayMsg.size).toByteArray()
-        val result = ByteArray(prefix.size + byteArrayMsg.size)
-        System.arraycopy(prefix, 0, result, 0, prefix.size)
-        System.arraycopy(byteArrayMsg, 0, result, prefix.size, byteArrayMsg.size)
+    private fun handleSignTypedMessage(id: Long, data: ByteArray, raw: String) {
+        context.materialAlertDialog {
+            title = "Sign Typed Message"
+            message = raw
+            cancelButton {
+                webView.sendError("Cancel", id)
+            }
+            okButton {
+                webView.sendResult(signEthereumMessage(data, false), id)
+            }
+        }.show()
+    }
 
-        val hash3Result = wallet.core.jni.Hash.keccak256(result)
-        val signatureData = privateKey.sign(hash3Result, Curve.SECP256K1)
+    private fun signEthereumMessage(message: ByteArray, addPrefix: Boolean): String {
+        var data = message
+        if (addPrefix) {
+            val messagePrefix = "\u0019Ethereum Signed Message:\n"
+            val prefix = (messagePrefix + message.size).toByteArray()
+            val result = ByteArray(prefix.size + message.size)
+            System.arraycopy(prefix, 0, result, 0, prefix.size)
+            System.arraycopy(message, 0, result, prefix.size, message.size)
+            data = wallet.core.jni.Hash.keccak256(result)
+        }
+
+        val signatureData = privateKey.sign(data, Curve.SECP256K1)
             .apply {
                 (this[this.size - 1]) = (this[this.size - 1] + 27).toByte()
             }

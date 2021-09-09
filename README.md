@@ -50,7 +50,7 @@ Step 2. Add the dependency
 
 ```groovy
 dependencies {
-    implementation 'com.github.TrustWallet:trust-web3-provider:1.0.4'
+    implementation 'com.github.trustwallet:trust-web3-provider:TAG'
 }
 ```
 
