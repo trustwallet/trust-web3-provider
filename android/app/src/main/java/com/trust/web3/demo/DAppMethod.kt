@@ -8,7 +8,8 @@ enum class DAppMethod {
     ECRECOVER,
     REQUESTACCOUNTS,
     WATCHASSET,
-    ADDETHEREUMCHAIN;
+    ADDETHEREUMCHAIN,
+    UNKNOWN;
 
     companion object {
         fun fromValue(value: String): DAppMethod {
@@ -20,7 +21,8 @@ enum class DAppMethod {
                 "ecRecover" -> ECRECOVER
                 "requestAccounts" -> REQUESTACCOUNTS
                 "watchAsset" -> WATCHASSET
-                else -> ADDETHEREUMCHAIN
+                "addEthereumChain" -> ADDETHEREUMCHAIN
+                else -> UNKNOWN
             }
         }
     }
