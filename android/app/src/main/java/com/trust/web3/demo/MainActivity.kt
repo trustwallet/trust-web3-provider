@@ -1,43 +1,53 @@
 package com.trust.web3.demo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val DAPP_URL = "https://js-eth-sign.surge.sh"
+        private const val CHAIN_ID = 56
+        private const val RPC_URL = "https://bsc-dataseed2.binance.org"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
         val provderJs = loadProviderJs()
         val initJs = loadInitJs(
-            1,
-            "https://mainnet.infura.io/v3/6e822818ec644335be6f0ed231f48310"
+            CHAIN_ID,
+            RPC_URL
         )
-        println("file lenght: ${provderJs.length}")
         WebView.setWebContentsDebuggingEnabled(true)
         val webview: WebView = findViewById(R.id.webview)
-        webview.settings.javaScriptEnabled = true
-        webview.addJavascriptInterface(WebAppInterface(webview), "_tw_")
-
-        val webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                println("loaded: ${url}")
-                view?.evaluateJavascript(provderJs, null)
-                view?.evaluateJavascript(initJs, null)
-            }
+        webview.settings.run {
+            javaScriptEnabled = true
+            domStorageEnabled = true
         }
-        webview.webViewClient = webViewClient
-        webview.loadUrl("https://js-eth-sign.surge.sh")
+        WebAppInterface(this, webview, DAPP_URL).run {
+            webview.addJavascriptInterface(this, "_tw_")
+
+            val webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    view?.evaluateJavascript(provderJs, null)
+                    view?.evaluateJavascript(initJs, null)
+                }
+            }
+            webview.webViewClient = webViewClient
+            webview.loadUrl(DAPP_URL)
+        }
     }
 
-    fun loadProviderJs(): String {
-        return resources.openRawResource(R.raw.trust).bufferedReader().use { it.readText() }
+    private fun loadProviderJs(): String {
+        return resources.openRawResource(R.raw.trust_min).bufferedReader().use { it.readText() }
     }
 
-    fun loadInitJs(chainId: Int, rpcUrl: String): String {
+    private fun loadInitJs(chainId: Int, rpcUrl: String): String {
         val source = """
         (function() {
             var config = {
