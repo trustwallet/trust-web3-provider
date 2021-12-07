@@ -164,10 +164,11 @@ class TrustWeb3Provider extends EventEmitter {
         case "personal_ecRecover":
           return this.personal_ecRecover(payload);
         case "eth_signTypedData_v3":
-          return this.eth_signTypedData(payload, false);
+          return this.eth_signTypedData(payload, "V3");
         case "eth_signTypedData":
+          return this.eth_signTypedData(payload, "V1");
         case "eth_signTypedData_v4":
-          return this.eth_signTypedData(payload, true);
+          return this.eth_signTypedData(payload, "V4");
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
@@ -251,14 +252,65 @@ class TrustWeb3Provider extends EventEmitter {
     });
   }
 
-  eth_signTypedData(payload, useV4) {
-    const message = JSON.parse(payload.params[1]);
-    const hash = TypedDataUtils.sign(message, useV4);
-    const messageName = `signTypedMessage${useV4 ? "V4" : "V3"}`;
-    this.postMessage(messageName, payload.id, {
-      data: "0x" + hash.toString("hex"),
-      raw: payload.params[1],
-    });
+  _processMetamaskV1SignParam(data) {
+    if (typeof data === "object") {
+      return {
+        message: data,
+        params: JSON.stringify(data),
+      };
+    } else if (typeof data === "string") {
+      return {
+        message: JSON.parse(data),
+        params: data,
+      }
+    } else {
+      throw Error("signTypedDataV1 params error ", data);
+    }
+  }
+
+  eth_signTypedData(payload, version) {
+    const messageName = `signTypedMessage${version}`;
+    switch(version) {
+      case "V1": {
+        let message;
+        let params;
+        try {
+          const res = this._processMetamaskV1SignParam(payload.params[1]);
+          // message = res.message;
+          params = res.params;
+        } catch (err) {
+          // that's for metamask test dapp error
+          console.log(err);
+          const res = this._processMetamaskV1SignParam(payload.params[0]);
+          // message = res.message;
+          params = res.params;
+        }
+        // const hash = TypedDataUtils.sign(message, true);
+        this.postMessage(messageName, payload.id, {
+          // data: "0x" + hash.toString("hex"),
+          raw: params,
+        });
+        break;
+      }
+      case "V3": {
+        const message = JSON.parse(payload.params[1]);
+        const hash = TypedDataUtils.sign(message, false);
+        this.postMessage(messageName, payload.id, {
+          data: "0x" + hash.toString("hex"),
+          raw: payload.params[1],
+        });
+        break;
+      }
+      case "V4": {
+        const message = JSON.parse(payload.params[1]);
+        const hash = TypedDataUtils.sign(message, true);
+        this.postMessage(messageName, payload.id, {
+          data: "0x" + hash.toString("hex"),
+          raw: payload.params[1],
+        });
+        break;
+      }
+    }
   }
 
   eth_sendTransaction(payload) {
