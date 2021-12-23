@@ -345,8 +345,8 @@ class TrustWeb3Provider extends EventEmitter {
         name: handler,
         object: data,
       };
-      if (window.trustwallet.postMessage) {
-        window.trustwallet.postMessage(object);
+      if (window.foxwallet.postMessage) {
+        window.foxwallet.postMessage(object);
       } else {
         // old clients
         window.webkit.messageHandlers[handler].postMessage(object);
@@ -409,7 +409,7 @@ class TrustWeb3Provider extends EventEmitter {
   }
 }
 
-window.trustwallet = {
+window.foxwallet = {
   Provider: TrustWeb3Provider,
   Web3: Web3,
   postMessage: null,
