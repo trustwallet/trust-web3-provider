@@ -132,7 +132,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         case .switchEthereumChain:
             guard let (chainId) = extractSwitchChainInfo(json: json) else { return }
             if chainId == "0x89" {
-                webview?.evaluateJavaScript("window.ethereum.setConfig({address: \"\(scriptConfig.address)\" , chainId: '0x89', rpcUrl: 'https://rpc-mainnet.matic.network', isDebug: true});", completionHandler: nil)
+                webview?.evaluateJavaScript("window.ethereum.setConfig({address: \"\(scriptConfig.address)\" , chainId: 137, rpcUrl: 'https://rpc-mainnet.matic.network', isDebug: true});", completionHandler: nil)
             } else {
                 alert(title: "error", message: "unSupported chainId")
             }
