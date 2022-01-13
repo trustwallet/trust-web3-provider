@@ -129,6 +129,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
         case .addEthereumChain:
             guard let (chainId, name, rpcUrls) = extractChainInfo(json: json) else { return }
             alert(title: name, message: "chainId: \(chainId)\n \(rpcUrls.joined(separator: "\n")))")
+        case .switchEthereumChain:
+            guard let (chainId) = extractSwitchChainInfo(json: json) else { return }
+            if chainId == "0x89" {
+                webview?.evaluateJavaScript("window.ethereum.setConfig({address: \"\(scriptConfig.address)\" , chainId: '0x89', rpcUrl: 'https://rpc-mainnet.matic.network', isDebug: true});", completionHandler: nil)
+            } else {
+                alert(title: "error", message: "unSupported chainId")
+            }
         default:
             break
         }
@@ -225,6 +232,16 @@ extension DAppWebViewController: WKScriptMessageHandler {
             return nil
         }
         return (chainId: string, name: name, rpcUrls: urls)
+    }
+
+    private func extractSwitchChainInfo(json: [String: Any]) ->(chainId: String)? {
+        guard
+            let params = json["object"] as? [String: Any],
+            let string = params["chainId"] as? String
+        else {
+            return nil
+        }
+        return (chainId: string)
     }
 
     private func extractRaw(json: [String: Any]) -> String? {
