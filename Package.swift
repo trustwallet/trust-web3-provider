@@ -15,7 +15,7 @@ let package = Package(
         .target(
             name: "TrustWeb3Provider",
             dependencies: [],
-            path: "spm",
+            path: "dist",
             resources: [
                 .process("trust-min.js", localization: .none)
             ]

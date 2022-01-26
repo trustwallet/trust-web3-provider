@@ -16,6 +16,9 @@
 		BB544C0721B2381C00E8C525 /* DAppMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0621B2381C00E8C525 /* DAppMethod.swift */; };
 		BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */; };
 		BB544C0B21B24E0400E8C525 /* WKUserScriptConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */; };
+		BBC0FD5A27A13A6E00DD4612 /* WalletCore in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5927A13A6E00DD4612 /* WalletCore */; };
+		BBC0FD5C27A13A9700DD4612 /* SwiftProtobuf in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */; };
+		BBC0FD5E27A167B100DD4612 /* TrustWeb3Provider in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5D27A167B100DD4612 /* TrustWeb3Provider */; };
 		BBD19299250F1DF500E313BA /* WKWebView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD19298250F1DF500E313BA /* WKWebView+Extensions.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +57,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC0FD5A27A13A6E00DD4612 /* WalletCore in Frameworks */,
+				BBC0FD5E27A167B100DD4612 /* TrustWeb3Provider in Frameworks */,
+				BBC0FD5C27A13A9700DD4612 /* SwiftProtobuf in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +81,7 @@
 				607FACD21AFB9204008FA782 /* Example */,
 				607FACE81AFB9204008FA782 /* Tests */,
 				607FACD11AFB9204008FA782 /* Products */,
+				BBC0FD5827A13A6E00DD4612 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -139,6 +146,13 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		BBC0FD5827A13A6E00DD4612 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -155,6 +169,11 @@
 			dependencies = (
 			);
 			name = TrustWeb3Provider_Example;
+			packageProductDependencies = (
+				BBC0FD5927A13A6E00DD4612 /* WalletCore */,
+				BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */,
+				BBC0FD5D27A167B100DD4612 /* TrustWeb3Provider */,
+			);
 			productName = TrustWeb3Provider;
 			productReference = 607FACD01AFB9204008FA782 /* TrustWeb3Provider_Example.app */;
 			productType = "com.apple.product-type.application";
@@ -488,6 +507,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BBC0FD5927A13A6E00DD4612 /* WalletCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WalletCore;
+		};
+		BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftProtobuf;
+		};
+		BBC0FD5D27A167B100DD4612 /* TrustWeb3Provider */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TrustWeb3Provider;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 607FACC81AFB9204008FA782 /* Project object */;
 }

@@ -6,5 +6,6 @@
 
 import Foundation
 
-public struct TrustWeb3Provider {
+public func providerJsUrl() -> URL {
+    return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
 }
