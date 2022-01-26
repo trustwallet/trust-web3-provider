@@ -18,6 +18,8 @@ profile
 DerivedData
 *.hmap
 *.ipa
+.swiftpm/
+IDEWorkspaceChecks.plist
 
 # Bundler
 .bundle

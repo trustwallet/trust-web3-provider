@@ -7,19 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		22AF27BBA8D8B8F876ECCF27 /* Pods_TrustWeb3Provider_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91A7C4513C7274B3809282D /* Pods_TrustWeb3Provider_Tests.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* DAppWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* DAppWebViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
-		BB544C0521B230BE00E8C525 /* dist in Resources */ = {isa = PBXBuildFile; fileRef = BB544C0421B230BE00E8C525 /* dist */; };
 		BB544C0721B2381C00E8C525 /* DAppMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0621B2381C00E8C525 /* DAppMethod.swift */; };
 		BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */; };
 		BB544C0B21B24E0400E8C525 /* WKUserScriptConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */; };
+		BBC0FD5A27A13A6E00DD4612 /* WalletCore in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5927A13A6E00DD4612 /* WalletCore */; };
+		BBC0FD5C27A13A9700DD4612 /* SwiftProtobuf in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */; };
+		BBC0FD5E27A167B100DD4612 /* TrustWeb3Provider in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5D27A167B100DD4612 /* TrustWeb3Provider */; };
 		BBD19299250F1DF500E313BA /* WKWebView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD19298250F1DF500E313BA /* WKWebView+Extensions.swift */; };
-		FDDE2BAA1C0D200991CE0EA4 /* Pods_TrustWeb3Provider_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960FF95B0B6171E298739B73 /* Pods_TrustWeb3Provider_Example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +33,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		37AD3B28A8214ACB2B07B6DB /* Pods-TrustWeb3Provider_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Tests/Pods-TrustWeb3Provider_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* TrustWeb3Provider_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrustWeb3Provider_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -44,20 +43,13 @@
 		607FACE51AFB9204008FA782 /* TrustWeb3Provider_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrustWeb3Provider_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		747CE7C4341A06BB59E852CC /* Pods-TrustWeb3Provider_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Tests/Pods-TrustWeb3Provider_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		960FF95B0B6171E298739B73 /* Pods_TrustWeb3Provider_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TrustWeb3Provider_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9DAA0C45AA8BFEFF95137B87 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		BB38221D27A1126C0043F3EC /* trust-web3-provider */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "trust-web3-provider"; path = ..; sourceTree = "<group>"; };
 		BB544C0221B2124500E8C525 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		BB544C0421B230BE00E8C525 /* dist */ = {isa = PBXFileReference; lastKnownFileType = folder; name = dist; path = ../../dist; sourceTree = "<group>"; };
 		BB544C0621B2381C00E8C525 /* DAppMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppMethod.swift; sourceTree = "<group>"; };
 		BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKScriptMessage+JSON.swift"; sourceTree = "<group>"; };
 		BB544C0A21B24E0400E8C525 /* WKUserScriptConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKUserScriptConfig.swift; sourceTree = "<group>"; };
 		BBD19298250F1DF500E313BA /* WKWebView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Extensions.swift"; sourceTree = "<group>"; };
-		C21C2822FF502C70248CBED9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		CA8DB6877E5830513FA359AD /* Pods-TrustWeb3Provider_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example.debug.xcconfig"; sourceTree = "<group>"; };
-		D91A7C4513C7274B3809282D /* Pods_TrustWeb3Provider_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TrustWeb3Provider_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F08F82901B708D284118EFFB /* TrustWeb3Provider.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TrustWeb3Provider.podspec; path = ../TrustWeb3Provider.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		F44112CD5DC8ACEC377D2F75 /* Pods-TrustWeb3Provider_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrustWeb3Provider_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example.release.xcconfig"; sourceTree = "<group>"; };
+		BBF13EF127A112EA00AB8211 /* WalletCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = WalletCore; path = Packages/WalletCore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +57,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FDDE2BAA1C0D200991CE0EA4 /* Pods_TrustWeb3Provider_Example.framework in Frameworks */,
+				BBC0FD5A27A13A6E00DD4612 /* WalletCore in Frameworks */,
+				BBC0FD5E27A167B100DD4612 /* TrustWeb3Provider in Frameworks */,
+				BBC0FD5C27A13A9700DD4612 /* SwiftProtobuf in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,32 +67,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22AF27BBA8D8B8F876ECCF27 /* Pods_TrustWeb3Provider_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		323B51BCD31BFF987183D840 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				960FF95B0B6171E298739B73 /* Pods_TrustWeb3Provider_Example.framework */,
-				D91A7C4513C7274B3809282D /* Pods_TrustWeb3Provider_Tests.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				BB2923B727A1098E005CC651 /* Packages */,
 				BB544C0221B2124500E8C525 /* README.md */,
-				607FACF51AFB993E008FA782 /* Podspec */,
 				607FACD21AFB9204008FA782 /* Example */,
 				607FACE81AFB9204008FA782 /* Tests */,
 				607FACD11AFB9204008FA782 /* Products */,
-				8B5580A260F8CFEF1414545F /* Pods */,
-				323B51BCD31BFF987183D840 /* Frameworks */,
+				BBC0FD5827A13A6E00DD4612 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,7 +97,6 @@
 		607FACD21AFB9204008FA782 /* Example */ = {
 			isa = PBXGroup;
 			children = (
-				BB544C0421B230BE00E8C525 /* dist */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* DAppWebViewController.swift */,
 				BB544C0621B2381C00E8C525 /* DAppMethod.swift */,
@@ -155,25 +137,20 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		607FACF51AFB993E008FA782 /* Podspec */ = {
+		BB2923B727A1098E005CC651 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				F08F82901B708D284118EFFB /* TrustWeb3Provider.podspec */,
-				9DAA0C45AA8BFEFF95137B87 /* README.md */,
-				C21C2822FF502C70248CBED9 /* LICENSE */,
+				BB38221D27A1126C0043F3EC /* trust-web3-provider */,
+				BBF13EF127A112EA00AB8211 /* WalletCore */,
 			);
-			name = Podspec;
+			name = Packages;
 			sourceTree = "<group>";
 		};
-		8B5580A260F8CFEF1414545F /* Pods */ = {
+		BBC0FD5827A13A6E00DD4612 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				CA8DB6877E5830513FA359AD /* Pods-TrustWeb3Provider_Example.debug.xcconfig */,
-				F44112CD5DC8ACEC377D2F75 /* Pods-TrustWeb3Provider_Example.release.xcconfig */,
-				37AD3B28A8214ACB2B07B6DB /* Pods-TrustWeb3Provider_Tests.debug.xcconfig */,
-				747CE7C4341A06BB59E852CC /* Pods-TrustWeb3Provider_Tests.release.xcconfig */,
 			);
-			name = Pods;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,17 +160,20 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TrustWeb3Provider_Example" */;
 			buildPhases = (
-				DA5CA147B5E6FFAF7D4DA3D2 /* [CP] Check Pods Manifest.lock */,
 				607FACCC1AFB9204008FA782 /* Sources */,
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
-				9B817E892CA041381AC440F9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = TrustWeb3Provider_Example;
+			packageProductDependencies = (
+				BBC0FD5927A13A6E00DD4612 /* WalletCore */,
+				BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */,
+				BBC0FD5D27A167B100DD4612 /* TrustWeb3Provider */,
+			);
 			productName = TrustWeb3Provider;
 			productReference = 607FACD01AFB9204008FA782 /* TrustWeb3Provider_Example.app */;
 			productType = "com.apple.product-type.application";
@@ -202,7 +182,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TrustWeb3Provider_Tests" */;
 			buildPhases = (
-				6F4DDF0DB98752309D4DFBCD /* [CP] Check Pods Manifest.lock */,
 				607FACE11AFB9204008FA782 /* Sources */,
 				607FACE21AFB9204008FA782 /* Frameworks */,
 				607FACE31AFB9204008FA782 /* Resources */,
@@ -262,7 +241,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB544C0521B230BE00E8C525 /* dist in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
@@ -277,62 +255,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		6F4DDF0DB98752309D4DFBCD /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-TrustWeb3Provider_Tests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9B817E892CA041381AC440F9 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TrustWeb3Provider_Example/Pods-TrustWeb3Provider_Example-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		DA5CA147B5E6FFAF7D4DA3D2 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-TrustWeb3Provider_Example-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		607FACCC1AFB9204008FA782 /* Sources */ = {
@@ -435,7 +357,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -485,7 +407,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -496,7 +418,6 @@
 		};
 		607FACF01AFB9204008FA782 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CA8DB6877E5830513FA359AD /* Pods-TrustWeb3Provider_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = TrustWeb3Provider/Info.plist;
@@ -514,7 +435,6 @@
 		};
 		607FACF11AFB9204008FA782 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F44112CD5DC8ACEC377D2F75 /* Pods-TrustWeb3Provider_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = TrustWeb3Provider/Info.plist;
@@ -532,7 +452,6 @@
 		};
 		607FACF31AFB9204008FA782 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 37AD3B28A8214ACB2B07B6DB /* Pods-TrustWeb3Provider_Tests.debug.xcconfig */;
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -548,7 +467,6 @@
 		};
 		607FACF41AFB9204008FA782 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 747CE7C4341A06BB59E852CC /* Pods-TrustWeb3Provider_Tests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = Tests/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
@@ -589,6 +507,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BBC0FD5927A13A6E00DD4612 /* WalletCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WalletCore;
+		};
+		BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftProtobuf;
+		};
+		BBC0FD5D27A167B100DD4612 /* TrustWeb3Provider */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TrustWeb3Provider;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 607FACC81AFB9204008FA782 /* Project object */;
 }
