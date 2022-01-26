@@ -6,6 +6,7 @@
 
 import Foundation
 import WebKit
+import TrustWeb3Provider
 
 struct WKUserScriptConfig {
 
@@ -13,18 +14,8 @@ struct WKUserScriptConfig {
     let chainId: Int
     let rpcUrl: String
 
-    var providerJsBundleUrl: URL {
-        let bundlePath = Bundle.main.path(forResource: "TrustWeb3Provider", ofType: "bundle")
-        let bundle = Bundle(path: bundlePath!)!
-        return bundle.url(forResource: "trust-min", withExtension: "js")!
-    }
-
-    var providerJsUrl: URL {
-        return Bundle.main.url(forResource: "trust-min", withExtension: "js", subdirectory: "dist")!
-    }
-
     var providerScript: WKUserScript {
-        let source = try! String(contentsOf: providerJsUrl)
+        let source = try! String(contentsOf: TrustWeb3Provider.providerJsUrl())
         let script = WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         return script
     }
