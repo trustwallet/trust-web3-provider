@@ -1,6 +1,6 @@
 {
   "name": "trust-web3-provider",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Trust Web3 Provider",
   "repository": {
     "type": "git",
@@ -13,6 +13,9 @@
     "build": "rm -rf ../dist/*.js && parcel build index.js && mv dist/index.js ../dist/trust-min.js",
     "lint": "eslint . --fix",
     "test": "jest"
+  },
+  "engines": {
+    "node": ">=12 <15"
   },
   "targets": {
     "default": {
@@ -27,12 +30,17 @@
     "web3": "^0.20.7"
   },
   "devDependencies": {
-    "@parcel/transformer-babel": "^2.2.1",
-    "babel-preset-env": "^1.7.0",
+    "@babel/core": "^7.16.12",
+    "@babel/preset-env": "^7.16.11",
     "eslint": "^8.7.0",
     "ethereumjs-util": "^7.0.5",
     "jest": "^27.4.7",
     "lodash": "^4.17.21",
     "parcel": "^2.0.0"
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "jsdom",
+    "globals": {}
   }
 }

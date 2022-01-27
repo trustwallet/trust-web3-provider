@@ -22,7 +22,7 @@ window.ethereum.isTrust
 TrustWeb3Provider is available through SPM. To install it, simply add the following dependency to your `Package.swift`:
 
 ```swift
-.package(name: "PromiseKit", url: "https://github.com/trustwallet/trust-web3-provider", .exactItem("<latest_tag>")),
+.package(name: "TrustWeb3Provider", url: "https://github.com/trustwallet/trust-web3-provider", .branch("master")),
 ```
 
 Here is an example project located at `ios/TrustWeb3Provider.xcodeproj` to demonstrate how to use this provider.
