@@ -2,17 +2,6 @@
   "name": "trust-web3-provider",
   "version": "0.3.0",
   "description": "Trust Web3 Provider",
-  "main": "index.js",
-  "android": {
-    "dist": "../android/lib/src/main/res/raw/"
-  },
-  "scripts": {
-    "build": "rm -rf ../dist/*.js && parcel build index.js --no-source-maps -o trust-min.js -d ../dist",
-    "build:android": "rm -rf $npm_package_android_dist/trust.js && mkdir -pv $npm_package_android_dist && parcel build index.js --no-source-maps -o trust.js -d $npm_package_android_dist",
-    "watch": "rm -rf ../dist/*.js && parcel watch index.js -o trust-min.js -d ../dist",
-    "lint": "eslint . --fix",
-    "test": "jest"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/TrustWallet/trust-web3-provider.git"
@@ -20,6 +9,16 @@
   "keywords": [],
   "author": "Trust <support@trustwalletapp.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "rm -rf ../dist/*.js && parcel build index.js && mv dist/index.js ../dist/trust-min.js",
+    "lint": "eslint . --fix",
+    "test": "jest"
+  },
+  "targets": {
+    "default": {
+      "sourceMap": false
+    }
+  },
   "dependencies": {
     "buffer": "^5.6.0",
     "eth-sig-util": "^3.0.1",
@@ -28,12 +27,12 @@
     "web3": "^0.20.7"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
+    "@parcel/transformer-babel": "^2.2.1",
     "babel-preset-env": "^1.7.0",
-    "eslint": "^5.16.0",
+    "eslint": "^8.7.0",
     "ethereumjs-util": "^7.0.5",
-    "jest": "^23.6.0",
+    "jest": "^27.4.7",
     "lodash": "^4.17.21",
-    "parcel-bundler": "^1.12.4"
+    "parcel": "^2.0.0"
   }
 }
