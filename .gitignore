@@ -42,6 +42,8 @@ Pods/
 node_modules/
 jspm_packages/
 staging/
+.parcel-cache/
+
 
 # Android
 .idea
