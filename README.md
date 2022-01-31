@@ -19,14 +19,13 @@ window.ethereum.isTrust
 
 ### iOS
 
-TrustWeb3Provider is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+TrustWeb3Provider is available through SPM. To install it, simply add the following dependency to your `Package.swift`:
 
-```ruby
-pod 'TrustWeb3Provider', git: 'https://github.com/trustwallet/trust-web3-provider', tag: '<latest_tag>'
+```swift
+.package(name: "TrustWeb3Provider", url: "https://github.com/trustwallet/trust-web3-provider", .branch("master")),
 ```
 
-Here is an example project located at `ios/TrustWeb3Provider.xcworkspace` to demonstrate how to use this provider.
+Here is an example project located at `ios/TrustWeb3Provider.xcodeproj` to demonstrate how to use this provider.
 
 ### Android
 

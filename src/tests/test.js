@@ -76,7 +76,6 @@ describe("TrustWeb3Provider constructor tests", () => {
 
     provider.request(request).then((chainId) => {
       expect(chainId).toEqual("0x38");
-      done();
     });
 
     const response = web3.currentProvider.send(request);
@@ -95,12 +94,10 @@ describe("TrustWeb3Provider constructor tests", () => {
 
     web3.eth.getAccounts((error, accounts) => {
       expect(accounts).toEqual(addresses);
-      done();
     });
 
     provider.request({ method: "eth_accounts" }).then((accounts) => {
       expect(accounts).toEqual(addresses);
-      done();
     });
 
     web3.currentProvider.sendAsync(
