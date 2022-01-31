@@ -1,18 +1,7 @@
 {
   "name": "trust-web3-provider",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Trust Web3 Provider",
-  "main": "index.js",
-  "android": {
-    "dist": "../android/lib/src/main/res/raw/"
-  },
-  "scripts": {
-    "build": "rm -rf ../dist/*.js && parcel build index.js --no-source-maps -o trust-min.js -d ../dist",
-    "build:android": "rm -rf $npm_package_android_dist/trust.js && mkdir -pv $npm_package_android_dist && parcel build index.js --no-source-maps -o trust.js -d $npm_package_android_dist",
-    "watch": "rm -rf ../dist/*.js && parcel watch index.js -o trust-min.js -d ../dist",
-    "lint": "eslint . --fix",
-    "test": "jest"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/TrustWallet/trust-web3-provider.git"
@@ -20,6 +9,14 @@
   "keywords": [],
   "author": "Trust <support@trustwalletapp.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js",
+    "lint": "eslint . --fix",
+    "test": "jest"
+  },
+  "engines": {
+    "node": ">=14"
+  },
   "dependencies": {
     "buffer": "^5.6.0",
     "eth-sig-util": "^3.0.1",
@@ -28,12 +25,18 @@
     "web3": "^0.20.7"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^5.16.0",
+    "@babel/core": "^7.16.12",
+    "@babel/preset-env": "^7.16.11",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "eslint": "^8.7.0",
     "ethereumjs-util": "^7.0.5",
-    "jest": "^23.6.0",
-    "lodash": "^4.17.21",
-    "parcel-bundler": "^1.12.4"
+    "jest": "^27.4.7",
+    "uglify-js": "^3.15.0"
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "jsdom",
+    "globals": {}
   }
 }
