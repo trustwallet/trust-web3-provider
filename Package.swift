@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "trust-web3-provider",
+    name: "TrustWeb3Provider",
     products: [
         .library(
             name: "TrustWeb3Provider",
