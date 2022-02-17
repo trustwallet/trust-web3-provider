@@ -23,9 +23,8 @@ class WebAppInterface(
     private val addr = CoinType.ETHEREUM.deriveAddress(privateKey).toLowerCase()
 
     @JavascriptInterface
-    fun postMessage(json: String) {
+    fun onRequest(jsonStr: String) {
         val obj = JSONObject(json)
-        println(obj)
         val id = obj.getLong("id")
         val method = DAppMethod.fromValue(obj.getString("name"))
         when (method) {
