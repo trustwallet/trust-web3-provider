@@ -26,7 +26,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.isTrust = true;
     this.isDebug = !!config.isDebug;
 
-    this.emitConnect(config.chainId);
+    this.emitConnect(this.chainId);
   }
 
   setAddress(address) {
@@ -45,7 +45,8 @@ class TrustWeb3Provider extends EventEmitter {
   setConfig(config) {
     this.setAddress(config.address);
 
-    this.chainId = config.chainId;
+    this.networkVersion = "" + config.chainId;
+    this.chainId = "0x" + (config.chainId || 1).toString(16);
     this.rpc = new RPCServer(config.rpcUrl);
     this.isDebug = !!config.isDebug;
   }
@@ -80,6 +81,9 @@ class TrustWeb3Provider extends EventEmitter {
    * @deprecated Use request() method instead.
    */
   send(payload) {
+    if (this.isDebug) {
+      console.log(`==> send payload ${JSON.stringify(payload)}`);
+    }
     let response = { jsonrpc: "2.0", id: payload.id };
     switch (payload.method) {
       case "eth_accounts":
@@ -224,11 +228,11 @@ class TrustWeb3Provider extends EventEmitter {
   }
 
   net_version() {
-    return this.chainId.toString(10) || null;
+    return this.networkVersion;
   }
 
   eth_chainId() {
-    return "0x" + this.chainId.toString(16);
+    return this.chainId;
   }
 
   eth_sign(payload) {
