@@ -53,10 +53,12 @@ describe("TrustWeb3Provider constructor tests", () => {
     const provider = new trustwallet.Provider(ropsten);
     const web3 = new Web3(provider);
 
-    expect(web3.currentProvider.chainId).toEqual(3);
+    expect(web3.currentProvider.chainId).toEqual("0x3");
+    expect(web3.currentProvider.networkVersion).toEqual("3");
 
     web3.currentProvider.setConfig(mainnet);
-    expect(web3.currentProvider.chainId).toEqual(1);
+    expect(web3.currentProvider.chainId).toEqual("0x1");
+    expect(web3.currentProvider.networkVersion).toEqual("1");
     expect(web3.currentProvider.rpc.rpcUrl).toBe(mainnet.rpcUrl);
 
     expect(provider.request).not.toBeUndefined;
