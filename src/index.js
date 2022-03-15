@@ -370,12 +370,13 @@ class TrustWeb3Provider extends EventEmitter {
     let callback = this.callbacks.get(id);
     let wrapResult = this.wrapResults.get(id);
     let data = { jsonrpc: "2.0", id: originId };
-    if (typeof result === "object" && result.jsonrpc && result.result) {
+    if (result && typeof result === "object" && result.jsonrpc && result.result) {
       data.result = result.result;
     } else {
       data.result = result;
     }
     if (this.isDebug) {
+      console.log("<== wrapResult: ", wrapResult);
       console.log(
         `<== sendResponse id: ${id}, result: ${JSON.stringify(
           result
