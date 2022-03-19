@@ -8,6 +8,7 @@
 
 var ethUtil = require("ethereumjs-util");
 require("../index");
+require("whatwg-fetch");
 const Web3 = require("web3");
 const trustwallet = window.trustwallet;
 
@@ -26,7 +27,7 @@ const ropsten = {
 const bsc = {
   address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
   chainId: 56,
-  rpcUrl: "https://bsc-dataseed1.binance.orge",
+  rpcUrl: "https://bsc-dataseed1.binance.org",
 };
 
 describe("TrustWeb3Provider constructor tests", () => {
@@ -177,5 +178,32 @@ describe("TrustWeb3Provider constructor tests", () => {
       expect(result).toEqual(signed);
       done();
     });
+  });
+
+  test("test batched sendAsync", (done) => {
+    const provider = new trustwallet.Provider(bsc);
+    const web3 = new Web3(provider);
+    const request = [
+      {jsonrpc: "2.0", id: 11, method: "eth_call", params: [{data: "0x06fdde03", to: "0xe9e7cea3dedca5984780bafc599bd69add087d56"}, "latest"]},
+      {jsonrpc: "2.0", id: 12, method: "eth_call", params: [{data: "0x313ce567", to: "0xe9e7cea3dedca5984780bafc599bd69add087d56"}, "latest"]}
+    ];
+    const expectedResult = [
+      {
+        jsonrpc: "2.0",
+        id: 11,
+        result: "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a4255534420546f6b656e00000000000000000000000000000000000000000000"
+      },
+      {
+        jsonrpc: "2.0",
+        id: 12,
+        result: "0x0000000000000000000000000000000000000000000000000000000000000012"
+      }
+    ];
+    web3.currentProvider.sendAsync(request,
+      (error, result) => {
+        expect(result).toEqual(expectedResult);
+        done();
+      }
+    );
   });
 }); // end of top describe()

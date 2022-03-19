@@ -32,7 +32,8 @@
     "eslint": "^8.7.0",
     "ethereumjs-util": "^7.0.5",
     "jest": "^27.4.7",
-    "uglify-js": "^3.15.0"
+    "uglify-js": "^3.15.0",
+    "whatwg-fetch": "^3.6.2"
   },
   "jest": {
     "verbose": true,
