@@ -120,7 +120,7 @@ class TrustWeb3Provider extends EventEmitter {
       that = window.ethereum;
     }
     if (Array.isArray(payload)) {
-      Promise.all(payload.map(that._request.bind(that)))
+      Promise.all(payload.map((_payload) => that._request(_payload)))
         .then((data) => callback(null, data))
         .catch((error) => callback(error, null));
     } else {
