@@ -29,8 +29,7 @@ public struct TrustWeb3Provider {
             var config = {
                 address: "\(address.lowercased())",
                 chainId: \(chainId),
-                rpcUrl: "\(rpcUrl)",
-                isDebug: true
+                rpcUrl: "\(rpcUrl)"
             };
 
             window.ethereum = new trustwallet.Provider(config);
@@ -76,8 +75,7 @@ public extension TypeWrapper where T == WKWebView {
         var config = {
             address: "\(address.lowercased())",
             chainId: \(chainId),
-            rpcUrl: "\(rpcUrl)",
-            isDebug: true
+            rpcUrl: "\(rpcUrl)"
         };
         ethereum.setConfig(config);
         """
