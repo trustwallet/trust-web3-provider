@@ -192,6 +192,7 @@ class TrustWeb3Provider extends EventEmitter {
           // call upstream rpc
           this.callbacks.delete(payload.id);
           this.wrapResults.delete(payload.id);
+          payload.jsonrpc = "2.0";
           return this.rpc
             .call(payload)
             .then((response) => {
@@ -412,6 +413,11 @@ class TrustWeb3Provider extends EventEmitter {
       callback(error instanceof Error ? error : new Error(error), null);
       this.callbacks.delete(id);
     }
+  }
+
+  emit(event, ...args) {
+    console.log(`=== emit event ${event} ${args}`);
+    super.emit(event, ...args);
   }
 }
 
