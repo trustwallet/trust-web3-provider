@@ -24,6 +24,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.callbacks = new Map();
     this.wrapResults = new Map();
     this.isTrust = true;
+    this.isMetaMask = false;
     this.isDebug = !!config.isDebug;
 
     this.emitConnect(this.chainId);
@@ -139,6 +140,7 @@ class TrustWeb3Provider extends EventEmitter {
     if (this.isDebug) {
       console.log(`==> _request payload ${JSON.stringify(payload)}`);
     }
+    this.fillJsonRpcVersion(payload);
     return new Promise((resolve, reject) => {
       if (!payload.id) {
         payload.id = Utils.genId();
@@ -206,6 +208,12 @@ class TrustWeb3Provider extends EventEmitter {
             .catch(reject);
       }
     });
+  }
+
+  fillJsonRpcVersion(payload) {
+    if (payload.jsonrpc === undefined) {
+      payload.jsonrpc = "2.0";
+    }
   }
 
   emitConnect(chainId) {
