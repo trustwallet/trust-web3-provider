@@ -13,7 +13,7 @@ import Utils from "./utils";
 import IdMapping from "./id_mapping";
 import { EventEmitter } from "events";
 import isUtf8 from "isutf8";
-import { TypedDataUtils } from "eth-sig-util";
+import { TypedDataUtils, SignTypedDataVersion } from "@metamask/eth-sig-util";
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
@@ -24,6 +24,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.callbacks = new Map();
     this.wrapResults = new Map();
     this.isTrust = true;
+    this.isMetaMask = false;
     this.isDebug = !!config.isDebug;
 
     this.emitConnect(this.chainId);
@@ -72,7 +73,7 @@ class TrustWeb3Provider extends EventEmitter {
    */
   enable() {
     console.log(
-      "enable() is deprecated, please use window.ethereum.request({method: \"eth_requestAccounts\"}) instead."
+      'enable() is deprecated, please use window.ethereum.request({method: "eth_requestAccounts"}) instead.'
     );
     return this.request({ method: "eth_requestAccounts", params: [] });
   }
@@ -139,6 +140,7 @@ class TrustWeb3Provider extends EventEmitter {
     if (this.isDebug) {
       console.log(`==> _request payload ${JSON.stringify(payload)}`);
     }
+    this.fillJsonRpcVersion(payload);
     return new Promise((resolve, reject) => {
       if (!payload.id) {
         payload.id = Utils.genId();
@@ -168,11 +170,11 @@ class TrustWeb3Provider extends EventEmitter {
         case "personal_ecRecover":
           return this.personal_ecRecover(payload);
         case "eth_signTypedData_v3":
-          return this.eth_signTypedData(payload, "V3");
+          return this.eth_signTypedData(payload, SignTypedDataVersion.V3);
         case "eth_signTypedData":
           return this.eth_signTypedData(payload, "V1");
         case "eth_signTypedData_v4":
-          return this.eth_signTypedData(payload, "V4");
+          return this.eth_signTypedData(payload, SignTypedDataVersion.V4);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
@@ -208,6 +210,12 @@ class TrustWeb3Provider extends EventEmitter {
             .catch(reject);
       }
     });
+  }
+
+  fillJsonRpcVersion(payload) {
+    if (payload.jsonrpc === undefined) {
+      payload.jsonrpc = "2.0";
+    }
   }
 
   emitConnect(chainId) {
@@ -264,65 +272,13 @@ class TrustWeb3Provider extends EventEmitter {
     });
   }
 
-  _processMetamaskV1SignParam(data) {
-    if (typeof data === "object") {
-      return {
-        message: data,
-        params: JSON.stringify(data),
-      };
-    } else if (typeof data === "string") {
-      return {
-        message: JSON.parse(data),
-        params: data,
-      }
-    } else {
-      throw Error("signTypedDataV1 params error ", data);
-    }
-  }
-
   eth_signTypedData(payload, version) {
-    const messageName = `signTypedMessage${version}`;
-    switch(version) {
-      case "V1": {
-        let message;
-        let params;
-        try {
-          const res = this._processMetamaskV1SignParam(payload.params[1]);
-          // message = res.message;
-          params = res.params;
-        } catch (err) {
-          // that's for metamask test dapp error
-          console.log(err);
-          const res = this._processMetamaskV1SignParam(payload.params[0]);
-          // message = res.message;
-          params = res.params;
-        }
-        // const hash = TypedDataUtils.sign(message, true);
-        this.postMessage(messageName, payload.id, {
-          // data: "0x" + hash.toString("hex"),
-          raw: params,
-        });
-        break;
-      }
-      case "V3": {
-        const message = JSON.parse(payload.params[1]);
-        const hash = TypedDataUtils.sign(message, false);
-        this.postMessage(messageName, payload.id, {
-          data: "0x" + hash.toString("hex"),
-          raw: payload.params[1],
-        });
-        break;
-      }
-      case "V4": {
-        const message = JSON.parse(payload.params[1]);
-        const hash = TypedDataUtils.sign(message, true);
-        this.postMessage(messageName, payload.id, {
-          data: "0x" + hash.toString("hex"),
-          raw: payload.params[1],
-        });
-        break;
-      }
-    }
+    const message = JSON.parse(payload.params[1]);
+    const hash = TypedDataUtils.eip712Hash(message, version);
+    this.postMessage("signTypedMessage", payload.id, {
+      data: "0x" + hash.toString("hex"),
+      raw: payload.params[1],
+    });
   }
 
   eth_sendTransaction(payload) {
