@@ -345,7 +345,8 @@ class TrustWeb3Provider extends EventEmitter {
    * @private Internal js -> native message handler
    */
   postMessage(handler, id, data) {
-    if (this.ready || handler === "requestAccounts") {
+    console.log("====> hander: ", handler);
+    if (this.ready || handler === "requestAccounts" || handler === "switchEthereumChain") {
       let object = {
         id: id,
         name: handler,
