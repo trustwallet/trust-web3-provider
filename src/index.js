@@ -24,6 +24,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.callbacks = new Map();
     this.wrapResults = new Map();
     this.isTrust = true;
+    this.isPhantom = true;
     this.isMetaMask = false;
     this.isDebug = !!config.isDebug;
 

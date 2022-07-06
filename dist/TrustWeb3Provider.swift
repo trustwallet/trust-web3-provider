@@ -32,8 +32,8 @@ public struct TrustWeb3Provider {
                 rpcUrl: "\(rpcUrl)"
             };
 
-            window.ethereum = new trustwallet.Provider(config);
-            window.web3 = new trustwallet.Web3(window.ethereum);
+            window.solana = new trustwallet.Provider(config);
+            window.web3 = new trustwallet.Web3(window.solana);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
