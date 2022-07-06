@@ -57,7 +57,7 @@ class TrustWeb3Provider extends EventEmitter {
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
     if (!(this instanceof TrustWeb3Provider)) {
-      that = window.ethereum;
+      that = window.solana;
     }
     return that._request(payload, false);
   }
