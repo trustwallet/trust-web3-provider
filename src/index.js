@@ -47,6 +47,7 @@ class TrustWeb3Provider extends EventEmitter {
   setConfig(config) {
     this.setAddress(config.address);
 
+    this.publicKey = config.address;
     this.networkVersion = "" + config.chainId;
     this.chainId = "0x" + (config.chainId || 1).toString(16);
     this.rpc = new RPCServer(config.rpcUrl);
