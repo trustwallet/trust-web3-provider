@@ -35,6 +35,13 @@ class TrustSolanaWeb3Provider extends TrustWeb3Provider {
     signTransaction(payload) {
         this.postMessage("signTransaction", 0, payload);
     }
+
+    signAllTransactions(transactions) {
+        const message = transactions.map(transaction => {
+            return transaction.serializeMessage().toString('hex');
+        });
+        this.postMessage("signTransaction", 0, message);
+    }
 }
 
 module.exports = TrustSolanaWeb3Provider;
