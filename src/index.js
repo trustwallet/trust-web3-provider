@@ -11,13 +11,12 @@ import RPCServer from "./rpc";
 import ProviderRpcError from "./error";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
-//import TrustSolanaWeb3Provider from "./solana";
 import { EventEmitter } from "events";
 import isUtf8 from "isutf8";
 import { TypedDataUtils, SignTypedDataVersion } from "@metamask/eth-sig-util";
-import { PublicKey, Message } from "@solana/web3.js";
+import TrustSolanaWeb3Provider from "./solana_web3_provider";
 
-class TrustWeb3Provider extends EventEmitter {
+class TrustEVMWeb3Provider extends EventEmitter {
   constructor(config) {
     super();
     this.setConfig(config);
@@ -387,70 +386,6 @@ class TrustWeb3Provider extends EventEmitter {
     }
   }
 }
-
-class TrustSolanaWeb3Provider extends EventEmitter {
-    constructor(config) {
-        super();
-
-        this.setAddress(config.address)
-        this.isPhantom = true;
-        this.chainId = "0x" + (config.chainId || 1).toString(16);
-        this.isConnected = false;
-        //this.isWalletEnabled = false;
-        //this.ready = !!config.address
-    }
-
-    connect() {
-      return new Promise((resolve) => {
-          this.isConnected = true
-        this.emit("connect", { chainId: this._chainId });
-        resolve();
-      });
-    }
-
-    setAddress(address) {
-      const lowerAddress = (address || "").toLowerCase();
-      this.publicKey = new PublicKey(lowerAddress);
-      this.ready = !!address;
-    }
-
-    signMessage(payload) {
-        const buffer = Utils.messageToBuffer(payload);
-        const hex = Utils.bufferToHex(buffer);
-        if (isUtf8(buffer)) {
-            this.postMessage("signPersonalMessage", 0, { data: hex });
-        } else {
-            this.postMessage("signMessage", 0, { data: hex });
-        }
-    }
-
-    signTransaction(payload) {
-      this.postMessage("signTransaction", 0, payload);
-    }
-
-    /**
-     * @private Internal js -> native message handler
-     */
-    postMessage(handler, id, data) {
-      if (this.ready) {
-        let object = {
-          id: id,
-          name: handler,
-          object: data,
-        };
-        if (window.trustwallet.postMessage) {
-          window.trustwallet.postMessage(object);
-        } else {
-          // old clients
-          window.webkit.messageHandlers[handler].postMessage(object);
-        }
-      } else {
-        // don't forget to verify in the app
-        this.sendError(id, new ProviderRpcError(4100, "provider is not ready"));
-      }
-    }
-}
-
 
 window.trustwallet = {
   Provider: TrustSolanaWeb3Provider,
