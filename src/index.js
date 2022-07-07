@@ -11,9 +11,11 @@ import RPCServer from "./rpc";
 import ProviderRpcError from "./error";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
+//import TrustSolanaWeb3Provider from "./solana";
 import { EventEmitter } from "events";
 import isUtf8 from "isutf8";
 import { TypedDataUtils, SignTypedDataVersion } from "@metamask/eth-sig-util";
+import { PublicKey, Message } from "@solana/web3.js";
 
 class TrustWeb3Provider extends EventEmitter {
   constructor(config) {
@@ -27,6 +29,7 @@ class TrustWeb3Provider extends EventEmitter {
     this.isPhantom = true;
     this.isMetaMask = false;
     this.isDebug = !!config.isDebug;
+    this.publicKey = new PublicKey("9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b");
 
     this.emitConnect(this.chainId);
   }
@@ -35,7 +38,6 @@ class TrustWeb3Provider extends EventEmitter {
     const lowerAddress = (address || "").toLowerCase();
     this.address = lowerAddress;
     this.ready = !!address;
-    this.publicKey = lowerAddress;
     for (var i = 0; i < window.frames.length; i++) {
       const frame = window.frames[i];
       if (frame.ethereum && frame.ethereum.isTrust) {
@@ -48,7 +50,6 @@ class TrustWeb3Provider extends EventEmitter {
   setConfig(config) {
     this.setAddress(config.address);
 
-    this.publicKey = config.address;
     this.networkVersion = "" + config.chainId;
     this.chainId = "0x" + (config.chainId || 1).toString(16);
     this.rpc = new RPCServer(config.rpcUrl);
@@ -387,8 +388,65 @@ class TrustWeb3Provider extends EventEmitter {
   }
 }
 
+class TrustSolanaWeb3Provider extends EventEmitter {
+    constructor(config) {
+        super();
+
+        this.setAddress(config.address)
+        this.isPhantom = true;
+        this.chainId = "0x" + (config.chainId || 1).toString(16);
+
+        //this.isWalletEnabled = false;
+        //this.ready = !!config.address
+    }
+
+    connect() {
+      return new Promise((resolve) => {
+        this.emit("connect", { chainId: this._chainId });
+        resolve();
+      });
+    }
+
+    get isConnected() {
+      return this._publicKey !== null;
+    }
+
+    setAddress(address) {
+      const lowerAddress = (address || "").toLowerCase();
+      this.publicKey = new PublicKey(lowerAddress);
+      this.ready = !!address;
+    }
+
+    signTransaction(payload) {
+      this.postMessage("signTransaction", payload.id, payload);
+    }
+
+    /**
+     * @private Internal js -> native message handler
+     */
+    postMessage(handler, id, data) {
+      if (this.ready) {
+        let object = {
+          id: id,
+          name: handler,
+          object: data,
+        };
+        if (window.trustwallet.postMessage) {
+          window.trustwallet.postMessage(object);
+        } else {
+          // old clients
+          window.webkit.messageHandlers[handler].postMessage(object);
+        }
+      } else {
+        // don't forget to verify in the app
+        this.sendError(id, new ProviderRpcError(4100, "provider is not ready"));
+      }
+    }
+}
+
+
 window.trustwallet = {
-  Provider: TrustWeb3Provider,
+  Provider: TrustSolanaWeb3Provider,
   Web3: Web3,
   postMessage: null,
 };
