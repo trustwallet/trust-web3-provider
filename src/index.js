@@ -414,6 +414,10 @@ class TrustSolanaWeb3Provider extends EventEmitter {
       this.ready = !!address;
     }
 
+    signMessage(message) {
+      this.postMessage("signMessage", 0, message);
+    }
+
     signTransaction(payload) {
       this.postMessage("signTransaction", 0, payload);
     }
