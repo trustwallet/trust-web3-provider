@@ -27,7 +27,7 @@ public struct TrustWeb3Provider {
         let source = """
         (function() {
             var config = {
-                address: "\(address.lowercased())",
+                address: "\(address)",
                 chainId: \(chainId),
                 rpcUrl: "\(rpcUrl)"
             };
