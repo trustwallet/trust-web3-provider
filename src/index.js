@@ -59,7 +59,7 @@ class TrustEVMWeb3Provider extends EventEmitter {
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
     if (!(this instanceof TrustWeb3Provider)) {
-      that = window.solana;
+      that = window.ethereum;
     }
     return that._request(payload, false);
   }
@@ -121,7 +121,7 @@ class TrustEVMWeb3Provider extends EventEmitter {
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
     if (!(this instanceof TrustWeb3Provider)) {
-      that = window.solana;
+      that = window.ethereum;
     }
     if (Array.isArray(payload)) {
       Promise.all(payload.map((_payload) => that._request(_payload)))
