@@ -395,20 +395,17 @@ class TrustSolanaWeb3Provider extends EventEmitter {
         this.setAddress(config.address)
         this.isPhantom = true;
         this.chainId = "0x" + (config.chainId || 1).toString(16);
-
+        this.isConnected = false;
         //this.isWalletEnabled = false;
         //this.ready = !!config.address
     }
 
     connect() {
       return new Promise((resolve) => {
+          this.isConnected = true
         this.emit("connect", { chainId: this._chainId });
         resolve();
       });
-    }
-
-    get isConnected() {
-      return this._publicKey !== null;
     }
 
     setAddress(address) {
