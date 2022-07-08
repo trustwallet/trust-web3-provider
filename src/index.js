@@ -25,10 +25,8 @@ class TrustEVMWeb3Provider extends EventEmitter {
     this.callbacks = new Map();
     this.wrapResults = new Map();
     this.isTrust = true;
-    this.isPhantom = true;
     this.isMetaMask = false;
     this.isDebug = !!config.isDebug;
-    this.publicKey = new PublicKey("9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b");
 
     this.emitConnect(this.chainId);
   }
@@ -387,8 +385,10 @@ class TrustEVMWeb3Provider extends EventEmitter {
   }
 }
 
+
 window.trustwallet = {
-  Provider: TrustSolanaWeb3Provider,
+  EVMProvider: TrustEVMWeb3Provider,
+  SolanaProvider: TrustSolanaWeb3Provider,
   Web3: Web3,
   postMessage: null,
 };
