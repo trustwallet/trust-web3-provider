@@ -32,7 +32,7 @@ public struct TrustWeb3Provider {
                 rpcUrl: "\(rpcUrl)"
             };
 
-            window.ethereum = new trustwallet.EVMProvider(config);
+            window.ethereum = new trustwallet.Provider(config);
             window.solana = new trustwallet.SolanaProvider(config);
 
             trustwallet.postMessage = (jsonString) => {

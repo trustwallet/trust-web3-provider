@@ -6,11 +6,10 @@
 
 "use strict";
 
-import TrustWeb3Provider from "./web3_provider";
+import BaseProvider from "./base_provider";
 import { PublicKey } from "@solana/web3.js";
-import { EventEmitter } from "events";
 
-class TrustSolanaWeb3Provider extends TrustWeb3Provider {
+class TrustSolanaWeb3Provider extends BaseProvider {
     constructor(config) {
         super();
 
@@ -22,14 +21,14 @@ class TrustSolanaWeb3Provider extends TrustWeb3Provider {
 
     connect() {
         return new Promise((resolve) => {
-            this.isConnected = true
+            this.isConnected = true;
             this.emit("connect");
             resolve();
         });
     }
 
     signMessage(payload) {
-        this.processMessage(payload);
+        console.log("signMessage", payload);
     }
 
     signTransaction(payload) {
@@ -38,7 +37,7 @@ class TrustSolanaWeb3Provider extends TrustWeb3Provider {
 
     signAllTransactions(transactions) {
         const message = transactions.map(transaction => {
-            return transaction.serializeMessage().toString('hex');
+            return transaction.serializeMessage().toString("hex");
         });
         this.postMessage("signTransaction", 0, message);
     }

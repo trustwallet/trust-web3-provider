@@ -6,9 +6,9 @@
 
 "use strict";
 
-var ethUtil = require("ethereumjs-util");
 require("../index");
 require("whatwg-fetch");
+const ethUtil = require("ethereumjs-util");
 const Web3 = require("web3");
 const trustwallet = window.trustwallet;
 
@@ -33,7 +33,7 @@ const bsc = {
 describe("TrustWeb3Provider constructor tests", () => {
   test("test constructor.name", () => {
     const provider = new trustwallet.Provider({});
-    const web3 = new trustwallet.Web3(provider);
+    const web3 = new Web3(provider);
     expect(web3.currentProvider.constructor.name).toBe("TrustWeb3Provider");
   });
 

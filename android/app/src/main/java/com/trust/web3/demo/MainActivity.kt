@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 rpcUrl: "$rpcUrl",
                 isDebug: true
             };
-            window.ethereum = new trustwallet.EVMProvider(config);
+            window.ethereum = new trustwallet.Provider(config);
             window.solana = new trustwallet.SolanaProvider(config);
             trustwallet.postMessage = (json) => {
                 window._tw_.postMessage(JSON.stringify(json));
