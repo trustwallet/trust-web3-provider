@@ -72,7 +72,7 @@ class TrustWeb3Provider extends BaseProvider {
    */
   enable() {
     console.log(
-      'enable() is deprecated, please use window.ethereum.request({method: "eth_requestAccounts"}) instead.'
+      "enable() is deprecated, please use window.ethereum.request({method: \"eth_requestAccounts\"}) instead."
     );
     return this.request({ method: "eth_requestAccounts", params: [] });
   }

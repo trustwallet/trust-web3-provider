@@ -13,6 +13,7 @@ public struct TrustWeb3Provider {
     public let address: String
     public let chainId: Int
     public let rpcUrl: String
+    public let solanaPubkey: String
 
     public var providerJsUrl: URL {
         return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
@@ -33,7 +34,7 @@ public struct TrustWeb3Provider {
             };
 
             window.ethereum = new trustwallet.Provider(config);
-            window.solana = new trustwallet.SolanaProvider(config);
+            window.solana = new trustwallet.SolanaProvider({address: "\(solanaPubkey)"});
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
@@ -43,10 +44,11 @@ public struct TrustWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(address: String, chainId: Int, rpcUrl: String) {
+    public init(address: String, chainId: Int, rpcUrl: String, solanaPubkey: String) {
         self.address = address
         self.chainId = chainId
         self.rpcUrl = rpcUrl
+        self.solanaPubkey = solanaPubkey
     }
 }
 

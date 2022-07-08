@@ -22,19 +22,22 @@ class DAppWebViewController: UIViewController {
     var current: TrustWeb3Provider = TrustWeb3Provider(
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
         chainId: 1,
-        rpcUrl: "https://cloudflare-eth.com"
+        rpcUrl: "https://cloudflare-eth.com",
+        solanaPubkey: "HBYC51YrGFAZ8rM7Sj8e9uqKggpSrDYrinQDZzvMtqQp"
     )
 
     var providers: [Int: TrustWeb3Provider] = [
         42161: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 42161,
-            rpcUrl: "https://arb1.arbitrum.io/rpc"
+            rpcUrl: "https://arb1.arbitrum.io/rpc",
+            solanaPubkey: "HBYC51YrGFAZ8rM7Sj8e9uqKggpSrDYrinQDZzvMtqQp"
         ),
         250: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 250,
-            rpcUrl: "https://rpc.ftm.tools"
+            rpcUrl: "https://rpc.ftm.tools",
+            solanaPubkey: "HBYC51YrGFAZ8rM7Sj8e9uqKggpSrDYrinQDZzvMtqQp"
         )
     ]
 
@@ -217,7 +220,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
-            self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0])
+            self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0], solanaPubkey: self.current.solanaPubkey)
             print("\(name) added")
             self.webview.tw.sendNull(id: id)
         }))
