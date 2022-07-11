@@ -7,7 +7,7 @@
 import Foundation
 
 enum DAppMethod: String, Decodable, CaseIterable {
-    case signTransaction
+    case signAllTransactions
     case signPersonalMessage
     case signMessage
     case signTypedMessage

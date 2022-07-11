@@ -8,6 +8,7 @@
 
 import BaseProvider from "./base_provider";
 import { PublicKey } from "@solana/web3.js";
+import bs58 from 'bs58';
 
 class TrustSolanaWeb3Provider extends BaseProvider {
     constructor(config) {
@@ -35,11 +36,15 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         this.postMessage("signTransaction", 0, payload);
     }
 
-    signAllTransactions(transactions) {
-        const message = transactions.map(transaction => {
-            return transaction.serializeMessage().toString("hex");
-        });
-        this.postMessage("signTransaction", 0, message);
+    signAllTransactions(payload) {
+        this.postMessage("signAllTransactions", 0, payload);
+    }
+
+    sendResponse(id, result) {
+        console.log(
+          `<== sendResponse id: ${id}, result: ${result}`
+        );
+        //super.sendResponse(id, result)
     }
 }
 

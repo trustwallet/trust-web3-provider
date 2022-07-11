@@ -14,10 +14,11 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://www.orca.so"
+        return "https://www.raydium.io/swap/"
     }
 
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
+    static let solanaPrivateKey = HDWallet(mnemonic: "...", passphrase: "")!.getKeyForCoin(coin: .solana)
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
@@ -106,6 +107,9 @@ extension DAppWebViewController: WKScriptMessageHandler {
         switch method {
         case .requestAccounts:
             handleRequestAccounts(id: id)
+        case .signAllTransactions:
+            let txs = extractRawTransactions(json: json)
+            handleSignSolanaTransactions(id: id, txs: txs)
         case .signMessage:
             guard let data = extractMessage(json: json) else {
                 print("data is missing")
@@ -135,7 +139,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             let recovered = ecRecover(signature: tuple.signature, message: tuple.message) ?? ""
             print(recovered)
             DispatchQueue.main.async {
-                self.webview.tw.send(result: recovered, to: id)
+                self.webview.tw.send(network: "ethereum", result: recovered, to: id)
             }
         case .addEthereumChain:
             guard let (chainId, name, rpcUrls) = extractChainInfo(json: json) else {
@@ -188,7 +192,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: addPrefix)
-            webview?.tw.send(result: "0x" + signed.hexString, to: id)
+            webview?.tw.send(network: "ethereum", result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -204,7 +208,25 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: false)
-            webview?.tw.send(result: "0x" + signed.hexString, to: id)
+            webview?.tw.send(network: "ethereum", result: "0x" + signed.hexString, to: id)
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+
+    func handleSignSolanaTransactions(id: Int64, txs: [Data]) {
+        let alert = UIAlertController(
+            title: "Sign Transactions",
+            message: "\(txs.count) encoded transaction(s)",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
+            webview?.tw.send(error: "Canceled", to: id)
+        }))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
+            txs.forEach { data in
+                let signed = Self.solanaPrivateKey.sign(digest: data, curve: .ed25519)
+                webview?.tw.send(network: "solana", result: Base58.encode(data: signed!), to: id)
+            }
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -266,6 +288,15 @@ extension DAppWebViewController: WKScriptMessageHandler {
         )
         alert.addAction(.init(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+
+    private func extractRawTransactions(json: [String: Any]) -> [Data] {
+        if let txs = json["object"] as? [[String: Any]] {
+            return txs.compactMap { try? JSONSerialization.data(withJSONObject: $0) }
+        }
+        else {
+            return []
+        }
     }
 
     private func extractMessage(json: [String: Any]) -> Data? {

@@ -95,8 +95,8 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func send(result: String, to id: Int64) {
-        let script = String(format: "ethereum.sendResponse(%ld, \"%@\")", id, result)
+    func send(network: String, result: String, to id: Int64) {
+        let script = String(format: "\(network).sendResponse(%ld, \"%@\")", id, result)
         value.evaluateJavaScript(script)
     }
 
