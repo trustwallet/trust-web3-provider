@@ -18,7 +18,7 @@ class DAppWebViewController: UIViewController {
     }
 
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
-    static let solanaPrivateKey = HDWallet(mnemonic: "...", passphrase: "")!.getKeyForCoin(coin: .solana)
+    static let solanaPrivateKey = HDWallet(mnemonic: "", passphrase: "")!.getKeyForCoin(coin: .solana)
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
@@ -108,8 +108,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         case .requestAccounts:
             handleRequestAccounts(id: id)
         case .signAllTransactions:
-            let txs = extractRawTransactions(json: json)
-            handleSignSolanaTransactions(id: id, txs: txs)
+            handleSignSolanaTransactions(id: id, json: json)
         case .signMessage:
             guard let data = extractMessage(json: json) else {
                 print("data is missing")
@@ -176,7 +175,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
             webview?.evaluateJavaScript("window.ethereum.setAddress(\"\(address)\");", completionHandler: nil)
-            webview?.tw.send(results: [address], to: id)
+            webview?.tw.send(network: "ethereum", results: [address], to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -213,7 +212,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
-    func handleSignSolanaTransactions(id: Int64, txs: [Data]) {
+    func handleSignSolanaTransactions(id: Int64, json: [String: Any]) {
+        guard let txs = json["object"] as? [[String:Any]] else {
+            print("data is missing")
+            return
+        }
+
         let alert = UIAlertController(
             title: "Sign Transactions",
             message: "\(txs.count) encoded transaction(s)",
@@ -223,10 +227,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             webview?.tw.send(error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            txs.forEach { data in
-                let signed = Self.solanaPrivateKey.sign(digest: data, curve: .ed25519)
-                webview?.tw.send(network: "solana", result: Base58.encode(data: signed!), to: id)
-            }
+            let signatures = txs
+                .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
+                .compactMap { Self.solanaPrivateKey.sign(digest: $0, curve: .ed25519) }
+                .map { Base58.encode(data: $0) }
+            webview?.tw.send(network: "solana", results: signatures, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
