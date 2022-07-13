@@ -52,6 +52,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
                 console.log(
                   `<== Signed succesfully: ${JSON.stringify(tx)}`
                 );
+                let isVerifiedSignature = tx.verifySignatures();
+                console.log(`The signatures were verifed: ${isVerifiedSignature}`)
                 return tx;
             });
             console.log(

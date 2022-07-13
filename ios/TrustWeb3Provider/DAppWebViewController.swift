@@ -230,7 +230,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             let signatures = txs
                 .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
                 .compactMap { Self.solanaPrivateKey.sign(digest: $0, curve: .ed25519) }
-                .map { Base58.encode(data: $0) }
+                .map { Base58.encodeNoCheck(data: $0) }
             webview?.tw.send(network: "solana", results: signatures, to: id)
         }))
         present(alert, animated: true, completion: nil)
