@@ -43,25 +43,12 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     signAllTransactions(payload) {
         this._request("signAllTransactions", payload)
         .then((signaturesEncoded) => {
-            console.log(
-              `<== Signatures: ${signaturesEncoded}`
-            );
             const signatures = signaturesEncoded.map((s) => bs58.decode(s));
-            console.log(
-              `<== Signatures decoded: ${signatures} size: ${signatures.size}`
-            );
             const transactions = payload.map((tx, idx) => {
-                tx.id = 0;
                 console.log(
-                  `<== Preparing to sign: ${JSON.stringify(tx)}`
+                  `<== Signature size: ${signatures[idx].length}`
                 );
-                console.log(
-                  `<== Public key: ${JSON.stringify(this.publicKey)}`
-                );
-                console.log(
-                  `<== Signature: ${JSON.stringify(signatures)}`
-                );
-                tx.addSignature(this.publicKey, signatures);
+                tx.addSignature(this.publicKey, signatures[idx]);
                 console.log(
                   `<== Signed succesfully: ${JSON.stringify(tx)}`
                 );
@@ -72,7 +59,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
             );
         })
         .catch((error) => {
-            console.log(`<== ${id} sendError ${error}`);
+            console.log(`<== Error ${error}`);
         });
     }
 
