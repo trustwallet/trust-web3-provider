@@ -32,6 +32,14 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         });
     }
 
+    disconnect() {
+        return new Promise((resolve) => {
+            this.isConnected = false;
+            this.emit("disconnect");
+            resolve();
+        });
+    }
+
     signMessage(payload) {
         console.log("signMessage", payload);
     }
