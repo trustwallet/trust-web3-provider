@@ -89,45 +89,6 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         }
       });
     }
-
-    /**
-     * @private Internal native result -> js
-     */
-    sendResponse(id, result) {
-      let originId = id;
-      let callback = this.callbacks.get(id);
-      let data = { jsonrpc: "2.0", id: originId };
-      if (
-        result !== null &&
-        typeof result === "object" &&
-        result.jsonrpc &&
-        result.result
-      ) {
-        data.result = result.result;
-      } else {
-        data.result = result;
-      }
-      if (this.isDebug) {
-        console.log(
-          `<== sendResponse id: ${id}, result: ${JSON.stringify(
-            result
-          )}, data: ${JSON.stringify(data)}`
-        );
-      }
-      if (callback) {
-        callback(null, result);
-        console.log(`deleted id: ${id}`);
-        this.callbacks.delete(id);
-      } else {
-        console.log(`callback id: ${id} not found`);
-      }
-    }
-
-    fillJsonRpcVersion(payload) {
-      if (payload.jsonrpc === undefined) {
-        payload.jsonrpc = "2.0";
-      }
-    }
 }
 
 module.exports = TrustSolanaWeb3Provider;
