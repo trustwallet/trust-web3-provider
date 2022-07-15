@@ -41,27 +41,21 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     }
 
     signAllTransactions(payload) {
-        this._request("signAllTransactions", payload)
+        this._request("signAllTransactions", payload.map((tx) => bs58.encode(tx.serializeMessage())))
         .then((signaturesEncoded) => {
             const signatures = signaturesEncoded.map((s) => bs58.decode(s));
+            const web3 = require('@solana/web3.js');
+            let connection = new web3.Connection(web3.clusterApiUrl('mainnet-beta'), 'confirmed');
             const transactions = payload.map((tx, idx) => {
-                console.log(
-                  `<== Signature size: ${signatures[idx].length}`
-                );
                 tx.addSignature(this.publicKey, signatures[idx]);
-                console.log(
-                  `<== Signed succesfully: ${JSON.stringify(tx)}`
-                );
                 let isVerifiedSignature = tx.verifySignatures();
-                console.log(`The signatures were verifed: ${isVerifiedSignature}`)
+                const rawTx = bs58.encode(tx.serialize());
+                web3.sendAndConfirmRawTransaction(connection, tx.serialize());
                 return tx;
             });
-            console.log(
-              `<== Signed transactions: ${transactions}`
-            );
         })
         .catch((error) => {
-            console.log(`<== Error ${error}`);
+            console.log(`<== Error: ${error}`);
         });
     }
 

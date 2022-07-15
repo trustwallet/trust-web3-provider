@@ -213,7 +213,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     func handleSignSolanaTransactions(id: Int64, json: [String: Any]) {
-        guard let txs = json["object"] as? [[String:Any]] else {
+        guard let txs = json["object"] as? [String] else {
             print("data is missing")
             return
         }
@@ -228,7 +228,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signatures = txs
-                .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
+                .compactMap { Base58.decodeNoCheck(string: $0) }
                 .compactMap { Self.solanaPrivateKey.sign(digest: $0, curve: .ed25519) }
                 .map { Base58.encodeNoCheck(data: $0) }
             webview?.tw.send(network: "solana", results: signatures, to: id)
