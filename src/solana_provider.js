@@ -18,26 +18,28 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
         this.callbacks = new Map();
         this.isPhantom = true;
-        this.isConnected = false;
-        this.publicKey = new PublicKey(config.address);
-        this.ready = !!config.address;
+        this.ready = true;
         this.isDebug = true;
     }
 
     connect() {
-        return new Promise((resolve) => {
-            this.isConnected = true;
+        return this._request("requestAccounts")
+        .then((addresses) => {
+            this.publicKey = new PublicKey(addresses[0]); // always 1 address for solana
             this.emit("connect");
-            resolve();
-        });
+        })
     }
 
     disconnect() {
         return new Promise((resolve) => {
-            this.isConnected = false;
+            this.publicKey = null;
             this.emit("disconnect");
             resolve();
         });
+    }
+
+    setAddress(address) {
+        this.publicKey = new PublicKey(address);
     }
 
     signMessage(payload) {
@@ -88,6 +90,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         switch (method) {
           case "signAllTransactions":
             return this.postMessage("signAllTransactions", id, payload);
+          case "requestAccounts":
+            return this.postMessage("requestAccounts", id, {});
           default:
             // call upstream rpc
             throw new ProviderRpcError(

@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://www.raydium.io/swap/"
+        return "https://www.orca.so/"
     }
 
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
@@ -24,7 +24,7 @@ class DAppWebViewController: UIViewController {
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
         chainId: 1,
         rpcUrl: "https://cloudflare-eth.com",
-        solanaPubkey: "HBYC51YrGFAZ8rM7Sj8e9uqKggpSrDYrinQDZzvMtqQp"
+        solanaPubkey: "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
     )
 
     var providers: [Int: TrustWeb3Provider] = [
@@ -32,13 +32,13 @@ class DAppWebViewController: UIViewController {
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 42161,
             rpcUrl: "https://arb1.arbitrum.io/rpc",
-            solanaPubkey: "HBYC51YrGFAZ8rM7Sj8e9uqKggpSrDYrinQDZzvMtqQp"
+            solanaPubkey: "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
         ),
         250: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 250,
             rpcUrl: "https://rpc.ftm.tools",
-            solanaPubkey: "HBYC51YrGFAZ8rM7Sj8e9uqKggpSrDYrinQDZzvMtqQp"
+            solanaPubkey: "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
         )
     ]
 
@@ -106,7 +106,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
         switch method {
         case .requestAccounts:
-            handleRequestAccounts(id: id)
+            handleRequestAccounts(network: "solana", id: id)
         case .signAllTransactions:
             handleSignSolanaTransactions(id: id, json: json)
         case .signMessage:
@@ -163,19 +163,19 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
-    func handleRequestAccounts(id: Int64) {
+    func handleRequestAccounts(network: String, id: Int64) {
         let alert = UIAlertController(
             title: webview.title,
             message: "\(webview.url?.host! ?? "Website") would like to connect your account",
             preferredStyle: .alert
         )
-        let address = current.address
+        let address = current.solanaPubkey
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
-            webview?.evaluateJavaScript("window.ethereum.setAddress(\"\(address)\");", completionHandler: nil)
-            webview?.tw.send(network: "ethereum", results: [address], to: id)
+            webview?.evaluateJavaScript("window.\(network).setAddress(\"\(address)\");", completionHandler: nil)
+            webview?.tw.send(network: network, results: [address], to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
