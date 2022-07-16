@@ -51,6 +51,7 @@ class DAppWebViewController: UIViewController {
         controller.add(self, name: TrustWeb3Provider.scriptHandlerName)
 
         config.userContentController = controller
+        config.allowsInlineMediaPlayback = true
 
         let webview = WKWebView(frame: .zero, configuration: config)
         webview.translatesAutoresizingMaskIntoConstraints = false
@@ -99,14 +100,18 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let json = message.json
         print(json)
-        guard let name = json["name"] as? String,
-            let method = DAppMethod(rawValue: name),
-            let id = json["id"] as? Int64 else {
+        guard
+            let method = extractMethod(json: json),
+            let id = json["id"] as? Int64,
+            let network = extractNetwork(json: json)
+        else {
             return
         }
         switch method {
         case .requestAccounts:
-            handleRequestAccounts(network: "solana", id: id)
+            handleRequestAccounts(network: network.rawValue, id: id)
+        case .signTransaction:
+            print("signTransaction is not implemented")
         case .signAllTransactions:
             handleSignSolanaTransactions(id: id, json: json)
         case .signMessage:
@@ -169,7 +174,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             message: "\(webview.url?.host! ?? "Website") would like to connect your account",
             preferredStyle: .alert
         )
-        let address = current.solanaPubkey
+        let address = network == "solana" ? current.solanaPubkey: current.address
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(error: "Canceled", to: id)
         }))
@@ -293,6 +298,24 @@ extension DAppWebViewController: WKScriptMessageHandler {
         )
         alert.addAction(.init(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+
+    private func extractMethod(json: [String: Any]) -> DAppMethod? {
+        guard
+            let name = json["name"] as? String
+        else {
+            return nil
+        }
+        return DAppMethod(rawValue: name)
+    }
+
+    private func extractNetwork(json: [String: Any]) -> ProviderNetwork? {
+        guard
+            let network = json["network"] as? String
+        else {
+            return nil
+        }
+        return ProviderNetwork(rawValue: network)
     }
 
     private func extractRawTransactions(json: [String: Any]) -> [Data] {

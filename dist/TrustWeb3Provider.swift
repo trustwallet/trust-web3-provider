@@ -7,6 +7,11 @@
 import Foundation
 import WebKit
 
+public enum ProviderNetwork: String {
+    case ethereum
+    case solana
+}
+
 public struct TrustWeb3Provider {
     public static let scriptHandlerName = "_tw_"
 
@@ -28,13 +33,12 @@ public struct TrustWeb3Provider {
         let source = """
         (function() {
             var config = {
-                address: "\(address)",
                 chainId: \(chainId),
                 rpcUrl: "\(rpcUrl)"
             };
 
             window.ethereum = new trustwallet.Provider(config);
-            window.solana = new trustwallet.SolanaProvider({address: "\(solanaPubkey)"});
+            window.solana = new trustwallet.SolanaProvider();
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)

@@ -37,7 +37,7 @@ describe("TrustWeb3Provider constructor tests", () => {
     expect(web3.currentProvider.constructor.name).toBe("TrustWeb3Provider");
   });
 
-  test("test setAddress", () => {
+  test("test Ethereum setAddress", () => {
     const provider = new trustwallet.Provider({
       chainId: 1,
       rpcUrl: "",
@@ -48,6 +48,19 @@ describe("TrustWeb3Provider constructor tests", () => {
     provider.setAddress(address);
     expect(provider.address).toBe(address.toLowerCase());
     expect(provider.ready).toBeTruthy();
+  });
+
+  test("test Solana setAddress", () => {
+    const provider = new trustwallet.SolanaProvider();
+    expect(provider.publicKey).toBe(null);
+
+    const publicKey = "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH";
+    provider.setAddress(publicKey);
+    expect(provider.publicKey.toString()).toBe(publicKey);
+
+    provider.disconnect().then(() => {
+      expect(provider.publicKey).toBe(null);
+    });
   });
 
   test("test setConfig", (done) => {
