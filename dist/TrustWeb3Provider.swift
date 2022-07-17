@@ -34,11 +34,12 @@ public struct TrustWeb3Provider {
         (function() {
             var config = {
                 chainId: \(chainId),
-                rpcUrl: "\(rpcUrl)"
+                rpcUrl: "\(rpcUrl)",
+                isDebug: false
             };
 
             window.ethereum = new trustwallet.Provider(config);
-            window.solana = new trustwallet.SolanaProvider();
+            window.solana = new trustwallet.SolanaProvider(config);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)

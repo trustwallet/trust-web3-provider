@@ -9,6 +9,13 @@
 import { EventEmitter } from "events";
 
 class BaseProvider extends EventEmitter {
+
+  constructor(config) {
+    super();
+    this.isDebug = !!config.isDebug;
+    this.isTrust = true;
+  }
+
   /**
    * @private Internal js -> native message handler
    */

@@ -16,15 +16,13 @@ import BaseProvider from "./base_provider";
 
 class TrustWeb3Provider extends BaseProvider {
   constructor(config) {
-    super();
+    super(config);
     this.setConfig(config);
 
     this.idMapping = new IdMapping();
     this.callbacks = new Map();
     this.wrapResults = new Map();
-    this.isTrust = true;
     this.isMetaMask = false;
-    this.isDebug = !!config.isDebug;
 
     this.emitConnect(this.chainId);
   }

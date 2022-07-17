@@ -15,13 +15,12 @@ import ProviderRpcError from "./error";
 const { PublicKey, Connection } = Web3;
 
 class TrustSolanaWeb3Provider extends BaseProvider {
-  constructor() {
-    super();
+  constructor(config) {
+    super(config);
 
     this.callbacks = new Map();
     this.isPhantom = true;
     this.publicKey = null;
-    this.isDebug = true;
     this.connection = new Connection(
       Web3.clusterApiUrl("mainnet-beta"),
       "confirmed"
