@@ -51,8 +51,10 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test Solana setAddress", () => {
-    const provider = new trustwallet.SolanaProvider();
+    const provider = new trustwallet.SolanaProvider({isDebug: true});
     expect(provider.publicKey).toBe(null);
+    expect(provider.isDebug).toBeTruthy();
+    expect(provider.isTrust).toBeTruthy();
 
     const publicKey = "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH";
     provider.setAddress(publicKey);

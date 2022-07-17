@@ -341,7 +341,6 @@ class TrustWeb3Provider extends BaseProvider {
     }
     if (callback) {
       wrapResult ? callback(null, data) : callback(null, result);
-      console.log(`deleted id: ${id}`);
       this.callbacks.delete(id);
     } else {
       console.log(`callback id: ${id} not found`);
