@@ -10,6 +10,7 @@ enum DAppMethod: String, Decodable, CaseIterable {
     case signTransaction
     case signAllTransactions
     case signPersonalMessage
+    case sendAndConfirmRawTransaction
     case signMessage
     case signTypedMessage
     case ecRecover

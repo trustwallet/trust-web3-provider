@@ -90,11 +90,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
    * @private Send raw transaction with default strategy
    */
   _sendAndConfirmRawTransaction(tx) {
-    Web3.sendAndConfirmRawTransaction(
-      this.connection,
-      tx.serialize(),
-      Web3.BlockheightBasedTransactionConfirmationStrategy
-    );
+    this._request("sendAndConfirmRawTransaction", {raw: bs58.encode(tx.serialize())})
   }
 
   /**
@@ -130,6 +126,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
           return this.postMessage("signAllTransactions", id, payload);
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
+        case "sendAndConfirmRawTransaction":
+          return this.postMessage("sendAndConfirmRawTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

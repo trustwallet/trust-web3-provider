@@ -17,6 +17,7 @@ class DAppWebViewController: UIViewController {
         return "http://localhost:3000/basics"
     }
 
+    static let solanaRPC = "https://api.mainnet-beta.solana.com/"
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
     static let solanaPrivateKey = HDWallet(mnemonic: ".", passphrase: "")!.getKeyForCoin(coin: .solana)
 
@@ -140,6 +141,18 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 return
             }
             handleSignTypedMessage(id: id, data: data, raw: raw)
+        case .sendAndConfirmRawTransaction:
+            guard let raw = extractRaw(json: json) else {
+                print("raw json is missing")
+                return
+            }
+
+            switch network {
+            case .ethereum:
+                fatalError("Ethereum doesn't support this")
+            case .solana:
+                sendAndConfirmRawTransactionSolana(raw: raw)
+            }
         case .ecRecover:
             guard let tuple = extractSignature(json: json) else {
                 print("signature or message is missing")
@@ -339,15 +352,6 @@ extension DAppWebViewController: WKScriptMessageHandler {
         return ProviderNetwork(rawValue: network)
     }
 
-    private func extractRawTransactions(json: [String: Any]) -> [Data] {
-        if let txs = json["object"] as? [[String: Any]] {
-            return txs.compactMap { try? JSONSerialization.data(withJSONObject: $0) }
-        }
-        else {
-            return []
-        }
-    }
-
     private func extractMessage(json: [String: Any]) -> Data? {
         guard
             let params = json["object"] as? [String: Any],
@@ -425,6 +429,47 @@ extension DAppWebViewController: WKScriptMessageHandler {
     private func ethereumMessage(for data: Data) -> Data {
         let prefix = "\u{19}Ethereum Signed Message:\n\(data.count)".data(using: .utf8)!
         return prefix + data
+    }
+
+    private func sendAndConfirmRawTransactionSolana(raw: String) {
+
+        guard let endpointUrl = URL(string: Self.solanaRPC) else {
+            return
+        }
+
+        var json = [String:Any]()
+
+        json["jsonrpc"] = "2.0"
+        json["method"] = "sendTransaction"
+        json["id"] = 1
+        json["params"] = [raw]
+
+        print("Sending transaction: \(raw)")
+        do {
+            let data = try JSONSerialization.data(withJSONObject: json, options: [])
+
+            var request = URLRequest(url: endpointUrl)
+            request.httpMethod = "POST"
+            request.httpBody = data
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                     print("error is \(error.localizedDescription)")
+                     return
+                 }
+
+                guard let data = data, let json = String(data: data, encoding: .utf8) else {
+                     print("no response")
+                     return
+                 }
+                print("Response: \(json)")
+            }
+            task.resume()
+        } catch(let error) {
+            print(error)
+        }
     }
 }
 
