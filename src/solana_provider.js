@@ -18,9 +18,12 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
 
+    this.providerNetwork = "solana";
     this.callbacks = new Map();
     this.isPhantom = true;
     this.publicKey = null;
+    this.isConnected = false;
+    // FIXME read from config, default is mainnet-beta
     this.connection = new Connection(
       Web3.clusterApiUrl("mainnet-beta"),
       "confirmed"
@@ -29,7 +32,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
   connect() {
     return this._request("requestAccounts").then((addresses) => {
-      this.publicKey = new PublicKey(addresses[0]); // always 1 address for solana
+      this.setAddress(addresses[0]);
       this.emit("connect");
     });
   }
@@ -37,6 +40,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   disconnect() {
     return new Promise((resolve) => {
       this.publicKey = null;
+      this.isConnected = false;
       this.emit("disconnect");
       resolve();
     });
@@ -44,24 +48,27 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
   setAddress(address) {
     this.publicKey = new PublicKey(address);
+    this.isConnected = true;
   }
 
-  signMessage(payload) {
-    console.log("signMessage", payload);
+  signMessage(message) {
+    const hex = Utils.bufferToHex(message);
+    if (this.isDebug) {
+      console.log(`==> signMessage ${message}, hex: ${hex}`);
+    }
+    this._request("signMessage", {data: hex});
   }
 
-  signTransaction(payload) {
-    this.signAllTransactions([payload]);
+  signTransaction(tx) {
+    this.signAllTransactions([tx]);
   }
-
-  signAllTransactions(payload) {
-    this._request(
-      "signAllTransactions",
-      payload.map((tx) => bs58.encode(tx.serializeMessage()))
-    )
+  
+  signAllTransactions(txs) {
+    const encodedTxs = txs.map((tx) => bs58.encode(tx.serializeMessage()))
+    this._request("signAllTransactions", encodedTxs)
       .then((signaturesEncoded) => {
         const signatures = signaturesEncoded.map((s) => bs58.decode(s));
-        payload.map((tx, idx) => {
+        txs.map((tx, idx) => {
           tx.addSignature(this.publicKey, signatures[idx]);
           if (!tx.verifySignatures()) {
             throw new ProviderRpcError(4300, "Invalid signature");
@@ -75,8 +82,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       });
   }
 
-  postMessage(handler, id, data) {
-    super.postMessage(handler, id, data, "solana");
+  signAndSendTransaction(tx) {
+    this._request("signAndSendTransaction", tx);
   }
 
   /**
@@ -104,11 +111,21 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         if (error) {
           reject(error);
         } else {
-          resolve(data);
+          // FIXME should be handled in adapter level
+          if (method === "signMessage") {
+            const result = {
+              signature: new Uint8Array(Utils.messageToBuffer(data).buffer)
+            };
+            resolve(result);
+          } else {
+            resolve(data);
+          }          
         }
       });
 
       switch (method) {
+        case "signMessage":
+          return this.postMessage("signMessage", id, payload);
         case "signAllTransactions":
           return this.postMessage("signAllTransactions", id, payload);
         case "requestAccounts":

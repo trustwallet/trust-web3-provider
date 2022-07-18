@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://www.orca.so/"
+        return "http://localhost:3000/basics"
     }
 
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
@@ -119,7 +119,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 print("data is missing")
                 return
             }
-            handleSignMessage(id: id, data: data, addPrefix: false)
+            switch network {
+            case .ethereum:
+                handleSignMessage(id: id, data: data, addPrefix: false)
+            case .solana:
+                handleSolanaSignMessage(id: id, data: data)
+            }
         case .signPersonalMessage:
             guard let data = extractMessage(json: json) else {
                 print("data is missing")
@@ -176,10 +181,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
         )
         let address = network == "solana" ? current.solanaPubkey: current.address
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(error: "Canceled", to: id)
+            webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
-            webview?.evaluateJavaScript("window.\(network).setAddress(\"\(address)\");", completionHandler: nil)
+            webview?.evaluateJavaScript("\(network).setAddress(\"\(address)\");", completionHandler: nil)
             webview?.tw.send(network: network, results: [address], to: id)
         }))
         present(alert, animated: true, completion: nil)
@@ -187,12 +192,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
     func handleSignMessage(id: Int64, data: Data, addPrefix: Bool) {
         let alert = UIAlertController(
-            title: "Sign Message",
+            title: "Sign Ethereum Message",
             message: addPrefix ? String(data: data, encoding: .utf8) ?? "" : data.hexString,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(error: "Canceled", to: id)
+            webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: addPrefix)
@@ -208,11 +213,27 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(error: "Canceled", to: id)
+            webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: false)
             webview?.tw.send(network: "ethereum", result: "0x" + signed.hexString, to: id)
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+
+    func handleSolanaSignMessage(id: Int64, data: Data) {
+        let alert = UIAlertController(
+            title: "Sign Solana Message",
+            message: String(data: data, encoding: .utf8) ?? data.hexString,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
+            webview?.tw.send(network: "solana", error: "Canceled", to: id)
+        }))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
+            let signed = Self.privateKey.sign(digest: data, curve: .ed25519)!
+            webview?.tw.send(network: "solana", result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -229,7 +250,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(error: "Canceled", to: id)
+            webview?.tw.send(network: "solana", error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signatures = txs
@@ -248,13 +269,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(error: "Canceled", to: id)
+            webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
             self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0], solanaPubkey: self.current.solanaPubkey)
             print("\(name) added")
-            self.webview.tw.sendNull(id: id)
+            self.webview.tw.sendNull(network: "ethereum", id: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -262,13 +283,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func handleSwitchChain(id: Int64, chainId: Int) {
         guard let provider = providers[chainId] else {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
-            webview.tw.send(error: "Unknown chain id", to: id)
+            webview.tw.send(network: "ethereum", error: "Unknown chain id", to: id)
             return
         }
 
         if chainId == current.chainId {
             print("No need to switch, already on chain \(chainId)")
-            webview.tw.sendNull(id: id)
+            webview.tw.sendNull(network: "ethereum", id: id)
         } else {
 
             let alert = UIAlertController(
@@ -277,14 +298,14 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.tw.send(error: "Canceled", to: id)
+                webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
                 self.current = provider
                 self.webview.tw.set(address: provider.address, chainId: provider.chainId, rpcUrl: provider.rpcUrl)
                 self.webview.tw.emitChange(chainId: chainId)
-                self.webview.tw.sendNull(id: id)
+                self.webview.tw.sendNull(network: "ethereum", id: id)
             }))
             present(alert, animated: true, completion: nil)
         }

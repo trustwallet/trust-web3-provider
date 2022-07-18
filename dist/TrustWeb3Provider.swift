@@ -30,12 +30,13 @@ public struct TrustWeb3Provider {
     }
 
     public var injectScript: WKUserScript {
+        // FIXME turn off debug flag
         let source = """
         (function() {
             var config = {
                 chainId: \(chainId),
                 rpcUrl: "\(rpcUrl)",
-                isDebug: false
+                isDebug: true
             };
 
             window.ethereum = new trustwallet.Provider(config);
@@ -72,8 +73,8 @@ public extension WKWebView {
 }
 
 public extension TypeWrapper where T == WKWebView {
-    func set(address: String) {
-        let script = String(format: "ethereum.setAddress(\"%@\");", address.lowercased())
+    func set(network: String, address: String) {
+        let script = String(format: "\(network).setAddress(\"%@\");", address.lowercased())
         value.evaluateJavaScript(script)
     }
 
@@ -95,8 +96,8 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func send(error: String, to id: Int64) {
-        let script = String(format: "ethereum.sendError(%ld, \"%@\")", id, error)
+    func send(network: String, error: String, to id: Int64) {
+        let script = String(format: "\(network).sendError(%ld, \"%@\")", id, error)
         value.evaluateJavaScript(script)
     }
 
@@ -105,8 +106,8 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func sendNull(id: Int64) {
-        let script = String(format: "ethereum.sendResponse(%ld, null)", id)
+    func sendNull(network: String, id: Int64) {
+        let script = String(format: "\(network).sendResponse(%ld, null)", id)
         value.evaluateJavaScript(script)
     }
 

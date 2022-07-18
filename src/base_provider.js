@@ -9,7 +9,6 @@
 import { EventEmitter } from "events";
 
 class BaseProvider extends EventEmitter {
-
   constructor(config) {
     super();
     this.isDebug = !!config.isDebug;
@@ -19,12 +18,12 @@ class BaseProvider extends EventEmitter {
   /**
    * @private Internal js -> native message handler
    */
-  postMessage(handler, id, data, network) {
+  postMessage(handler, id, data) {
     let object = {
       id: id,
       name: handler,
       object: data,
-      network: network,
+      network: this.providerNetwork,
     };
     if (window.trustwallet.postMessage) {
       window.trustwallet.postMessage(object);
@@ -40,9 +39,7 @@ class BaseProvider extends EventEmitter {
     let callback = this.callbacks.get(id);
     if (this.isDebug) {
       console.log(
-        `<== sendResponse id: ${id}, result: ${JSON.stringify(
-          result
-        )}, data: ${JSON.stringify(result)}`
+        `<== sendResponse id: ${id}, result: ${JSON.stringify(result)}`
       );
     }
     if (callback) {

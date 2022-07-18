@@ -19,6 +19,7 @@ class TrustWeb3Provider extends BaseProvider {
     super(config);
     this.setConfig(config);
 
+    this.providerNetwork = "ethereum";
     this.idMapping = new IdMapping();
     this.callbacks = new Map();
     this.wrapResults = new Map();
@@ -307,7 +308,7 @@ class TrustWeb3Provider extends BaseProvider {
    */
   postMessage(handler, id, data) {
     if (this.ready || handler === "requestAccounts") {
-      super.postMessage(handler, id, data, "ethereum");
+      super.postMessage(handler, id, data);
     } else {
       // don't forget to verify in the app
       this.sendError(id, new ProviderRpcError(4100, "provider is not ready"));
