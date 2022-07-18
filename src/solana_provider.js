@@ -56,16 +56,16 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     if (this.isDebug) {
       console.log(`==> signMessage ${message}, hex: ${hex}`);
     }
-    this._request("signMessage", {data: hex});
+    return this._request("signMessage", {data: hex});
   }
 
   signTransaction(tx) {
-    this.signAllTransactions([tx]);
+    return this.signAllTransactions([tx]);
   }
   
   signAllTransactions(txs) {
     const encodedTxs = txs.map((tx) => bs58.encode(tx.serializeMessage()))
-    this._request("signAllTransactions", encodedTxs)
+    return this._request("signAllTransactions", encodedTxs)
       .then((signaturesEncoded) => {
         const signatures = signaturesEncoded.map((s) => bs58.decode(s));
         txs.map((tx, idx) => {
@@ -83,7 +83,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   signAndSendTransaction(tx) {
-    this._request("signAndSendTransaction", tx);
+    return this._request("signAndSendTransaction", tx);
   }
 
   /**
