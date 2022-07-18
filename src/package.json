@@ -12,7 +12,8 @@
   "scripts": {
     "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js",
     "lint": "eslint . --fix",
-    "test": "jest"
+    "test": "jest",
+    "lfs-fix": "git rm --cached --force ../dist/trust-min.js && git add ../dist/trust-min.js"
   },
   "engines": {
     "node": ">=14"

@@ -12,7 +12,7 @@ import bs58 from "bs58";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
 
-const { PublicKey, Connection } = Web3;
+const { PublicKey } = Web3;
 
 class TrustSolanaWeb3Provider extends BaseProvider {
   constructor(config) {
@@ -23,11 +23,6 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     this.isPhantom = true;
     this.publicKey = null;
     this.isConnected = false;
-    // FIXME read from config, default is mainnet-beta
-    this.connection = new Connection(
-      Web3.clusterApiUrl("mainnet-beta"),
-      "confirmed"
-    );
   }
 
   connect() {
@@ -56,7 +51,11 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     if (this.isDebug) {
       console.log(`==> signMessage ${message}, hex: ${hex}`);
     }
-    return this._request("signMessage", {data: hex});
+    return this._request("signMessage", {data: hex}).then(data => {
+      return{
+        signature: new Uint8Array(Utils.messageToBuffer(data).buffer),
+      };
+    });
   }
 
   signTransaction(tx) {
@@ -90,11 +89,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
    * @private Send raw transaction with default strategy
    */
   _sendAndConfirmRawTransaction(tx) {
-    Web3.sendAndConfirmRawTransaction(
-      this.connection,
-      tx.serialize(),
-      Web3.BlockheightBasedTransactionConfirmationStrategy
-    );
+    return this._request("sendAndConfirmRawTransaction", {raw: bs58.encode(tx.serialize())});
   }
 
   /**
@@ -111,15 +106,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         if (error) {
           reject(error);
         } else {
-          // FIXME should be handled in adapter level
-          if (method === "signMessage") {
-            const result = {
-              signature: new Uint8Array(Utils.messageToBuffer(data).buffer)
-            };
-            resolve(result);
-          } else {
-            resolve(data);
-          }          
+          resolve(data);
         }
       });
 
@@ -130,6 +117,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
           return this.postMessage("signAllTransactions", id, payload);
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
+        case "sendAndConfirmRawTransaction":
+          return this.postMessage("sendAndConfirmRawTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(
