@@ -19,7 +19,6 @@ class DAppWebViewController: UIViewController {
 
     static let solanaRPC = "https://api.mainnet-beta.solana.com/"
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
-    static let solanaPrivateKey = HDWallet(mnemonic: ".", passphrase: "")!.getKeyForCoin(coin: .solana)
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
