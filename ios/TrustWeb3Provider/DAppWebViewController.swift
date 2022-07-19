@@ -111,10 +111,25 @@ extension DAppWebViewController: WKScriptMessageHandler {
         switch method {
         case .requestAccounts:
             handleRequestAccounts(network: network.rawValue, id: id)
-        case .signTransaction:
-            print("signTransaction is not implemented")
         case .signAllTransactions:
-            handleSignSolanaTransactions(id: id, json: json)
+            guard let transactions = json["object"] as? [String] else {
+                print("data is missing")
+                return
+            }
+
+            handleSignSolanaTransactions(id: id, transactions: transactions)
+        case .sendRawTransaction:
+            guard let raw = extractRaw(json: json) else {
+                print("raw json is missing")
+                return
+            }
+
+            switch network {
+            case .ethereum:
+                fatalError("Ethereum doesn't support this")
+            case .solana:
+                sendRawSolanaTransaction(id: id, raw: raw)
+            }
         case .signMessage:
             guard let data = extractMessage(json: json) else {
                 print("data is missing")
@@ -141,18 +156,6 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 return
             }
             handleSignTypedMessage(id: id, data: data, raw: raw)
-        case .sendAndConfirmRawTransaction:
-            guard let raw = extractRaw(json: json) else {
-                print("raw json is missing")
-                return
-            }
-
-            switch network {
-            case .ethereum:
-                fatalError("Ethereum doesn't support this")
-            case .solana:
-                sendAndConfirmRawTransactionSolana(raw: raw)
-            }
         case .ecRecover:
             guard let tuple = extractSignature(json: json) else {
                 print("signature or message is missing")
@@ -251,22 +254,17 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
-    func handleSignSolanaTransactions(id: Int64, json: [String: Any]) {
-        guard let txs = json["object"] as? [String] else {
-            print("data is missing")
-            return
-        }
-
+    func handleSignSolanaTransactions(id: Int64, transactions: [String]) {
         let alert = UIAlertController(
             title: "Sign Transactions",
-            message: "\(txs.count) encoded transaction(s)",
+            message: "\(transactions.count) encoded transaction(s)",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(network: "solana", error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            let signatures = txs
+            let signatures = transactions
                 .compactMap { Base58.decodeNoCheck(string: $0) }
                 .compactMap { Self.solanaPrivateKey.sign(digest: $0, curve: .ed25519) }
                 .map { Base58.encodeNoCheck(data: $0) }
@@ -431,7 +429,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         return prefix + data
     }
 
-    private func sendAndConfirmRawTransactionSolana(raw: String) {
+    private func sendRawSolanaTransaction(id: Int64, raw: String) {
 
         guard let endpointUrl = URL(string: Self.solanaRPC) else {
             return
@@ -454,17 +452,17 @@ extension DAppWebViewController: WKScriptMessageHandler {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
                 if let error = error {
                      print("error is \(error.localizedDescription)")
                      return
                  }
 
-                guard let data = data, let json = String(data: data, encoding: .utf8) else {
+                guard let data = data else {
                      print("no response")
                      return
                  }
-                print("Response: \(json)")
+                self?.webview.tw.send(network: "solana", result: Base58.encodeNoCheck(data: data), to: id)
             }
             task.resume()
         } catch(let error) {
