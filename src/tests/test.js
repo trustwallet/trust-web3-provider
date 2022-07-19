@@ -13,21 +13,27 @@ const Web3 = require("web3");
 const trustwallet = window.trustwallet;
 
 const mainnet = {
-  address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
-  chainId: 1,
-  rpcUrl: "https://mainnet.infura.io/v3/<key>",
+  ethereum: {
+    address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
+    chainId: 1,
+    rpcUrl: "https://mainnet.infura.io/v3/<key>",
+  }
 };
 
 const ropsten = {
-  address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
-  chainId: 3,
-  rpcUrl: "https://ropsten.infura.io/apikey",
+  ethereum: {
+    address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
+    chainId: 3,
+    rpcUrl: "https://ropsten.infura.io/apikey",
+  }
 };
 
 const bsc = {
-  address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
-  chainId: 56,
-  rpcUrl: "https://bsc-dataseed1.binance.org",
+  ethereum: {
+    address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
+    chainId: 56,
+    rpcUrl: "https://bsc-dataseed1.binance.org",
+  }
 };
 
 describe("TrustWeb3Provider constructor tests", () => {
