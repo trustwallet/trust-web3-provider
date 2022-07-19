@@ -110,7 +110,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
         switch method {
         case .requestAccounts:
-            handleRequestAccounts(network: network.rawValue, id: id)
+            handleRequestAccounts(network: network, id: id)
         case .signAllTransactions:
             guard let transactions = json["object"] as? [String] else {
                 print("data is missing")
@@ -164,7 +164,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             let recovered = ecRecover(signature: tuple.signature, message: tuple.message) ?? ""
             print(recovered)
             DispatchQueue.main.async {
-                self.webview.tw.send(network: "ethereum", result: recovered, to: id)
+                self.webview.tw.send(network: .ethereum, result: recovered, to: id)
             }
         case .addEthereumChain:
             guard let (chainId, name, rpcUrls) = extractChainInfo(json: json) else {
@@ -189,13 +189,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
-    func handleRequestAccounts(network: String, id: Int64) {
+    func handleRequestAccounts(network: ProviderNetwork, id: Int64) {
         let alert = UIAlertController(
             title: webview.title,
             message: "\(webview.url?.host! ?? "Website") would like to connect your account",
             preferredStyle: .alert
         )
-        let address = network == "solana" ? current.solanaPubkey: current.address
+        let address = network == .solana ? current.solanaPubkey: current.address
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
@@ -213,11 +213,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
+            webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: addPrefix)
-            webview?.tw.send(network: "ethereum", result: "0x" + signed.hexString, to: id)
+            webview?.tw.send(network: .ethereum, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -229,11 +229,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
+            webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: false)
-            webview?.tw.send(network: "ethereum", result: "0x" + signed.hexString, to: id)
+            webview?.tw.send(network: .ethereum, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -245,11 +245,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: "solana", error: "Canceled", to: id)
+            webview?.tw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = Self.privateKey.sign(digest: data, curve: .ed25519)!
-            webview?.tw.send(network: "solana", result: "0x" + signed.hexString, to: id)
+            webview?.tw.send(network: .solana, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -261,14 +261,14 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: "solana", error: "Canceled", to: id)
+            webview?.tw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signatures = transactions
                 .compactMap { Base58.decodeNoCheck(string: $0) }
                 .compactMap { Self.solanaPrivateKey.sign(digest: $0, curve: .ed25519) }
                 .map { Base58.encodeNoCheck(data: $0) }
-            webview?.tw.send(network: "solana", results: signatures, to: id)
+            webview?.tw.send(network: .solana, results: signatures, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -280,13 +280,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
+            webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
             self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0], solanaPubkey: self.current.solanaPubkey)
             print("\(name) added")
-            self.webview.tw.sendNull(network: "ethereum", id: id)
+            self.webview.tw.sendNull(network: .ethereum, id: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -294,13 +294,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func handleSwitchChain(id: Int64, chainId: Int) {
         guard let provider = providers[chainId] else {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
-            webview.tw.send(network: "ethereum", error: "Unknown chain id", to: id)
+            webview.tw.send(network: .ethereum, error: "Unknown chain id", to: id)
             return
         }
 
         if chainId == current.chainId {
             print("No need to switch, already on chain \(chainId)")
-            webview.tw.sendNull(network: "ethereum", id: id)
+            webview.tw.sendNull(network: .ethereum, id: id)
         } else {
 
             let alert = UIAlertController(
@@ -309,14 +309,14 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.tw.send(network: "ethereum", error: "Canceled", to: id)
+                webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
                 self.current = provider
                 self.webview.tw.set(address: provider.address, chainId: provider.chainId, rpcUrl: provider.rpcUrl)
                 self.webview.tw.emitChange(chainId: chainId)
-                self.webview.tw.sendNull(network: "ethereum", id: id)
+                self.webview.tw.sendNull(network: .ethereum, id: id)
             }))
             present(alert, animated: true, completion: nil)
         }
@@ -463,7 +463,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                      return
                  }
                 DispatchQueue.main.async {
-                    self?.webview.tw.send(network: "solana", result: Base58.encodeNoCheck(data: data), to: id)
+                    self?.webview.tw.send(network: .solana, result: Base58.encodeNoCheck(data: data), to: id)
                 }
             }
             task.resume()

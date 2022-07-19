@@ -99,24 +99,24 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func send(network: String, error: String, to id: Int64) {
-        let script = String(format: "\(network).sendError(%ld, \"%@\")", id, error)
+    func send(network: ProviderNetwork, error: String, to id: Int64) {
+        let script = String(format: "\(network.rawValue).sendError(%ld, \"%@\")", id, error)
         value.evaluateJavaScript(script)
     }
 
-    func send(network: String, result: String, to id: Int64) {
-        let script = String(format: "\(network).sendResponse(%ld, \"%@\")", id, result)
+    func send(network: ProviderNetwork, result: String, to id: Int64) {
+        let script = String(format: "\(network.rawValue).sendResponse(%ld, \"%@\")", id, result)
         value.evaluateJavaScript(script)
     }
 
-    func sendNull(network: String, id: Int64) {
-        let script = String(format: "\(network).sendResponse(%ld, null)", id)
+    func sendNull(network: ProviderNetwork, id: Int64) {
+        let script = String(format: "\(network.rawValue).sendResponse(%ld, null)", id)
         value.evaluateJavaScript(script)
     }
 
-    func send(network: String, results: [String], to id: Int64) {
+    func send(network: ProviderNetwork, results: [String], to id: Int64) {
         let array = results.map { String(format: "\"%@\"", $0) }
-        let script = String(format: "\(network).sendResponse(%ld, [%@])", id, array.joined(separator: ","))
+        let script = String(format: "\(network.rawValue).sendResponse(%ld, [%@])", id, array.joined(separator: ","))
         value.evaluateJavaScript(script)
     }
 
