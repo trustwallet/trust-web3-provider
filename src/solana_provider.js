@@ -59,27 +59,23 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   signTransaction(tx) {
-    return this.signAllTransactions([tx]).then(transactions => {
-        return transactions[0];
-    });
-  }
-  
-  signAllTransactions(txs) {
-    const encodedTxs = txs.map((tx) => bs58.encode(tx.serializeMessage()))
-    return this._request("signAllTransactions", encodedTxs)
-      .then((signaturesEncoded) => {
-        const signatures = signaturesEncoded.map((s) => bs58.decode(s));
-        return txs.map((tx, idx) => {
-          tx.addSignature(this.publicKey, signatures[idx]);
-          if (!tx.verifySignatures()) {
-            throw new ProviderRpcError(4300, "Invalid signature");
-          }
-          return tx;
-        });
+    return this._request("signRawTransaction", { raw: bs58.encode(tx.serializeMessage()) })
+      .then((signatureEncoded) => {
+        const signature = bs58.decode(signatureEncoded);
+        tx.addSignature(this.publicKey, signature);
+        if (!tx.verifySignatures()) {
+          throw new ProviderRpcError(4300, "Invalid signature");
+        }
+        console.log(`==> signed single ${JSON.stringify(tx)}`);
+        return tx;
       })
       .catch((error) => {
         console.log(`<== Error: ${error}`);
       });
+  }
+
+  signAllTransactions(txs) {
+    return Promise.all(txs.map((tx) => this.signTransaction(tx)));
   }
 
   signAndSendTransaction(tx, options) {
@@ -110,12 +106,10 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       switch (method) {
         case "signMessage":
           return this.postMessage("signMessage", id, payload);
-        case "signAllTransactions":
-          return this.postMessage("signAllTransactions", id, payload);
+        case "signRawTransaction":
+          return this.postMessage("signRawTransaction", id, payload);
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
-        case "sendRawTransaction":
-          return this.postMessage("sendRawTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

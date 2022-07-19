@@ -7,7 +7,7 @@
 import Foundation
 import WebKit
 
-public enum ProviderNetwork: String {
+public enum ProviderNetwork: String, Decodable {
     case ethereum
     case solana
 }
@@ -18,7 +18,6 @@ public struct TrustWeb3Provider {
     public let address: String
     public let chainId: Int
     public let rpcUrl: String
-    public let solanaPubkey: String
 
     public var providerJsUrl: URL {
         return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
@@ -53,11 +52,10 @@ public struct TrustWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(address: String, chainId: Int, rpcUrl: String, solanaPubkey: String) {
+    public init(address: String, chainId: Int, rpcUrl: String) {
         self.address = address
         self.chainId = chainId
         self.rpcUrl = rpcUrl
-        self.solanaPubkey = solanaPubkey
     }
 }
 

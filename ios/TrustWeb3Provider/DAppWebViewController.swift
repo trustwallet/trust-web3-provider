@@ -18,27 +18,25 @@ class DAppWebViewController: UIViewController {
     }
 
     static let solanaRPC = "https://api.mainnet-beta.solana.com/"
+    static let solanaPubkey = "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
         chainId: 1,
-        rpcUrl: "https://cloudflare-eth.com",
-        solanaPubkey: "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
+        rpcUrl: "https://cloudflare-eth.com"
     )
 
     var providers: [Int: TrustWeb3Provider] = [
         42161: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 42161,
-            rpcUrl: "https://arb1.arbitrum.io/rpc",
-            solanaPubkey: "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
+            rpcUrl: "https://arb1.arbitrum.io/rpc"
         ),
         250: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 250,
-            rpcUrl: "https://rpc.ftm.tools",
-            solanaPubkey: "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
+            rpcUrl: "https://rpc.ftm.tools"
         )
     ]
 
@@ -110,13 +108,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
         switch method {
         case .requestAccounts:
             handleRequestAccounts(network: network, id: id)
-        case .signAllTransactions:
-            guard let transactions = json["object"] as? [String] else {
-                print("data is missing")
+        case .signRawTransaction:
+            guard let raw = extractRaw(json: json) else {
+                print("raw json is missing")
                 return
             }
 
-            handleSignSolanaTransactions(id: id, transactions: transactions)
+            handleSignRawTransaction(id: id, raw: raw)
         case .sendRawTransaction:
             guard let raw = extractRaw(json: json) else {
                 print("raw json is missing")
@@ -194,7 +192,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             message: "\(webview.url?.host! ?? "Website") would like to connect your account",
             preferredStyle: .alert
         )
-        let address = network == .solana ? current.solanaPubkey: current.address
+        let address = network == .solana ? Self.solanaPubkey: current.address
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
@@ -253,21 +251,20 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
-    func handleSignSolanaTransactions(id: Int64, transactions: [String]) {
+    func handleSignRawTransaction(id: Int64, raw: String) {
         let alert = UIAlertController(
-            title: "Sign Transactions",
-            message: "\(transactions.count) encoded transaction(s)",
+            title: "Sign Transaction",
+            message: raw,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            let signatures = transactions
-                .compactMap { Base58.decodeNoCheck(string: $0) }
-                .compactMap { Self.solanaPrivateKey.sign(digest: $0, curve: .ed25519) }
-                .map { Base58.encodeNoCheck(data: $0) }
-            webview?.tw.send(network: .solana, results: signatures, to: id)
+            guard let decoded = Base58.decodeNoCheck(string: raw) else { return }
+            guard let signature = Self.privateKey.sign(digest: decoded, curve: .ed25519) else { return }
+            let signatureEncoded = Base58.encodeNoCheck(data: signature)
+            webview?.tw.send(network: .solana, result: signatureEncoded, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -283,7 +280,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
-            self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0], solanaPubkey: self.current.solanaPubkey)
+            self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0])
             print("\(name) added")
             self.webview.tw.sendNull(network: .ethereum, id: id)
         }))
