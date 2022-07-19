@@ -462,7 +462,9 @@ extension DAppWebViewController: WKScriptMessageHandler {
                      print("no response")
                      return
                  }
-                self?.webview.tw.send(network: "solana", result: Base58.encodeNoCheck(data: data), to: id)
+                DispatchQueue.main.async {
+                    self?.webview.tw.send(network: "solana", result: Base58.encodeNoCheck(data: data), to: id)
+                }
             }
             task.resume()
         } catch(let error) {

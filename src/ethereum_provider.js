@@ -42,11 +42,11 @@ class TrustWeb3Provider extends BaseProvider {
   }
 
   setConfig(config) {
-    this.setAddress(config.address);
+    this.setAddress(config.ethereum.address);
 
-    this.networkVersion = "" + config.chainId;
-    this.chainId = "0x" + (config.chainId || 1).toString(16);
-    this.rpc = new RPCServer(config.rpcUrl);
+    this.networkVersion = "" + config.ethereum.chainId;
+    this.chainId = "0x" + (config.ethereum.chainId || 1).toString(16);
+    this.rpc = new RPCServer(config.ethereum.rpcUrl);
     this.isDebug = !!config.isDebug;
   }
 
