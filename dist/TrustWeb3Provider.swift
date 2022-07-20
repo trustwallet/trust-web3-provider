@@ -29,7 +29,6 @@ public struct TrustWeb3Provider {
     }
 
     public var injectScript: WKUserScript {
-        // FIXME turn off debug flag
         let source = """
         (function() {
             var config = {
@@ -39,8 +38,7 @@ public struct TrustWeb3Provider {
                 },
                 solana: {
                     cluster: "mainnet-beta"
-                },
-                isDebug: true
+                }
             };
 
             window.ethereum = new trustwallet.Provider(config);
