@@ -129,8 +129,6 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         return this.postMessage("signMessage", id, payload);
         case "signRawTransaction":
         return this.postMessage("signRawTransaction", id, payload);
-        case "sendRawTransaction":
-        return this.postMessage("sendRawTransaction", id, payload);
         case "requestAccounts":
         return this.postMessage("requestAccounts", id, {});
         default:

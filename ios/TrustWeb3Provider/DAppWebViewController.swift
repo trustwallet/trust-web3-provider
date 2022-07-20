@@ -115,18 +115,6 @@ extension DAppWebViewController: WKScriptMessageHandler {
             }
 
             handleSignRawTransaction(id: id, raw: raw)
-        case .sendRawTransaction:
-            guard let raw = extractRaw(json: json) else {
-                print("raw json is missing")
-                return
-            }
-
-            switch network {
-            case .ethereum:
-                fatalError("Ethereum doesn't support this")
-            case .solana:
-                sendRawSolanaTransaction(id: id, raw: raw)
-            }
         case .signMessage:
             guard let data = extractMessage(json: json) else {
                 print("data is missing")
@@ -423,53 +411,6 @@ extension DAppWebViewController: WKScriptMessageHandler {
     private func ethereumMessage(for data: Data) -> Data {
         let prefix = "\u{19}Ethereum Signed Message:\n\(data.count)".data(using: .utf8)!
         return prefix + data
-    }
-
-    private func sendRawSolanaTransaction(id: Int64, raw: String) {
-
-        guard let endpointUrl = URL(string: Self.solanaRPC) else {
-            return
-        }
-
-        var json = [String:Any]()
-
-        json["jsonrpc"] = "2.0"
-        json["method"] = "sendTransaction"
-        json["id"] = 1
-        json["params"] = [raw]
-
-        print("Sending transaction: \(raw)")
-        do {
-            let data = try JSONSerialization.data(withJSONObject: json, options: [])
-
-            var request = URLRequest(url: endpointUrl)
-            request.httpMethod = "POST"
-            request.httpBody = data
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-
-            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-                if let error = error {
-                    print("error is \(error.localizedDescription)")
-                    return
-                }
-
-                guard
-                    let data = data,
-                    let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                    let hash = result["result"] as? String
-                else {
-                    print("wrong response format")
-                    return
-                }
-                DispatchQueue.main.async {
-                    self?.webview.tw.send(network: .solana, result: hash, to: id)
-                }
-            }
-            task.resume()
-        } catch(let error) {
-            print(error)
-        }
     }
 }
 
