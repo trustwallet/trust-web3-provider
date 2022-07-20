@@ -12,7 +12,7 @@ import bs58 from "bs58";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
 
-const { PublicKey } = Web3;
+const { PublicKey, Connection } = Web3;
 
 class TrustSolanaWeb3Provider extends BaseProvider {
   constructor(config) {
@@ -23,6 +23,10 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     this.isPhantom = true;
     this.publicKey = null;
     this.isConnected = false;
+    this.connection = new Connection(
+      Web3.clusterApiUrl(config.cluster),
+      "confirmed"
+    );
   }
 
   connect() {
@@ -89,12 +93,11 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         `==> signAndSendTransaction ${JSON.stringify(tx)}, options: ${options}`
       );
     }
-    return this.signTransaction(tx).then((transaction) => {
-      const serialized = bs58.encode(transaction.serialize());
-      return this._request("sendRawTransaction", { raw: serialized }).then(
-        (hash) => {
-          return { signature: hash };
-        }
+    return this.signTransaction(tx).then((signedTx) => {
+      return Web3.sendAndConfirmRawTransaction(
+        this.connection,
+        signedTx.serialize(),
+        Web3.BlockheightBasedTransactionConfirmationStrategy
       );
     });
   }

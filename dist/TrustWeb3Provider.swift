@@ -37,7 +37,9 @@ public struct TrustWeb3Provider {
                     chainId: \(chainId),
                     rpcUrl: "\(rpcUrl)"
                 },
-                solana: {},
+                solana: {
+                    cluster: "mainnet-beta"
+                },
                 isDebug: true
             };
 
