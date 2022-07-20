@@ -66,7 +66,9 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         if (!tx.verifySignatures()) {
           throw new ProviderRpcError(4300, "Invalid signature");
         }
-        console.log(`==> signed single ${JSON.stringify(tx)}`);
+        if (this.isDebug) {
+          console.log(`==> signed single ${JSON.stringify(tx)}`);
+        }
         return tx;
       })
       .catch((error) => {
@@ -79,9 +81,12 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   signAndSendTransaction(tx, options) {
+    if (this.isDebug) {
+      console.log(`==> signAndSendTransaction ${tx}, options: ${options}`);
+    }
     return this.signTransaction(tx).then(transaction => {
-      const signature = bs58.encode(transaction.serialize());
-        return this._request("sendRawTransaction", { raw: signature });
+      const serialized = bs58.encode(transaction.serialize());
+        return this._request("sendRawTransaction", { raw: serialized });
     });
   }
 

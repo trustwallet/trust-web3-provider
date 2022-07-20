@@ -38,6 +38,7 @@ public struct TrustWeb3Provider {
                     chainId: \(chainId),
                     rpcUrl: "\(rpcUrl)"
                 },
+                solana: {},
                 isDebug: true
             };
 
