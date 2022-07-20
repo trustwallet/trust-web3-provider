@@ -34,7 +34,6 @@ public struct TrustWeb3Provider {
         (function() {
             var config = {
                 ethereum: {
-                    address: "\(address.lowercased())",
                     chainId: \(chainId),
                     rpcUrl: "\(rpcUrl)"
                 },
@@ -87,7 +86,7 @@ public extension TypeWrapper where T == WKWebView {
             chainId: \(chainId),
             rpcUrl: "\(rpcUrl)"
         };
-        ethereum.setConfig(config);
+        ethereum.setConfig({ethereum: config});
         """
         value.evaluateJavaScript(script)
     }

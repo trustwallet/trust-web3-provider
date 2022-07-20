@@ -52,7 +52,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       console.log(`==> signMessage ${message}, hex: ${hex}`);
     }
     return this._request("signMessage", {data: hex}).then(data => {
-      return{
+      return {
         signature: new Uint8Array(Utils.messageToBuffer(data).buffer),
       };
     });
@@ -82,11 +82,13 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
   signAndSendTransaction(tx, options) {
     if (this.isDebug) {
-      console.log(`==> signAndSendTransaction ${tx}, options: ${options}`);
+      console.log(`==> signAndSendTransaction ${JSON.stringify(tx)}, options: ${options}`);
     }
     return this.signTransaction(tx).then(transaction => {
       const serialized = bs58.encode(transaction.serialize());
-        return this._request("sendRawTransaction", { raw: serialized });
+        return this._request("sendRawTransaction", { raw: serialized }).then(hash => {
+          return {signature: hash};
+        });
     });
   }
 
@@ -95,7 +97,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
    */
   _request(method, payload) {
     if (this.isDebug) {
-      console.log(`==> _request payload ${JSON.stringify(payload)}`);
+      console.log(`==> _request method:${method}, payload ${JSON.stringify(payload)}`);
     }
     return new Promise((resolve, reject) => {
       const id = Utils.genId();
@@ -113,6 +115,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
           return this.postMessage("signMessage", id, payload);
         case "signRawTransaction":
           return this.postMessage("signRawTransaction", id, payload);
+        case "sendRawTransaction":
+          return this.postMessage("sendRawTransaction", id, payload);
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
         default:

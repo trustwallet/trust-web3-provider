@@ -17,8 +17,8 @@ class DAppWebViewController: UIViewController {
         return "http://localhost:3000/basics"
     }
 
-    static let solanaRPC = "https://api.mainnet-beta.solana.com/"
-    static let solanaPubkey = "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH"
+    static let solanaRPC = "https://api.devnet.solana.com" // "https://api.mainnet-beta.solana.com/"
+    static let solanaPubkey = "H4JcMPicKkHcxxDjkyyrLoQj7Kcibd9t815ak4UvTr9M"
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
@@ -197,7 +197,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
-            webview?.evaluateJavaScript("\(network).setAddress(\"\(address)\");", completionHandler: nil)
+            webview?.tw.set(network: network.rawValue, address: address)
             webview?.tw.send(network: network, results: [address], to: id)
         }))
         present(alert, animated: true, completion: nil)
@@ -414,7 +414,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         let data = ethereumMessage(for: message)
         let hash = Hash.keccak256(data: data)
         guard let publicKey = PublicKey.recover(signature: signature, message: hash),
-            PublicKey.isValid(data: publicKey.data, type: publicKey.keyType) else {
+              PublicKey.isValid(data: publicKey.data, type: publicKey.keyType) else {
             return nil
         }
         return CoinType.ethereum.deriveAddressFromPublicKey(publicKey: publicKey).lowercased()
@@ -450,16 +450,20 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
             let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
                 if let error = error {
-                     print("error is \(error.localizedDescription)")
-                     return
-                 }
+                    print("error is \(error.localizedDescription)")
+                    return
+                }
 
-                guard let data = data else {
-                     print("no response")
-                     return
-                 }
+                guard
+                    let data = data,
+                    let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    let hash = result["result"] as? String
+                else {
+                    print("wrong response format")
+                    return
+                }
                 DispatchQueue.main.async {
-                    self?.webview.tw.send(network: .solana, result: Base58.encodeNoCheck(data: data), to: id)
+                    self?.webview.tw.send(network: .solana, result: hash, to: id)
                 }
             }
             task.resume()
@@ -472,7 +476,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
 extension DAppWebViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard navigationAction.request.url != nil else {
-           return nil
+            return nil
         }
         _ = webView.load(navigationAction.request)
         return nil

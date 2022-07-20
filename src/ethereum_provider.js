@@ -23,7 +23,7 @@ class TrustWeb3Provider extends BaseProvider {
     this.idMapping = new IdMapping();
     this.callbacks = new Map();
     this.wrapResults = new Map();
-    this.isMetaMask = false;
+    this.isMetaMask = !!config.ethereum.isMetaMask;
 
     this.emitConnect(this.chainId);
   }
@@ -32,12 +32,16 @@ class TrustWeb3Provider extends BaseProvider {
     const lowerAddress = (address || "").toLowerCase();
     this.address = lowerAddress;
     this.ready = !!address;
-    for (var i = 0; i < window.frames.length; i++) {
-      const frame = window.frames[i];
-      if (frame.ethereum && frame.ethereum.isTrust) {
-        frame.ethereum.address = lowerAddress;
-        frame.ethereum.ready = !!address;
+    try {
+      for (var i = 0; i < window.frames.length; i++) {
+        const frame = window.frames[i];
+        if (frame.ethereum && frame.ethereum.isTrust) {
+          frame.ethereum.address = lowerAddress;
+          frame.ethereum.ready = !!address;
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   }
 
