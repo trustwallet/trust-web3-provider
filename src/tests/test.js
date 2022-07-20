@@ -42,9 +42,11 @@ describe("TrustWeb3Provider constructor tests", () => {
       ethereum:{
         chainId: 1,
         rpcUrl: "",
+        isMetaMask: false,
     }});
     const address = mainnet.address;
     expect(provider.address).toBe("");
+    expect(provider.isMetaMask).toBeFalsy();
 
     provider.setAddress(address);
     expect(provider.address).toBe(address.toLowerCase());
@@ -52,10 +54,17 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test Solana setAddress", () => {
-    const provider = new trustwallet.SolanaProvider({isDebug: true});
+    const provider = new trustwallet.SolanaProvider({
+      solana: {
+        cluster: "mainnet-beta",
+        isPhantom: false,
+      },
+      isDebug: true
+    });
     expect(provider.publicKey).toBe(null);
     expect(provider.isDebug).toBeTruthy();
     expect(provider.isTrust).toBeTruthy();
+    expect(provider.isPhantom).toBeFalsy();
 
     const publicKey = "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH";
     provider.setAddress(publicKey);

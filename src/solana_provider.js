@@ -20,13 +20,13 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
     this.providerNetwork = "solana";
     this.callbacks = new Map();
-    this.isPhantom = true;
+    this.isPhantom = !!config.solana.isPhantom;
     this.publicKey = null;
     this.isConnected = false;
     this.connection = new Connection(
       Web3.clusterApiUrl(config.cluster),
       "confirmed"
-      );
+    );
   }
 
   connect() {
@@ -67,20 +67,20 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       data: JSON.stringify(tx),
       raw: bs58.encode(tx.serializeMessage()),
     })
-    .then((signatureEncoded) => {
-      const signature = bs58.decode(signatureEncoded);
-      tx.addSignature(this.publicKey, signature);
-      if (!tx.verifySignatures()) {
-        throw new ProviderRpcError(4300, "Invalid signature");
-      }
-      if (this.isDebug) {
-        console.log(`==> signed single ${JSON.stringify(tx)}`);
-      }
-      return tx;
-    })
-    .catch((error) => {
-      console.log(`<== Error: ${error}`);
-    });
+      .then((signatureEncoded) => {
+        const signature = bs58.decode(signatureEncoded);
+        tx.addSignature(this.publicKey, signature);
+        if (!tx.verifySignatures()) {
+          throw new ProviderRpcError(4300, "Invalid signature");
+        }
+        if (this.isDebug) {
+          console.log(`==> signed single ${JSON.stringify(tx)}`);
+        }
+        return tx;
+      })
+      .catch((error) => {
+        console.log(`<== Error: ${error}`);
+      });
   }
 
   signAllTransactions(txs) {
@@ -91,7 +91,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     if (this.isDebug) {
       console.log(
         `==> signAndSendTransaction ${JSON.stringify(tx)}, options: ${options}`
-        );
+      );
     }
     return this.signTransaction(tx).then(async (signedTx) => {
       const signature = await Web3.sendAndConfirmRawTransaction(
@@ -99,19 +99,19 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         signedTx.serialize(),
         Web3.BlockheightBasedTransactionConfirmationStrategy,
         options
-        );
-      return { signature: signature }
+      );
+      return { signature: signature };
     });
   }
 
   /**
    * @private Internal rpc handler
    */
-   _request(method, payload) {
+  _request(method, payload) {
     if (this.isDebug) {
       console.log(
         `==> _request method: ${method}, payload ${JSON.stringify(payload)}`
-        );
+      );
     }
     return new Promise((resolve, reject) => {
       const id = Utils.genId();
@@ -126,19 +126,19 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
       switch (method) {
         case "signMessage":
-        return this.postMessage("signMessage", id, payload);
+          return this.postMessage("signMessage", id, payload);
         case "signRawTransaction":
-        return this.postMessage("signRawTransaction", id, payload);
+          return this.postMessage("signRawTransaction", id, payload);
         case "requestAccounts":
-        return this.postMessage("requestAccounts", id, {});
+          return this.postMessage("requestAccounts", id, {});
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(
             4200,
             `Trust does not support calling ${payload.method} yet.`
-            );
-        }
-      });
+          );
+      }
+    });
   }
 }
 
