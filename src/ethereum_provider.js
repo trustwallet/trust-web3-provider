@@ -362,18 +362,6 @@ class TrustWeb3Provider extends BaseProvider {
       }
     }
   }
-
-  /**
-   * @private Internal native error -> js
-   */
-  sendError(id, error) {
-    console.log(`<== ${id} sendError ${error}`);
-    let callback = this.callbacks.get(id);
-    if (callback) {
-      callback(error instanceof Error ? error : new Error(error), null);
-      this.callbacks.delete(id);
-    }
-  }
 }
 
 module.exports = TrustWeb3Provider;

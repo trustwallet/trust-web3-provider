@@ -51,7 +51,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     if (this.isDebug) {
       console.log(`==> signMessage ${message}, hex: ${hex}`);
     }
-    return this._request("signMessage", {data: hex}).then(data => {
+    return this._request("signMessage", { data: hex }).then((data) => {
       return {
         signature: new Uint8Array(Utils.messageToBuffer(data).buffer),
       };
@@ -59,7 +59,10 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   signTransaction(tx) {
-    return this._request("signRawTransaction", { raw: bs58.encode(tx.serializeMessage()) })
+    return this._request("signRawTransaction", {
+      data: JSON.stringify(tx),
+      raw: bs58.encode(tx.serializeMessage()),
+    })
       .then((signatureEncoded) => {
         const signature = bs58.decode(signatureEncoded);
         tx.addSignature(this.publicKey, signature);
@@ -82,13 +85,17 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
   signAndSendTransaction(tx, options) {
     if (this.isDebug) {
-      console.log(`==> signAndSendTransaction ${JSON.stringify(tx)}, options: ${options}`);
+      console.log(
+        `==> signAndSendTransaction ${JSON.stringify(tx)}, options: ${options}`
+      );
     }
-    return this.signTransaction(tx).then(transaction => {
+    return this.signTransaction(tx).then((transaction) => {
       const serialized = bs58.encode(transaction.serialize());
-        return this._request("sendRawTransaction", { raw: serialized }).then(hash => {
-          return {signature: hash};
-        });
+      return this._request("sendRawTransaction", { raw: serialized }).then(
+        (hash) => {
+          return { signature: hash };
+        }
+      );
     });
   }
 
@@ -97,7 +104,9 @@ class TrustSolanaWeb3Provider extends BaseProvider {
    */
   _request(method, payload) {
     if (this.isDebug) {
-      console.log(`==> _request method:${method}, payload ${JSON.stringify(payload)}`);
+      console.log(
+        `==> _request method: ${method}, payload ${JSON.stringify(payload)}`
+      );
     }
     return new Promise((resolve, reject) => {
       const id = Utils.genId();
