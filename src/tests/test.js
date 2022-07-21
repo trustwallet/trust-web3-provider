@@ -6,9 +6,9 @@
 
 "use strict";
 
-var ethUtil = require("ethereumjs-util");
 require("../index");
 require("whatwg-fetch");
+const ethUtil = require("ethereumjs-util");
 const Web3 = require("web3");
 const trustwallet = window.trustwallet;
 
@@ -32,32 +32,57 @@ const bsc = {
 
 describe("TrustWeb3Provider constructor tests", () => {
   test("test constructor.name", () => {
-    const provider = new trustwallet.Provider({});
-    const web3 = new trustwallet.Web3(provider);
+    const provider = new trustwallet.Provider({ethereum: {}});
+    const web3 = new Web3(provider);
     expect(web3.currentProvider.constructor.name).toBe("TrustWeb3Provider");
   });
 
-  test("test setAddress", () => {
+  test("test Ethereum setAddress", () => {
     const provider = new trustwallet.Provider({
-      chainId: 1,
-      rpcUrl: "",
-    });
+      ethereum:{
+        chainId: 1,
+        rpcUrl: "",
+        isMetaMask: false,
+    }});
     const address = mainnet.address;
     expect(provider.address).toBe("");
+    expect(provider.isMetaMask).toBeFalsy();
 
     provider.setAddress(address);
     expect(provider.address).toBe(address.toLowerCase());
     expect(provider.ready).toBeTruthy();
   });
 
+  test("test Solana setAddress", () => {
+    const provider = new trustwallet.SolanaProvider({
+      solana: {
+        cluster: "mainnet-beta",
+        isPhantom: false,
+      },
+      isDebug: true
+    });
+    expect(provider.publicKey).toBe(null);
+    expect(provider.isDebug).toBeTruthy();
+    expect(provider.isTrust).toBeTruthy();
+    expect(provider.isPhantom).toBeFalsy();
+
+    const publicKey = "8gP4CUuPG2Dv5iGyvNmnitBMydLvCLKb8jWH6fME1SWH";
+    provider.setAddress(publicKey);
+    expect(provider.publicKey.toString()).toBe(publicKey);
+
+    provider.disconnect().then(() => {
+      expect(provider.publicKey).toBe(null);
+    });
+  });
+
   test("test setConfig", (done) => {
-    const provider = new trustwallet.Provider(ropsten);
+    const provider = new trustwallet.Provider({ethereum: ropsten});
     const web3 = new Web3(provider);
 
     expect(web3.currentProvider.chainId).toEqual("0x3");
     expect(web3.currentProvider.networkVersion).toEqual("3");
 
-    web3.currentProvider.setConfig(mainnet);
+    web3.currentProvider.setConfig({ethereum: mainnet});
     expect(web3.currentProvider.chainId).toEqual("0x1");
     expect(web3.currentProvider.networkVersion).toEqual("1");
     expect(web3.currentProvider.rpc.rpcUrl).toBe(mainnet.rpcUrl);
@@ -72,7 +97,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_chainId", (done) => {
-    const provider = new trustwallet.Provider(bsc);
+    const provider = new trustwallet.Provider({ethereum: bsc});
     const web3 = new Web3(provider);
 
     let request = { jsonrpc: "2.0", method: "eth_chainId", id: 123 };
@@ -91,7 +116,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_accounts", (done) => {
-    const provider = new trustwallet.Provider(mainnet);
+    const provider = new trustwallet.Provider({ethereum: mainnet});
     const web3 = new Web3(provider);
     const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
 
@@ -113,7 +138,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_sign", (done) => {
-    const provider = new trustwallet.Provider(mainnet);
+    const provider = new trustwallet.Provider({ethereum: mainnet});
     const web3 = new Web3(provider);
     const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
     const signed =
@@ -134,7 +159,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test personal_sign", (done) => {
-    const provider = new trustwallet.Provider(bsc);
+    const provider = new trustwallet.Provider({ethereum: bsc});
     const signed =
       "0xf3a9e21a3238b025b7edf5013876548cfb2f2a838aca573de88c91ea9aecf7190cd6330a0172bd5d106841647831f30065f644eddc2f86091e1bb370c9ff833f1c";
 
@@ -164,7 +189,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_signTypedData_v4", (done) => {
-    const provider = new trustwallet.Provider(mainnet);
+    const provider = new trustwallet.Provider({ethereum: mainnet});
     const signed =
       "0x7aff0e37900fc2eb5e78c56b07246a0904b3ba642cab17917d7524110b83fe04296790ff076a7dd31b2a11ded9fcbe3959fe872b7c18fa79f5146807855fcce41b";
 
@@ -181,7 +206,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test batched sendAsync", (done) => {
-    const provider = new trustwallet.Provider(bsc);
+    const provider = new trustwallet.Provider({ethereum: bsc});
     const web3 = new Web3(provider);
     const request = [
       {jsonrpc: "2.0", id: 11, method: "eth_call", params: [{data: "0x06fdde03", to: "0xe9e7cea3dedca5984780bafc599bd69add087d56"}, "latest"]},

@@ -7,6 +7,11 @@
 import Foundation
 import WebKit
 
+public enum ProviderNetwork: String, Decodable {
+    case ethereum
+    case solana
+}
+
 public struct TrustWeb3Provider {
     public static let scriptHandlerName = "_tw_"
 
@@ -27,13 +32,17 @@ public struct TrustWeb3Provider {
         let source = """
         (function() {
             var config = {
-                address: "\(address.lowercased())",
-                chainId: \(chainId),
-                rpcUrl: "\(rpcUrl)"
+                ethereum: {
+                    chainId: \(chainId),
+                    rpcUrl: "\(rpcUrl)"
+                },
+                solana: {
+                    cluster: "mainnet-beta"
+                }
             };
 
             window.ethereum = new trustwallet.Provider(config);
-            window.web3 = new trustwallet.Web3(window.ethereum);
+            window.solana = new trustwallet.SolanaProvider(config);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
@@ -65,8 +74,8 @@ public extension WKWebView {
 }
 
 public extension TypeWrapper where T == WKWebView {
-    func set(address: String) {
-        let script = String(format: "ethereum.setAddress(\"%@\");", address.lowercased())
+    func set(network: String, address: String) {
+        let script = String(format: "\(network).setAddress(\"%@\");", address.lowercased())
         value.evaluateJavaScript(script)
     }
 
@@ -77,7 +86,7 @@ public extension TypeWrapper where T == WKWebView {
             chainId: \(chainId),
             rpcUrl: "\(rpcUrl)"
         };
-        ethereum.setConfig(config);
+        ethereum.setConfig({ethereum: config});
         """
         value.evaluateJavaScript(script)
     }
@@ -88,24 +97,24 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func send(error: String, to id: Int64) {
-        let script = String(format: "ethereum.sendError(%ld, \"%@\")", id, error)
+    func send(network: ProviderNetwork, error: String, to id: Int64) {
+        let script = String(format: "\(network.rawValue).sendError(%ld, \"%@\")", id, error)
         value.evaluateJavaScript(script)
     }
 
-    func send(result: String, to id: Int64) {
-        let script = String(format: "ethereum.sendResponse(%ld, \"%@\")", id, result)
+    func send(network: ProviderNetwork, result: String, to id: Int64) {
+        let script = String(format: "\(network.rawValue).sendResponse(%ld, \"%@\")", id, result)
         value.evaluateJavaScript(script)
     }
 
-    func sendNull(id: Int64) {
-        let script = String(format: "ethereum.sendResponse(%ld, null)", id)
+    func sendNull(network: ProviderNetwork, id: Int64) {
+        let script = String(format: "\(network.rawValue).sendResponse(%ld, null)", id)
         value.evaluateJavaScript(script)
     }
 
-    func send(results: [String], to id: Int64) {
+    func send(network: ProviderNetwork, results: [String], to id: Int64) {
         let array = results.map { String(format: "\"%@\"", $0) }
-        let script = String(format: "ethereum.sendResponse(%ld, [%@])", id, array.joined(separator: ","))
+        let script = String(format: "\(network.rawValue).sendResponse(%ld, [%@])", id, array.joined(separator: ","))
         value.evaluateJavaScript(script)
     }
 

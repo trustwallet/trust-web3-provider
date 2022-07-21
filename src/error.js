@@ -12,7 +12,7 @@ class ProviderRpcError extends Error {
     this.code = code;
     this.message = message;
   }
-  
+
   toString() {
     return `${this.message} (${this.code})`;
   }

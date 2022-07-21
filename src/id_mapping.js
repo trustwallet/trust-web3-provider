@@ -10,7 +10,7 @@ import Utils from "./utils";
 
 class IdMapping {
   constructor() {
-    this.intIds = new Map;
+    this.intIds = new Map();
   }
 
   tryIntifyId(payload) {
