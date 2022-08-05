@@ -20,7 +20,6 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
     this.providerNetwork = "solana";
     this.callbacks = new Map();
-    this.isPhantom = !!config.solana.isPhantom;
     this.publicKey = null;
     this.isConnected = false;
     this.connection = new Connection(

@@ -65,20 +65,19 @@ class MainActivity : AppCompatActivity() {
             var config = {                
                 ethereum: {
                     chainId: $chainId,
-                    rpcUrl: "$rpcUrl",
-                    isMetaMask: true
+                    rpcUrl: "$rpcUrl"
                 },
                 solana: {
                     cluster: "mainnet-beta",
-                    isPhantom: true
                 },
                 isDebug: true
             };
-            window.ethereum = new trustwallet.Provider(config);
-            window.solana = new trustwallet.SolanaProvider(config);
+            trustwallet.ethereum = new trustwallet.Provider(config);
+            trustwallet.solana = new trustwallet.SolanaProvider(config);
             trustwallet.postMessage = (json) => {
                 window._tw_.postMessage(JSON.stringify(json));
             }
+            window.ethereum = trustwallet.ethereum;
         })();
         """
         return  source

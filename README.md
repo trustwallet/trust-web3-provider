@@ -17,7 +17,7 @@ If trust provider injected properly `isTrust` will be `true`
 ```javascript
 window.ethereum.isTrust
 // or
-window.solana.isTrust
+window.trustwallet.solana.isTrust
 ```
 
 ## Installation
