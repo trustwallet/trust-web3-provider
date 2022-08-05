@@ -40,9 +40,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     implementation "com.louiscad.splitties:splitties-alertdialog-material:3.0.0"
-    implementation "com.trustwallet:wallet-core:2.6.23"
+    implementation "com.trustwallet:wallet-core:2.9.7"
 
-    implementation 'com.github.trustwallet:trust-web3-provider:1.0.5'
+    implementation 'com.github.trustwallet:trust-web3-provider:2.0.0-alpha'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

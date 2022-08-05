@@ -45,8 +45,7 @@ Here is an example project located at `ios/TrustWeb3Provider.xcodeproj` to demon
 
 ### Android
 
-TrustWeb3Provider is available through [Jitpack](https://jitpack.io) and [GitHub Packages](https://github.com/trustwallet/trust-web3-provider/packages), new version will only be available in GitHub.
-
+TrustWeb3Provider is available through [Jitpack](https://jitpack.io)
 #### Jitpack
 
 To install it:

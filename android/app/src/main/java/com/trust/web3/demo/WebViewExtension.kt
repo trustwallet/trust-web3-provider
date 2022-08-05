@@ -2,23 +2,23 @@ package com.trust.web3.demo
 
 import android.webkit.WebView
 
-fun WebView.sendError(message: String, methodId: Long) {
-    val script = "window.ethereum.sendError($methodId, \"$message\")"
+fun WebView.sendError(network: String, message: String, methodId: Long) {
+    val script = "window.$network.sendError($methodId, \"$message\")"
     this.post {
         this.evaluateJavascript(script) {}
     }
 }
 
-fun WebView.sendResult(message: String, methodId: Long) {
-    val script = "window.ethereum.sendResponse($methodId, \"$message\")"
+fun WebView.sendResult(network: String, message: String, methodId: Long) {
+    val script = "window.$network.sendResponse($methodId, \"$message\")"
     this.post {
         this.evaluateJavascript(script) {}
     }
 }
 
-fun WebView.sendResults(messages: List<String>, methodId: Long) {
+fun WebView.sendResults(network: String, messages: List<String>, methodId: Long) {
     val message = messages.joinToString(separator = ",")
-    val script = "window.ethereum.sendResponse($methodId, \"$message\")"
+    val script = "window.$network.sendResponse($methodId, \"$message\")"
     this.post {
         this.evaluateJavascript(script) {}
     }

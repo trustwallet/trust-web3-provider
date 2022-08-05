@@ -1,13 +1,15 @@
 package com.trust.web3.demo
 
+import android.net.http.SslError
 import android.os.Bundle
+import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        private const val DAPP_URL = "https://js-eth-sign.surge.sh"
+        private const val DAPP_URL = "https://www.magiceden.io/me"
         private const val CHAIN_ID = 56
         private const val RPC_URL = "https://bsc-dataseed2.binance.org"
     }
@@ -37,6 +39,16 @@ class MainActivity : AppCompatActivity() {
                     view?.evaluateJavascript(provderJs, null)
                     view?.evaluateJavascript(initJs, null)
                 }
+
+                override fun onReceivedSslError(
+                    view: WebView?,
+                    handler: SslErrorHandler?,
+                    error: SslError?
+                ) {
+                    // Ignore SSL certificate errors
+                    handler?.proceed()
+                    println(error.toString())
+                }
             }
             webview.webViewClient = webViewClient
             webview.loadUrl(DAPP_URL)
@@ -50,9 +62,16 @@ class MainActivity : AppCompatActivity() {
     private fun loadInitJs(chainId: Int, rpcUrl: String): String {
         val source = """
         (function() {
-            var config = {
-                chainId: $chainId,
-                rpcUrl: "$rpcUrl",
+            var config = {                
+                ethereum: {
+                    chainId: $chainId,
+                    rpcUrl: "$rpcUrl",
+                    isMetaMask: true
+                },
+                solana: {
+                    cluster: "mainnet-beta",
+                    isPhantom: true
+                },
                 isDebug: true
             };
             window.ethereum = new trustwallet.Provider(config);
