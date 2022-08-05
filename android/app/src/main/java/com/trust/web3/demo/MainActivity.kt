@@ -74,11 +74,12 @@ class MainActivity : AppCompatActivity() {
                 },
                 isDebug: true
             };
-            window.ethereum = new trustwallet.Provider(config);
-            window.solana = new trustwallet.SolanaProvider(config);
+            trustwallet.ethereum = new trustwallet.Provider(config);
+            trustwallet.solana = new trustwallet.SolanaProvider(config);
             trustwallet.postMessage = (json) => {
                 window._tw_.postMessage(JSON.stringify(json));
             }
+            window.ethereum = trustwallet.ethereum;
         })();
         """
         return  source

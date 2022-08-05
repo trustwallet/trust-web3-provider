@@ -41,12 +41,13 @@ public struct TrustWeb3Provider {
                 }
             };
 
-            window.ethereum = new trustwallet.Provider(config);
-            window.solana = new trustwallet.SolanaProvider(config);
-
+            trustwallet.ethereum = new trustwallet.Provider(config);
+            trustwallet.solana = new trustwallet.SolanaProvider(config);
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
             };
+
+            window.ethereum = trustwallet.ethereum;
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
