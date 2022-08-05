@@ -14,10 +14,10 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "http://localhost:3000/basics"
+        return "https://solanart.io"
     }
 
-    static let solanaRPC = "https://api.devnet.solana.com" // "https://api.mainnet-beta.solana.com/"
+    static let solanaRPC = "https://api.mainnet-beta.solana.com"
     static let solanaPubkey = "H4JcMPicKkHcxxDjkyyrLoQj7Kcibd9t815ak4UvTr9M"
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
 

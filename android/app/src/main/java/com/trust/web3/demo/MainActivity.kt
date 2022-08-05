@@ -65,12 +65,10 @@ class MainActivity : AppCompatActivity() {
             var config = {                
                 ethereum: {
                     chainId: $chainId,
-                    rpcUrl: "$rpcUrl",
-                    isMetaMask: true
+                    rpcUrl: "$rpcUrl"
                 },
                 solana: {
                     cluster: "mainnet-beta",
-                    isPhantom: true
                 },
                 isDebug: true
             };

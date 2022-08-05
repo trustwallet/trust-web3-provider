@@ -37,12 +37,16 @@ public struct TrustWeb3Provider {
                     rpcUrl: "\(rpcUrl)"
                 },
                 solana: {
-                    cluster: "mainnet-beta"
+                    cluster: "mainnet-beta",
+                    isPhantom: true
                 }
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
             trustwallet.solana = new trustwallet.SolanaProvider(config);
+            window.phantom = {
+                solana: trustwallet.solana
+            }
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
             };
@@ -94,28 +98,28 @@ public extension TypeWrapper where T == WKWebView {
 
     func emitChange(chainId: Int) {
         let string = "0x" + String(chainId, radix: 16)
-        let script = String(format: "ethereum.emitChainChanged(\"%@\");", string)
+        let script = String(format: "trustwallet.ethereum.emitChainChanged(\"%@\");", string)
         value.evaluateJavaScript(script)
     }
 
     func send(network: ProviderNetwork, error: String, to id: Int64) {
-        let script = String(format: "\(network.rawValue).sendError(%ld, \"%@\")", id, error)
+        let script = String(format: "trustwallet.\(network.rawValue).sendError(%ld, \"%@\")", id, error)
         value.evaluateJavaScript(script)
     }
 
     func send(network: ProviderNetwork, result: String, to id: Int64) {
-        let script = String(format: "\(network.rawValue).sendResponse(%ld, \"%@\")", id, result)
+        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, \"%@\")", id, result)
         value.evaluateJavaScript(script)
     }
 
     func sendNull(network: ProviderNetwork, id: Int64) {
-        let script = String(format: "\(network.rawValue).sendResponse(%ld, null)", id)
+        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, null)", id)
         value.evaluateJavaScript(script)
     }
 
     func send(network: ProviderNetwork, results: [String], to id: Int64) {
         let array = results.map { String(format: "\"%@\"", $0) }
-        let script = String(format: "\(network.rawValue).sendResponse(%ld, [%@])", id, array.joined(separator: ","))
+        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, [%@])", id, array.joined(separator: ","))
         value.evaluateJavaScript(script)
     }
 
