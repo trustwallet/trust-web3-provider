@@ -37,16 +37,13 @@ public struct TrustWeb3Provider {
                     rpcUrl: "\(rpcUrl)"
                 },
                 solana: {
-                    cluster: "mainnet-beta",
-                    isPhantom: true
+                    cluster: "mainnet-beta"
                 }
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
             trustwallet.solana = new trustwallet.SolanaProvider(config);
-            window.phantom = {
-                solana: trustwallet.solana
-            }
+
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
             };
