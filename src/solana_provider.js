@@ -22,6 +22,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     this.callbacks = new Map();
     this.publicKey = null;
     this.isConnected = false;
+    this.isPhantom = true;
     this.connection = new Connection(
       Web3.clusterApiUrl(config.cluster),
       "confirmed"
