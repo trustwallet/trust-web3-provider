@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://solanart.io"
+        return "https://www.coinswap.market/home"
     }
 
     static let solanaRPC = "https://api.mainnet-beta.solana.com"
@@ -22,7 +22,7 @@ class DAppWebViewController: UIViewController {
     static let privateKey = PrivateKey(data: Data(hexString: "0x4646464646464646464646464646464646464646464646464646464646464646")!)!
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
-        address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
+        address: "iaa1ugk7mnkhwpt8ym3lk08s5sx4net2xt6djd0nnn",
         chainId: 1,
         rpcUrl: "https://cloudflare-eth.com"
     )
@@ -125,6 +125,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 handleSignMessage(id: id, data: data, addPrefix: false)
             case .solana:
                 handleSolanaSignMessage(id: id, data: data)
+            case .cosmos:
+                fatalError()
             }
         case .signPersonalMessage:
             guard let data = extractMessage(json: json) else {
