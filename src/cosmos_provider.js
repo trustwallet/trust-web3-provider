@@ -88,7 +88,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
         case "experimentalSuggestChain":
-          return this.postMessage("experimentalSuggestChain", id, payload);
+          return this.postMessage("switchChain", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

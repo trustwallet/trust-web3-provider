@@ -7,18 +7,12 @@
 import Foundation
 import WebKit
 
-public enum ProviderNetwork: String, Decodable {
-    case ethereum
-    case solana
-    case cosmos
-}
-
 public struct TrustWeb3Provider {
     public static let scriptHandlerName = "_tw_"
 
-    public let address: String
-    public let chainId: Int
-    public let rpcUrl: String
+    public var ethereum: EthereumConfig
+    public var solana: SolanaConfig
+    public var cosmos: CosmosConfig
 
     public var providerJsUrl: URL {
         return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
@@ -34,11 +28,11 @@ public struct TrustWeb3Provider {
         (function() {
             var config = {
                 ethereum: {
-                    chainId: \(chainId),
-                    rpcUrl: "\(rpcUrl)"
+                    chainId: \(ethereum.chainId),
+                    rpcUrl: "\(ethereum.rpcUrl)"
                 },
                 solana: {
-                    cluster: "mainnet-beta"
+                    cluster: "\(solana.cluster)"
                 }
             };
 
@@ -57,10 +51,21 @@ public struct TrustWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(address: String, chainId: Int, rpcUrl: String) {
-        self.address = address
-        self.chainId = chainId
-        self.rpcUrl = rpcUrl
+    public init(ethereum: EthereumConfig, solana: SolanaConfig, cosmos: CosmosConfig) {
+        self.ethereum = ethereum
+        self.solana = solana
+        self.cosmos = cosmos
+    }
+
+    public func address(for network: ProviderNetwork) -> String {
+        switch network {
+        case .ethereum:
+            return ethereum.address
+        case .solana:
+            return solana.address
+        case .cosmos:
+            return cosmos.address
+        }
     }
 }
 
@@ -126,5 +131,45 @@ public extension TypeWrapper where T == WKWebView {
 
     func removeScriptHandler() {
         value.configuration.userContentController.removeScriptMessageHandler(forName: TrustWeb3Provider.scriptHandlerName)
+    }
+}
+
+public enum ProviderNetwork: String, Decodable {
+    case ethereum
+    case solana
+    case cosmos
+}
+
+public struct EthereumConfig {
+    public let address: String
+    public let chainId: Int
+    public let rpcUrl: String
+
+    public init(address: String, chainId: Int, rpcUrl: String) {
+        self.address = address
+        self.chainId = chainId
+        self.rpcUrl = rpcUrl
+    }
+}
+
+public struct SolanaConfig {
+    public let address: String
+    public let cluster: String
+
+    public init(address: String, cluster: String) {
+        self.address = address
+        self.cluster = cluster
+    }
+}
+
+public struct CosmosConfig {
+    public let address: String
+    public let chainId: String
+    public let rpcUrl: String
+
+    public init(address: String, chainId: String, rpcUrl: String) {
+        self.address = address
+        self.chainId = chainId
+        self.rpcUrl = rpcUrl
     }
 }
