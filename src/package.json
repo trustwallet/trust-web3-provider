@@ -19,15 +19,13 @@
     "node": ">=14"
   },
   "dependencies": {
-    "@cosmjs/launchpad": "^0.24.0-alpha.25",
     "@cosmjs/proto-signing": "^0.24.0-alpha.25",
     "@metamask/eth-sig-util": "^4.0.1",
     "@solana/web3.js": "^1.5.0",
     "bs58": "^4.0.1",
     "buffer": "^5.6.0",
     "events": "^3.2.0",
-    "isutf8": "^3.1.1",
-    "tsc": "^2.0.4"
+    "isutf8": "^3.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.16.12",
