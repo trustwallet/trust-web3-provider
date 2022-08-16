@@ -31,7 +31,7 @@ class DAppWebViewController: UIViewController {
         ),
         cosmos: CosmosConfig(
             address: "cosmos1t5u0jfg3ljsjrh2m9e47d4ny2hea7eehxrzdgd",
-            chainId: "cosmos-1",
+            chainId: "cosmoshub-4",
             rpcUrl: "https://cosmoshub.validator.network:443"
         )
     )
@@ -51,9 +51,14 @@ class DAppWebViewController: UIViewController {
 
     var cosmosConfigs: [String: CosmosConfig] = [
         "osmosis-1": CosmosConfig(
-            address: "osmo14rct98qvjh36xmard8w7rmqnyfr4vrvl6j6rrw",
+            address: "osmo15jetnnj03usvx4naz2lzdw7vxysu2g43546dvf",
             chainId: "osmosis-1",
             rpcUrl: "https://rpc.osmosis.zone/"
+        ),
+        "cosmoshub-4": CosmosConfig(
+            address: "cosmos1t5u0jfg3ljsjrh2m9e47d4ny2hea7eehxrzdgd",
+            chainId: "cosmoshub-4",
+            rpcUrl: "https://cosmoshub.validator.network:443"
         )
     ]
 
@@ -125,6 +130,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
         switch method {
         case .requestAccounts:
             handleRequestAccounts(network: network, id: id)
+        case .signTransaction:
+            guard let params = json["object"] as? [String: Any] else {
+                print("data is missing")
+                return
+            }
+
+            handleSignTransaction(params, network: network, id: id)
         case .signRawTransaction:
             guard let raw = extractRaw(json: json) else {
                 print("raw json is missing")
@@ -267,6 +279,28 @@ extension DAppWebViewController: WKScriptMessageHandler {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = Self.privateKey.sign(digest: data, curve: .ed25519)!
             webview?.tw.send(network: .solana, result: "0x" + signed.hexString, to: id)
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+
+    func handleSignTransaction(_ params: [String: Any], network: ProviderNetwork, id: Int64) {
+        guard network == .cosmos else { fatalError("Not supported") }
+
+        let alert = UIAlertController(
+            title: "Sign Transaction",
+            message: params.description,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
+            webview?.tw.send(network: network, error: "Canceled", to: id)
+        }))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
+            guard let input = self.signingInput(for: params, network: .cosmos) else {
+                return
+            }
+            let signature: CosmosSigningOutput = AnySigner.sign(input: input, coin: .osmosis)
+            let signatureEncoded = signature.json
+            webview?.tw.send(network: .cosmos, result: signatureEncoded, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -482,6 +516,60 @@ extension DAppWebViewController: WKScriptMessageHandler {
     private func ethereumMessage(for data: Data) -> Data {
         let prefix = "\u{19}Ethereum Signed Message:\n\(data.count)".data(using: .utf8)!
         return prefix + data
+    }
+
+    private func signingInput(for params: [String: Any], network: ProviderNetwork) -> SigningInput? {
+        guard network == .cosmos else { fatalError("Not supported") }
+
+        guard let accountNumberStr = params["account_number"] as? String, let accountNumber = UInt64(accountNumberStr) else { return nil }
+        guard let chainID = params["chain_id"] as? String else { return nil }
+        guard let fee = params["fee"] as? [String: Any] else { return nil }
+        guard let gasStr = fee["gas"] as? String, let gas = UInt64(gasStr) else { return nil }
+        guard let memo = params["memo"] as? String else { return nil }
+        guard let sequenceStr = params["sequence"] as? String, let sequence = UInt64(sequenceStr) else { return nil }
+        guard let msgs = params["msgs"] as? [[String: Any]] else { return nil }
+
+        return CosmosSigningInput.with {
+            $0.signingMode = .json
+            $0.accountNumber = accountNumber
+            $0.chainID = chainID
+            $0.memo = memo
+            $0.sequence = sequence
+            $0.messages = parseCosmosMessages(msgs)
+            $0.fee = CosmosFee.with {
+                $0.gas = gas
+                $0.amounts = []
+            }
+            $0.privateKey = Self.privateKey.data
+        }
+    }
+
+    private func parseCosmosMessages(_ messages: [[String: Any]]) -> [CosmosMessage] {
+        messages.compactMap { params -> CosmosMessage? in
+            guard let type = params["type"] as? String else { return nil }
+            guard let value = params["value"] as? [String: Any] else { return nil }
+            guard let token = value["token"] as? [String: Any] else { return nil }
+            guard let denom = token["denom"] as? String else { return nil }
+            guard let amount = token["amount"] as? String else { return nil }
+            guard let sender = token["sender"] as? String else { return nil }
+            guard let receiver = token["receiver"] as? String else { return nil }
+
+            return CosmosMessage.with {
+                $0.rawJsonMessage = CosmosMessage.RawJSON.with {
+                    $0.type = type
+                    $0.value = """
+                        {
+                            "amount": [{
+                                "amount": "\(amount)",
+                                "denom": "\(denom)"
+                            }],
+                            "from_address": "\(sender)",
+                            "to_address": "\(receiver)"
+                        }
+                    """
+                }
+            }
+        }
     }
 }
 

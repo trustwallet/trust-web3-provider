@@ -53,7 +53,8 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   signAmino(chainId, signerAddress, signDoc) {
-    return this._request("signAmino")
+    console.log(`==> to sign ${JSON.stringify(signDoc)}`);
+    return this._request("signAmino", signDoc)
   }
 
   signDirect(chainId, signerAddress, signDoc) {
@@ -89,6 +90,8 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
           return this.postMessage("requestAccounts", id, {});
         case "experimentalSuggestChain":
           return this.postMessage("switchChain", id, payload);
+        case "signAmino":
+          return this.postMessage("signTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

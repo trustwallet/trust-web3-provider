@@ -33,7 +33,8 @@ public struct TrustWeb3Provider {
                 },
                 solana: {
                     cluster: "\(solana.cluster)"
-                }
+                },
+                isDebug: true
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
