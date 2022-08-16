@@ -52,7 +52,7 @@ public struct TrustWeb3Provider {
             };
 
             window.ethereum = trustwallet.ethereum;
-            window.solana = trustwallet.solana;
+            window.solana = window.phantom.solana;
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
