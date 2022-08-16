@@ -25,7 +25,7 @@ class CosmJSOfflineSignerOnlyAmino {
         if (key.bech32Address !== signerAddress) {
             throw new Error("Unknown signer address");
         }
-        return await this.trustwallet.signAmino(this.chainId, signerAddress, signDoc);
+        return await this.trustwallet.signAmino(this.chainId, signerAddress, signDoc, {});
     }
     async sign(signerAddress, signDoc) {
         return await this.signAmino(signerAddress, signDoc);

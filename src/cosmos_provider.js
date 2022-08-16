@@ -9,6 +9,7 @@
 import BaseProvider from "./base_provider";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
+import { Buffer } from "buffer";
 
 const { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } = require('./cosmjs');
 
@@ -52,17 +53,25 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     });
   }
 
-  signAmino(chainId, signerAddress, signDoc) {
-    console.log(`==> to sign ${JSON.stringify(signDoc)}`);
-    return this._request("signAmino", signDoc)
+  experimentalSuggestChain(chainInfo) {
+    return this._request("experimentalSuggestChain", chainInfo);
+  }
+
+  signAmino(chainId, signerAddress, signDoc, signOptions) {
+    return this._request("signAmino", signDoc).then((signatureJSON) => {
+      const signature = JSON.parse(signatureJSON.replace(/\r?\n|\r/g, '\\r\\n'));
+      const signed = signDoc;
+      return {signed, signature}
+    })
   }
 
   signDirect(chainId, signerAddress, signDoc) {
     return this._request("signDirect")
   }
 
-  experimentalSuggestChain(chainInfo) {
-    return this._request("experimentalSuggestChain", chainInfo);
+  sendTx(chainId, tx, mode) {
+    const tx_bytes = Buffer.from(tx).toString("base64");
+    console.log(`==> final tx hash: ${tx_bytes}`);
   }
 
     /**

@@ -115,7 +115,7 @@ public extension TypeWrapper where T == WKWebView {
     }
 
     func send(network: ProviderNetwork, result: String, to id: Int64) {
-        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, \"%@\")", id, result)
+        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, \'%@\')", id, result)
         value.evaluateJavaScript(script)
     }
 

@@ -299,8 +299,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 return
             }
             let signature: CosmosSigningOutput = AnySigner.sign(input: input, coin: .osmosis)
-            let signatureEncoded = signature.json
-            webview?.tw.send(network: .cosmos, result: signatureEncoded, to: id)
+            guard let txJSONData = signature.json.data(using: .utf8) else { return }
+            guard let txJSON = try? JSONSerialization.jsonObject(with: txJSONData) as? [String: Any] else { return }
+            guard let tx = txJSON["tx"] as? [String: Any] else { return }
+            guard let signature = (tx["signatures"] as? [Any])?.first else { return }
+            guard let signatureEncoded = try? JSONSerialization.data(withJSONObject: signature) else { return }
+            guard let signatureResult = String(data: signatureEncoded, encoding: .utf8) else { return }
+            webview?.tw.send(network: .cosmos, result: signatureResult, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
