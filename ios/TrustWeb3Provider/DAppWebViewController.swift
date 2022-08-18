@@ -534,6 +534,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
         guard let sequenceStr = params["sequence"] as? String, let sequence = UInt64(sequenceStr) else { return nil }
         guard let msgs = params["msgs"] as? [[String: Any]] else { return nil }
 
+        guard let feeAmounts = fee["amount"] as? [[String: Any]] else {
+            return nil
+        }
+
         return CosmosSigningInput.with {
             $0.signingMode = .json
             $0.accountNumber = accountNumber
@@ -543,9 +547,24 @@ extension DAppWebViewController: WKScriptMessageHandler {
             $0.messages = parseCosmosMessages(msgs)
             $0.fee = CosmosFee.with {
                 $0.gas = gas
-                $0.amounts = []
+                $0.amounts = parseCosmosAmounts(feeAmounts)
             }
             $0.privateKey = Self.privateKey.data
+        }
+    }
+
+    private func parseCosmosAmounts(_ amounts: [[String: Any]]) -> [CosmosAmount] {
+        return amounts.compactMap { feeAmount -> CosmosAmount? in
+            guard
+                let amount = feeAmount["amount"] as? String,
+                let denom = feeAmount["denom"] as? String
+            else {
+                return nil
+            }
+            return CosmosAmount.with {
+                $0.amount = Int64(amount)!
+                $0.denom = denom
+            }
         }
     }
 
@@ -553,25 +572,17 @@ extension DAppWebViewController: WKScriptMessageHandler {
         messages.compactMap { params -> CosmosMessage? in
             guard let type = params["type"] as? String else { return nil }
             guard let value = params["value"] as? [String: Any] else { return nil }
-            guard let token = value["token"] as? [String: Any] else { return nil }
-            guard let denom = token["denom"] as? String else { return nil }
-            guard let amount = token["amount"] as? String else { return nil }
-            guard let sender = token["sender"] as? String else { return nil }
-            guard let receiver = token["receiver"] as? String else { return nil }
+            guard
+                let data = try? JSONSerialization.data(withJSONObject: value, options: []),
+                let jsonString = String(data: data, encoding: .utf8)
+            else {
+                return nil
+            }
 
             return CosmosMessage.with {
                 $0.rawJsonMessage = CosmosMessage.RawJSON.with {
                     $0.type = type
-                    $0.value = """
-                        {
-                            "amount": [{
-                                "amount": "\(amount)",
-                                "denom": "\(denom)"
-                            }],
-                            "from_address": "\(sender)",
-                            "to_address": "\(receiver)"
-                        }
-                    """
+                    $0.value = jsonString
                 }
             }
         }
