@@ -72,6 +72,9 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   sendTx(chainId, tx, mode) {
     const tx_bytes = Buffer.from(tx).toString("base64");
     console.log(`==> final tx hash: ${tx_bytes}`);
+    return this._request("sendTx", {raw: tx_bytes, mode: mode}).then((tx_hash) => {
+      return Buffer.from(tx_hash, "hex");
+    });
   }
 
     /**
@@ -101,6 +104,8 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
           return this.postMessage("switchChain", id, payload);
         case "signAmino":
           return this.postMessage("signTransaction", id, payload);
+        case "sendTx":
+          return this.postMessage("sendRawTransaction", id, payload); 
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

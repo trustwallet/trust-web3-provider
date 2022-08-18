@@ -172,6 +172,16 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 return
             }
             handleSignTypedMessage(id: id, data: data, raw: raw)
+        case .sendRawTransaction:
+            guard network == .cosmos else { fatalError("\(network.rawValue) is not supported for this command") }
+            guard
+                let mode = extractMode(json: json),
+                let raw = extractRaw(json: json)
+            else {
+                print("mode or raw json is missing")
+                return
+            }
+            handleCosmosSendRawTransaction(id, mode, raw)
         case .ecRecover:
             guard let tuple = extractSignature(json: json) else {
                 print("signature or message is missing")
@@ -406,6 +416,23 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
+    func handleCosmosSendRawTransaction(_ id: Int64,_ mode: String,_ raw: String) {
+        let url = URL(string: "https://lcd-osmosis.keplr.app/cosmos/tx/v1beta1/txs")!
+        ["mode": mode, "tx_bytes": raw].postRequest(to: url) { result in
+            switch result {
+            case .failure(let error):
+                self.webview.tw.send(network: .cosmos, error: error.localizedDescription, to: id)
+            case .success(let json):
+                guard let response = json["tx_response"] as? [String: Any],
+                      let txHash = response["txhash"] as? String else {
+                    self.webview.tw.send(network: .cosmos, error: "error json parsing", to: id)
+                    return
+                }
+                self.webview.tw.send(network: .cosmos, result: txHash, to: id)
+            }
+        }
+    }
+
     func alert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,
@@ -499,6 +526,26 @@ extension DAppWebViewController: WKScriptMessageHandler {
             return nil
         }
         return raw
+    }
+
+    private func extractMode(json: [String: Any]) -> String? {
+        guard
+            let params = json["object"] as? [String: Any],
+            let mode = params["mode"] as? String
+        else {
+            return nil
+        }
+
+        switch mode {
+          case "async":
+            return "BROADCAST_MODE_ASYNC"
+          case "block":
+            return "BROADCAST_MODE_BLOCK"
+          case "sync":
+            return "BROADCAST_MODE_SYNC"
+          default:
+            return "BROADCAST_MODE_UNSPECIFIED"
+        }
     }
 
     private func signMessage(data: Data, addPrefix: Bool = true) -> Data {
@@ -615,5 +662,41 @@ extension DAppWebViewController: WKUIDelegate {
             completionHandler(false)
         }))
         present(alert, animated: true, completion: nil)
+    }
+}
+
+extension Dictionary where Key == String {
+    func postRequest(to rpc: URL, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        do {
+            let data = try JSONSerialization.data(withJSONObject: self, options: [])
+
+            var request = URLRequest(url: rpc)
+            request.httpMethod = "POST"
+            request.httpBody = data
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("error is \(error.localizedDescription)")
+                    completion(.failure(error))
+                    return
+                }
+
+                guard
+                    let data = data,
+                    let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+                else {
+                    return
+                }
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            }
+            task.resume()
+        } catch(let error) {
+            print("error is \(error.localizedDescription)")
+            completion(.failure(error))
+        }
     }
 }
