@@ -1,5 +1,6 @@
 package com.trust.web3.demo
 
+import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Bundle
 import android.webkit.SslErrorHandler
@@ -34,8 +35,8 @@ class MainActivity : AppCompatActivity() {
             webview.addJavascriptInterface(this, "_tw_")
 
             val webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    super.onPageFinished(view, url)
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
                     view?.evaluateJavascript(provderJs, null)
                     view?.evaluateJavascript(initJs, null)
                 }
