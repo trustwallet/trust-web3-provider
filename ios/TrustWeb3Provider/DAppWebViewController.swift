@@ -609,7 +609,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 return nil
             }
             return CosmosAmount.with {
-                $0.amount = Int64(amount)!
+                $0.amount = amount
                 $0.denom = denom
             }
         }

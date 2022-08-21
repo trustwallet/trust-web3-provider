@@ -28,6 +28,7 @@ public struct TrustWeb3Provider {
         (function() {
             var config = {
                 ethereum: {
+                    address: "\(ethereum.address)",
                     chainId: \(ethereum.chainId),
                     rpcUrl: "\(ethereum.rpcUrl)"
                 },
