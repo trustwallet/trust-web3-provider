@@ -18,6 +18,8 @@ class CosmJSOfflineSignerOnlyAmino {
         ];
     }
     async signAmino(signerAddress, signDoc) {
+        console.log(`==> signAmino for address ${signerAddress} doc ${signDoc}`);
+
         if (this.chainId !== signDoc.chain_id) {
             throw new Error("Unmatched chain id with the offline signer");
         }
@@ -39,6 +41,7 @@ class CosmJSOfflineSigner extends CosmJSOfflineSignerOnlyAmino {
         this.trustwallet = trustwallet;
     }
     async signDirect(signerAddress, signDoc) {
+        console.log(`==> signDirect for address ${signerAddress} doc ${JSON.stringify(signDoc)}`);
         if (this.chainId !== signDoc.chainId) {
             throw new Error("Unmatched chain id with the offline signer");
         }

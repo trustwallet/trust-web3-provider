@@ -48,6 +48,16 @@ public struct TrustWeb3Provider {
 
             window.ethereum = trustwallet.ethereum;
             window.keplr = trustwallet.cosmos;
+
+            window.getOfflineSigner = (chainId) => {
+                return window.getOfflineSignerForProvider(chainId, trustwallet.cosmos);
+            }
+            window.getOfflineSignerOnlyAmino = (chainId) => {
+                return window.getOfflineSignerOnlyAminoForProvider(chainId, trustwallet.cosmos);
+            }
+            window.getOfflineSignerAuto = (chainId) => {
+                return window.getOfflineSignerAutoForProvider(chainId, trustwallet.cosmos);
+            }
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -92,12 +102,12 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func set(address: String, chainId: Int, rpcUrl: String) {
+    func set(ethereumConfig: EthereumConfig) {
         let script = """
         var config = {
-            address: "\(address.lowercased())",
-            chainId: \(chainId),
-            rpcUrl: "\(rpcUrl)"
+            address: "\(ethereumConfig.address.lowercased())",
+            chainId: \(ethereumConfig.chainId),
+            rpcUrl: "\(ethereumConfig.rpcUrl)"
         };
         ethereum.setConfig({ethereum: config});
         """
@@ -165,11 +175,13 @@ public struct SolanaConfig {
 }
 
 public struct CosmosConfig {
+    public let publicKey: String
     public let address: String
     public let chainId: String
     public let rpcUrl: String
 
-    public init(address: String, chainId: String, rpcUrl: String) {
+    public init(publicKey: String, address: String, chainId: String, rpcUrl: String) {
+        self.publicKey = publicKey
         self.address = address
         self.chainId = chainId
         self.rpcUrl = rpcUrl
