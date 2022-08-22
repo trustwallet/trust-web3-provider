@@ -60,9 +60,16 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   signDirect(chainId, signerAddress, signDoc) {
-    return this._request("signDirect", { raw: signDoc.bodyBytes }).then((signatureJSON) => {
+    const object = {
+      body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
+      auth_info_bytes: Utils.bufferToHex(signDoc.bodyBytes),
+      chain_id: signDoc.chainId,
+      account_number: signDoc.accountNumber.toString()
+    };
+    return this._request("signDirect", object).then((signatureJSON) => {
       const signature = JSON.parse(signatureJSON.replace(/\r?\n|\r/g, '\\r\\n'));
       const signed = signDoc;
+      console.log(`==> signature: ${JSON.stringify(signature)}`);
       return {signed, signature}
     })
   }
