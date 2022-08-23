@@ -184,12 +184,10 @@ public struct CosmosConfig {
     public let publicKey: String
     public let address: String
     public let chainId: String
-    public let rpcUrl: String
 
-    public init(publicKey: String, address: String, chainId: String, rpcUrl: String) {
+    public init(publicKey: String, address: String, chainId: String) {
         self.publicKey = publicKey
         self.address = address
         self.chainId = chainId
-        self.rpcUrl = rpcUrl
     }
 }

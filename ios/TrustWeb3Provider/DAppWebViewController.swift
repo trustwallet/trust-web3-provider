@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://restake.app/osmosis"
+        return "https://restake.app/evmos"
     }
 
     static let wallet = HDWallet(mnemonic: ".", passphrase: "")!
@@ -32,8 +32,7 @@ class DAppWebViewController: UIViewController {
         cosmos: CosmosConfig(
             publicKey: wallet.getKeyForCoin(coin: .cosmos).getPublicKeySecp256k1(compressed: true).description,
             address: wallet.getAddressForCoin(coin: .cosmos),
-            chainId: "cosmoshub-4",
-            rpcUrl: "https://cosmoshub.validator.network:443"
+            chainId: "cosmoshub-4"
         )
     )
 
@@ -54,21 +53,23 @@ class DAppWebViewController: UIViewController {
         "osmosis-1": CosmosConfig(
             publicKey: wallet.getKeyForCoin(coin: .osmosis).getPublicKeySecp256k1(compressed: true).description,
             address: wallet.getAddressForCoin(coin: .osmosis),
-            chainId: "osmosis-1",
-            rpcUrl: "https://rpc.osmosis.zone/"
+            chainId: "osmosis-1"
         ),
         "cosmoshub-4": CosmosConfig(
             publicKey: wallet.getKeyForCoin(coin: .cosmos).getPublicKeySecp256k1(compressed: true).description,
             address: wallet.getAddressForCoin(coin: .cosmos),
-            chainId: "cosmoshub-4",
-            rpcUrl: "https://cosmoshub.validator.network:443"
+            chainId: "cosmoshub-4"
         ),
         "kava_2222-10": CosmosConfig(
             publicKey: wallet.getKeyForCoin(coin: .kava).getPublicKeySecp256k1(compressed: true).description,
             address: wallet.getAddressForCoin(coin: .kava),
-            chainId: "kava_2222-10",
-            rpcUrl: "https://cosmoshub.validator.network:443"
-        )
+            chainId: "kava_2222-10"
+        ),
+        "evmos_9001-2": CosmosConfig(
+            publicKey: wallet.getKeyForCoin(coin: .nativeEvmos).getPublicKeySecp256k1(compressed: true).description,
+            address: wallet.getAddressForCoin(coin: .nativeEvmos),
+            chainId: "evmos_9001-2"
+        ),
     ]
 
     lazy var webview: WKWebView = {
@@ -124,6 +125,8 @@ class DAppWebViewController: UIViewController {
             return .cosmos
         case "kava_2222-10":
             return .kava
+        case "evmos_9001-2":
+            return .nativeEvmos
         default:
             fatalError("no coin found for the current config")
         }
@@ -369,7 +372,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             let pubkey = PrivateKey(data: input.privateKey)!.getPublicKeySecp256k1(compressed: true)
             let signature: [String: Any] = [
                 "pub_key": [
-                    "type": "tendermint/PubKeySecp256k1", // Evmos might be different
+                    "type": self.cosmosCoin == .nativeEvmos ? "ethermint/PubKeyEthSecp256k1" : "tendermint/PubKeySecp256k1", // Evmos might be different
                     "value": pubkey.data.base64EncodedString()
                 ],
                 "signature": output.signature.base64EncodedString()
@@ -461,7 +464,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         } else {
             let alert = UIAlertController(
                 title: "Switch Chain",
-                message: "ChainId: \(chainId)\nRPC: \(config.rpcUrl)",
+                message: "ChainId: \(chainId)",
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
