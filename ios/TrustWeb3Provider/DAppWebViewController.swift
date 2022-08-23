@@ -46,20 +46,7 @@ class DAppWebViewController: UIViewController {
         )
     ]
 
-    var cosmosConfigs: [String: CosmosConfig] = [
-        "osmosis-1": CosmosConfig(
-            chainId: "osmosis-1"
-        ),
-        "cosmoshub-4": CosmosConfig(
-            chainId: "cosmoshub-4"
-        ),
-        "kava_2222-10": CosmosConfig(
-            chainId: "kava_2222-10"
-        ),
-        "evmos_9001-2": CosmosConfig(
-            chainId: "evmos_9001-2"
-        ),
-    ]
+    var cosmosChains = ["osmosis-1", "cosmoshub-4", "kava_2222-10", "evmos_9001-2"]
 
     lazy var webview: WKWebView = {
         let config = WKWebViewConfiguration()
@@ -144,8 +131,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
         switch method {
         case .requestAccounts:
             if network == .cosmos {
-                if let chainId = extractCosmosChainId(json: json), let config = cosmosConfigs[chainId] {
-                    provider.cosmos = config
+                if let chainId = extractCosmosChainId(json: json), provider.cosmos.chainId != chainId {
+                    provider.cosmos = CosmosConfig(chainId: chainId)
                 }
             }
 
@@ -441,7 +428,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     func handleSwitchCosmosChain(id: Int64, chainId: String) {
-        guard let config = cosmosConfigs[chainId] else {
+        if !cosmosChains.contains(chainId) {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
             webview.tw.send(network: .ethereum, error: "Unknown chain id", to: id)
             return
@@ -461,7 +448,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
-                self.provider.cosmos = config
+                self.provider.cosmos = CosmosConfig(chainId: chainId)
                 self.webview.tw.sendNull(network: .cosmos, id: id)
             }))
             present(alert, animated: true, completion: nil)
