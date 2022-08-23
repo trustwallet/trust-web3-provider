@@ -37,8 +37,7 @@ public struct TrustWeb3Provider {
                 },
                 cosmos: {
                     chainId: "\(cosmos.chainId)"
-                },
-                isDebug: true
+                }
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
@@ -74,17 +73,6 @@ public struct TrustWeb3Provider {
         self.solana = solana
         self.cosmos = cosmos
     }
-
-    public func address(for network: ProviderNetwork) -> String {
-        switch network {
-        case .ethereum:
-            return ethereum.address
-        case .solana:
-            return solana.address
-        case .cosmos:
-            return cosmos.address
-        }
-    }
 }
 
 public struct TypeWrapper<T> {
@@ -103,7 +91,6 @@ public extension WKWebView {
 
 public extension TypeWrapper where T == WKWebView {
     func set(network: String, address: String) {
-        guard network != "cosmos" else { return }
         let script = String(format: "trustwallet.\(network).setAddress(\"%@\");", address.lowercased())
         value.evaluateJavaScript(script)
     }
@@ -171,23 +158,17 @@ public struct EthereumConfig {
 }
 
 public struct SolanaConfig {
-    public let address: String
     public let cluster: String
 
-    public init(address: String, cluster: String) {
-        self.address = address
+    public init(cluster: String) {
         self.cluster = cluster
     }
 }
 
 public struct CosmosConfig {
-    public let publicKey: String
-    public let address: String
     public let chainId: String
 
-    public init(publicKey: String, address: String, chainId: String) {
-        self.publicKey = publicKey
-        self.address = address
+    public init(chainId: String) {
         self.chainId = chainId
     }
 }

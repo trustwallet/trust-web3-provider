@@ -50,7 +50,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   getAccounts() {
     return this._request("requestAccounts", { chainId: this.chainId }).then(
       (response) => {
-        const account = JSON.parse(response.replace(/\r?\n|\r/g, "\\r\\n"));
+        const account = JSON.parse(response);
         return [
           {
             algo: "secp256k1",

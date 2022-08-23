@@ -26,12 +26,9 @@ class DAppWebViewController: UIViewController {
             rpcUrl: "https://cloudflare-eth.com"
         ),
         solana: SolanaConfig(
-            address: "H4JcMPicKkHcxxDjkyyrLoQj7Kcibd9t815ak4UvTr9M",
             cluster: "mainnet-beta"
         ),
         cosmos: CosmosConfig(
-            publicKey: wallet.getKeyForCoin(coin: .cosmos).getPublicKeySecp256k1(compressed: true).description,
-            address: wallet.getAddressForCoin(coin: .cosmos),
             chainId: "cosmoshub-4"
         )
     )
@@ -51,23 +48,15 @@ class DAppWebViewController: UIViewController {
 
     var cosmosConfigs: [String: CosmosConfig] = [
         "osmosis-1": CosmosConfig(
-            publicKey: wallet.getKeyForCoin(coin: .osmosis).getPublicKeySecp256k1(compressed: true).description,
-            address: wallet.getAddressForCoin(coin: .osmosis),
             chainId: "osmosis-1"
         ),
         "cosmoshub-4": CosmosConfig(
-            publicKey: wallet.getKeyForCoin(coin: .cosmos).getPublicKeySecp256k1(compressed: true).description,
-            address: wallet.getAddressForCoin(coin: .cosmos),
             chainId: "cosmoshub-4"
         ),
         "kava_2222-10": CosmosConfig(
-            publicKey: wallet.getKeyForCoin(coin: .kava).getPublicKeySecp256k1(compressed: true).description,
-            address: wallet.getAddressForCoin(coin: .kava),
             chainId: "kava_2222-10"
         ),
         "evmos_9001-2": CosmosConfig(
-            publicKey: wallet.getKeyForCoin(coin: .nativeEvmos).getPublicKeySecp256k1(compressed: true).description,
-            address: wallet.getAddressForCoin(coin: .nativeEvmos),
             chainId: "evmos_9001-2"
         ),
     ]
@@ -294,11 +283,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 webview?.tw.set(network: network.rawValue, address: address)
                 webview?.tw.send(network: network, results: [address], to: id)
             case .solana:
-                let address = provider.solana.address
+                let address = "H4JcMPicKkHcxxDjkyyrLoQj7Kcibd9t815ak4UvTr9M"
                 webview?.tw.send(network: network, results: [address], to: id)
             case .cosmos:
-                let pubKey = provider.cosmos.publicKey
-                let address = provider.cosmos.address
+                let pubKey = Self.wallet.getKeyForCoin(coin: self.cosmosCoin).getPublicKeySecp256k1(compressed: true).description
+                let address = Self.wallet.getAddressForCoin(coin: self.cosmosCoin)
                 let json = try! JSONSerialization.data(
                     withJSONObject: ["pubKey": pubKey, "address": address]
                 )
