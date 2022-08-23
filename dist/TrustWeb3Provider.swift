@@ -35,6 +35,9 @@ public struct TrustWeb3Provider {
                 solana: {
                     cluster: "\(solana.cluster)"
                 },
+                cosmos: {
+                    chainId: "\(cosmos.chainId)"
+                },
                 isDebug: true
             };
 
@@ -49,15 +52,18 @@ public struct TrustWeb3Provider {
             window.ethereum = trustwallet.ethereum;
             window.keplr = trustwallet.cosmos;
 
-            window.getOfflineSigner = (chainId) => {
-                return window.getOfflineSignerForProvider(chainId, trustwallet.cosmos);
+            const getDefaultCosmosProvider = (chainId) => {
+                var config = {
+                    cosmos: {
+                        chainId: "\(cosmos.chainId)"
+                    }
+                };
+                trustwallet.cosmos.setConfig(config);
+                return trustwallet.cosmos;
             }
-            window.getOfflineSignerOnlyAmino = (chainId) => {
-                return window.getOfflineSignerOnlyAminoForProvider(chainId, trustwallet.cosmos);
-            }
-            window.getOfflineSignerAuto = (chainId) => {
-                return window.getOfflineSignerAutoForProvider(chainId, trustwallet.cosmos);
-            }
+            window.getOfflineSigner = getDefaultCosmosProvider;
+            window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
+            window.getOfflineSignerAuto = getDefaultCosmosProvider;
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)

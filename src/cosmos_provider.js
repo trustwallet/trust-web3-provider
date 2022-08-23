@@ -20,29 +20,45 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     this.mode = "extension";
     this.isKeplr = true;
     this.version = "0.10.16";
+    
+    this.setConfig(config);
     console.log(`constructor`);
   }
 
   enable(chainIds) {
-    console.log(`==> enable for ${chainIds}`);
+    console.log(`==> enabled for ${chainIds}`);
+  }
+
+  setConfig(config) {
+    this.chainId = config.chainId;
+  }
+
+  updateChainId(chainId) {
+    const config = {
+      chainId: chainId
+    };
+    this.setConfig(config);
   }
 
   getKey(chainId) {
-    return this._request("requestAccounts", { chainId: chainId }).then(
+    this.updateChainId(chainId);
+    return this.getAccounts().then((accounts) => {
+      return accounts[0];
+    });
+  }
+
+  getAccounts() {
+    return this._request("requestAccounts", { chainId: this.chainId }).then(
       (response) => {
         const account = JSON.parse(response.replace(/\r?\n|\r/g, "\\r\\n"));
-        console.log(`==> received publickey ${account.pubKey}`);
-        console.log(`==> received address ${account.address}`);
-        console.log(`==> received add ${JSON.stringify(account)}`);
-
-        return {
-          name: "",
-          algo: "secp256k1",
-          pubKey: Buffer.from(account.pubKey, "hex"),
-          address: account.address,
-          bech32Address: account.address,
-          isNanoLedger: false,
-        };
+        return [
+          {
+            algo: "secp256k1",
+            address: account.address,
+            bech32Address: account.address,
+            pubkey: Buffer.from(account.pubKey, "hex")
+          }
+        ];
       }
     );
   }
@@ -51,14 +67,48 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     return this._request("experimentalSuggestChain", chainInfo);
   }
 
-  signAmino(chainId, signerAddress, signDoc, signOptions) {
+  sign(signerAddress, signDoc) {
+    return this.signAmino(signerAddress, signDoc);
+  }
+
+  signAmino(param1, param2, param3) {
+    let signerAddress = "";
+    let signDoc = {};
+    if (param3) {
+      this.updateChainId(param1);
+      signerAddress = param2;
+      signDoc = param3;
+    } else {
+      signerAddress = param1;
+      signDoc = param2;
+    }
+    
+    return this._signAmino(signerAddress, signDoc);
+  }
+
+  _signAmino(signerAddress, signDoc) {
     return this._request("signAmino", signDoc).then((signature) => {
       // FIXME assgin signature to signDoc
       return { signed: signDoc, signature: JSON.parse(signature) };
     });
   }
 
-  signDirect(chainId, signerAddress, signDoc) {
+  signDirect(param1, param2, param3) {
+    let signerAddress = "";
+    let signDoc = {};
+    if (param3) {
+      this.updateChainId(param1);
+      signerAddress = param2;
+      signDoc = param3;
+    } else {
+      signerAddress = param1;
+      signDoc = param2;
+    }
+    
+    return this._signDirect(signerAddress, signDoc);
+  }
+
+  _signDirect(signerAddress, signDoc) {
     const object = {
       body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
       auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes),
