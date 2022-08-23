@@ -18,7 +18,6 @@ class DAppWebViewController: UIViewController {
     }
 
     static let wallet = HDWallet(mnemonic: ".", passphrase: "")!
-    static let privateKey = wallet.getKeyForCoin(coin: .osmosis)
 
     var provider = TrustWeb3Provider(
         ethereum: EthereumConfig(
@@ -31,8 +30,8 @@ class DAppWebViewController: UIViewController {
             cluster: "mainnet-beta"
         ),
         cosmos: CosmosConfig(
-            publicKey: privateKey.getPublicKeySecp256k1(compressed: true).description,
-            address: "cosmos1t5u0jfg3ljsjrh2m9e47d4ny2hea7eehxrzdgd",
+            publicKey: wallet.getKeyForCoin(coin: .cosmos).getPublicKeySecp256k1(compressed: true).description,
+            address: wallet.getAddressForCoin(coin: .cosmos),
             chainId: "cosmoshub-4",
             rpcUrl: "https://cosmoshub.validator.network:443"
         )
@@ -53,20 +52,20 @@ class DAppWebViewController: UIViewController {
 
     var cosmosConfigs: [String: CosmosConfig] = [
         "osmosis-1": CosmosConfig(
-            publicKey: privateKey.getPublicKeySecp256k1(compressed: true).description,
+            publicKey: wallet.getKeyForCoin(coin: .osmosis).getPublicKeySecp256k1(compressed: true).description,
             address: wallet.getAddressForCoin(coin: .osmosis),
             chainId: "osmosis-1",
             rpcUrl: "https://rpc.osmosis.zone/"
         ),
         "cosmoshub-4": CosmosConfig(
-            publicKey: privateKey.getPublicKeySecp256k1(compressed: true).description,
-            address: "cosmos1t5u0jfg3ljsjrh2m9e47d4ny2hea7eehxrzdgd",
+            publicKey: wallet.getKeyForCoin(coin: .cosmos).getPublicKeySecp256k1(compressed: true).description,
+            address: wallet.getAddressForCoin(coin: .cosmos),
             chainId: "cosmoshub-4",
             rpcUrl: "https://cosmoshub.validator.network:443"
         ),
         "kava_2222-10": CosmosConfig(
-            publicKey: privateKey.getPublicKeySecp256k1(compressed: true).description,
-            address: "kava1hsknpsfd7frd0y332cj852sw5a4zjmy0l3qzrt",
+            publicKey: wallet.getKeyForCoin(coin: .kava).getPublicKeySecp256k1(compressed: true).description,
+            address: wallet.getAddressForCoin(coin: .kava),
             chainId: "kava_2222-10",
             rpcUrl: "https://cosmoshub.validator.network:443"
         )
@@ -115,6 +114,19 @@ class DAppWebViewController: UIViewController {
     func navigate(to url: String) {
         guard let url = URL(string: url) else { return }
         webview.load(URLRequest(url: url))
+    }
+
+    var cosmosCoin: CoinType {
+        switch provider.cosmos.chainId {
+        case "osmosis-1":
+            return .osmosis
+        case "cosmoshub-4":
+            return .cosmos
+        case "kava_2222-10":
+            return .kava
+        default:
+            fatalError("no coin found for the current config")
+        }
     }
 }
 
@@ -337,7 +349,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             webview?.tw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            let signed = Self.privateKey.sign(digest: data, curve: .ed25519)!
+            let signed = Self.wallet.getKeyForCoin(coin: .solana).sign(digest: data, curve: .ed25519)!
             webview?.tw.send(network: .solana, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
@@ -353,8 +365,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            // FIXME remove hardcoded coin: .osmosis
-            let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: .osmosis)
+            let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
             let pubkey = PrivateKey(data: input.privateKey)!.getPublicKeySecp256k1(compressed: true)
             let signature: [String: Any] = [
                 "pub_key": [
@@ -381,7 +392,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             guard let decoded = Base58.decodeNoCheck(string: raw) else { return }
-            guard let signature = Self.privateKey.sign(digest: decoded, curve: .ed25519) else { return }
+            guard let signature = Self.wallet.getKeyForCoin(coin: .solana).sign(digest: decoded, curve: .ed25519) else { return }
             let signatureEncoded = Base58.encodeNoCheck(data: signature)
             webview?.tw.send(network: .solana, result: signatureEncoded, to: id)
         }))
@@ -599,7 +610,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
     private func signMessage(data: Data, addPrefix: Bool = true) -> Data {
         let message = addPrefix ? Hash.keccak256(data: ethereumMessage(for: data)) : data
-        var signed = Self.privateKey.sign(digest: message, curve: .secp256k1)!
+        var signed = Self.wallet.getKeyForCoin(coin: .ethereum).sign(digest: message, curve: .secp256k1)!
         signed[64] += 27
         return signed
     }
@@ -639,7 +650,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 }
             ]
             $0.signingMode = .protobuf
-            $0.privateKey = Self.privateKey.data
+            $0.privateKey = Self.wallet.getKeyForCoin(coin: cosmosCoin).data
         }
     }
 
@@ -667,7 +678,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 $0.gas = gas
                 $0.amounts = parseCosmosAmounts(feeAmounts)
             }
-            $0.privateKey = Self.privateKey.data
+            $0.privateKey = Self.wallet.getKeyForCoin(coin: cosmosCoin).data
         }
     }
 
