@@ -149,7 +149,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         case .signTransaction:
             guard network == .cosmos else { print("not supported"); return }
 
-            let input: SigningInput
+            let input: CosmosSigningInput
             if let params = json["object"] as? [String: Any] {
                 input = self.cosmosSigningInputAmino(params: params)!
             } else {
@@ -166,7 +166,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
                 handleSignSolanaRawTransaction(id: id, raw: raw)
             case .cosmos:
-                let input: SigningInput
+                let input: CosmosSigningInput
                 if let params = json["object"] as? [String: Any] {
                     input = self.cosmosSigningInputDirect(params: params)!
                 } else {
@@ -343,7 +343,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
-    func handleSignCosmosTransaction(_ input: SigningInput, network: ProviderNetwork, id: Int64) {
+    func handleSignCosmosTransaction(_ input: CosmosSigningInput, network: ProviderNetwork, id: Int64) {
         let alert = UIAlertController(
             title: "Sign Transaction",
             message: "Smart contract call",
@@ -353,11 +353,16 @@ extension DAppWebViewController: WKScriptMessageHandler {
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            let signature: CosmosSigningOutput = AnySigner.sign(input: input, coin: .osmosis)
-            guard let txJSONData = signature.json.data(using: .utf8) else { return }
-            guard let txJSON = try? JSONSerialization.jsonObject(with: txJSONData) as? [String: Any] else { return }
-            guard let tx = txJSON["tx"] as? [String: Any] else { return }
-            guard let signature = (tx["signatures"] as? [Any])?.first else { return }
+            // FIXME remove hardcoded coin: .osmosis
+            let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: .osmosis)
+            let pubkey = PrivateKey(data: input.privateKey)!.getPublicKeySecp256k1(compressed: true)
+            let signature: [String: Any] = [
+                "pub_key": [
+                    "type": "tendermint/PubKeySecp256k1", // Evmos might be different
+                    "value": pubkey.data.base64EncodedString()
+                ],
+                "signature": output.signature.base64EncodedString()
+            ]
             guard let signatureEncoded = try? JSONSerialization.data(withJSONObject: signature) else { return }
             guard let signatureResult = String(data: signatureEncoded, encoding: .utf8) else { return }
             webview?.tw.send(network: .cosmos, result: signatureResult, to: id)
@@ -614,14 +619,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
         return prefix + data
     }
 
-    private func cosmosSigningInputDirect(params: [String: Any]) -> SigningInput? {
+    private func cosmosSigningInputDirect(params: [String: Any]) -> CosmosSigningInput? {
         guard let accountNumberStr = params["account_number"] as? String, let accountNumber = UInt64(accountNumberStr) else { return nil }
         guard let chainID = params["chain_id"] as? String else { return nil }
         guard let authInfoBytesHex = params["auth_info_bytes"] as? String else { return nil }
         guard let authInfoBytes = Data(hexString: authInfoBytesHex) else { return nil }
         guard let bodyBytesHex = params["body_bytes"] as? String else { return nil }
         guard let bodyBytes = Data(hexString: bodyBytesHex) else { return nil }
-
 
         return CosmosSigningInput.with {
             $0.accountNumber = accountNumber
@@ -634,12 +638,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     }
                 }
             ]
-            $0.signingMode = .json
+            $0.signingMode = .protobuf
             $0.privateKey = Self.privateKey.data
         }
     }
 
-    private func cosmosSigningInputAmino(params: [String: Any]) -> SigningInput? {
+    private func cosmosSigningInputAmino(params: [String: Any]) -> CosmosSigningInput? {
         guard let accountNumberStr = params["account_number"] as? String, let accountNumber = UInt64(accountNumberStr) else { return nil }
         guard let chainID = params["chain_id"] as? String else { return nil }
         guard let fee = params["fee"] as? [String: Any] else { return nil }

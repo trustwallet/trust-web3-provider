@@ -11,8 +11,6 @@ import Utils from "./utils";
 import ProviderRpcError from "./error";
 import { Buffer } from "buffer";
 
-const { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } = require('./cosmjs');
-
 export class TrustCosmosWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
@@ -30,21 +28,23 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   getKey(chainId) {
-    return this._request("requestAccounts", {chainId: chainId}).then((response) => {
-      const account = JSON.parse(response.replace(/\r?\n|\r/g, '\\r\\n'));
-      console.log(`==> received publickey ${account.pubKey}`);
-      console.log(`==> received address ${account.address}`);
-      console.log(`==> received add ${JSON.stringify(account)}`);
+    return this._request("requestAccounts", { chainId: chainId }).then(
+      (response) => {
+        const account = JSON.parse(response.replace(/\r?\n|\r/g, "\\r\\n"));
+        console.log(`==> received publickey ${account.pubKey}`);
+        console.log(`==> received address ${account.address}`);
+        console.log(`==> received add ${JSON.stringify(account)}`);
 
-      return {
-        name: "",
-        algo: "secp256k1",
-        pubKey: Buffer.from(account.pubKey, 'hex'),
-        address: account.address,
-        bech32Address: account.address,
-        isNanoLedger: false,
-      };
-    });
+        return {
+          name: "",
+          algo: "secp256k1",
+          pubKey: Buffer.from(account.pubKey, "hex"),
+          address: account.address,
+          bech32Address: account.address,
+          isNanoLedger: false,
+        };
+      }
+    );
   }
 
   experimentalSuggestChain(chainInfo) {
@@ -52,37 +52,37 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   signAmino(chainId, signerAddress, signDoc, signOptions) {
-    return this._request("signAmino", signDoc).then((signatureJSON) => {
-      const signature = JSON.parse(signatureJSON.replace(/\r?\n|\r/g, '\\r\\n'));
-      const signed = signDoc;
-      return {signed, signature}
-    })
+    return this._request("signAmino", signDoc).then((signature) => {
+      // FIXME assgin signature to signDoc
+      return { signed: signDoc, signature: JSON.parse(signature) };
+    });
   }
 
   signDirect(chainId, signerAddress, signDoc) {
     const object = {
       body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
-      auth_info_bytes: Utils.bufferToHex(signDoc.bodyBytes),
+      auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes),
       chain_id: signDoc.chainId,
-      account_number: signDoc.accountNumber.toString()
+      account_number: signDoc.accountNumber.toString(),
     };
-    return this._request("signDirect", object).then((signatureJSON) => {
-      const signature = JSON.parse(signatureJSON.replace(/\r?\n|\r/g, '\\r\\n'));
-      const signed = signDoc;
-      console.log(`==> signature: ${JSON.stringify(signature)}`);
-      return {signed, signature}
-    })
+    return this._request("signDirect", object).then((signature) => {
+      console.log(`==> signature: ${signature}`);
+      // FIXME assgin signature to signDoc
+      return { signed: signDoc, signature: JSON.parse(signature) };
+    });
   }
 
   sendTx(chainId, tx, mode) {
     const tx_bytes = Buffer.from(tx).toString("base64");
     console.log(`==> final tx hash: ${tx_bytes}`);
-    return this._request("sendTx", {raw: tx_bytes, mode: mode}).then((tx_hash) => {
-      return Buffer.from(tx_hash, "hex");
-    });
+    return this._request("sendTx", { raw: tx_bytes, mode: mode }).then(
+      (tx_hash) => {
+        return Buffer.from(tx_hash, "hex");
+      }
+    );
   }
 
-    /**
+  /**
    * @private Internal rpc handler
    */
   _request(method, payload) {
@@ -112,7 +112,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
         case "signDirect":
           return this.postMessage("signRawTransaction", id, payload);
         case "sendTx":
-          return this.postMessage("sendRawTransaction", id, payload); 
+          return this.postMessage("sendRawTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(
