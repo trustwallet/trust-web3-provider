@@ -10,9 +10,9 @@ import WebKit
 public struct TrustWeb3Provider {
     public static let scriptHandlerName = "_tw_"
 
-    public var ethereum: EthereumConfig
-    public var solana: SolanaConfig
-    public var cosmos: CosmosConfig
+    public let address: String
+    public let chainId: Int
+    public let rpcUrl: String
 
     public var providerJsUrl: URL {
         return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
@@ -28,15 +28,12 @@ public struct TrustWeb3Provider {
         (function() {
             var config = {
                 ethereum: {
-                    address: "\(ethereum.address)",
-                    chainId: \(ethereum.chainId),
-                    rpcUrl: "\(ethereum.rpcUrl)"
+                    address: "\(address)",
+                    chainId: \(chainId),
+                    rpcUrl: "\(rpcUrl)"
                 },
                 solana: {
-                    cluster: "\(solana.cluster)"
-                },
-                cosmos: {
-                    chainId: "\(cosmos.chainId)"
+                    cluster: "mainnet-beta"
                 }
             };
 
@@ -65,10 +62,10 @@ public struct TrustWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(ethereum: EthereumConfig, solana: SolanaConfig, cosmos: CosmosConfig) {
-        self.ethereum = ethereum
-        self.solana = solana
-        self.cosmos = cosmos
+    public init(address: String, chainId: Int, rpcUrl: String) {
+        self.address = address
+        self.chainId = chainId
+        self.rpcUrl = rpcUrl
     }
 }
 
@@ -92,12 +89,12 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func set(ethereumConfig: EthereumConfig) {
+    func set(address: String, chainId: Int, rpcUrl: String) {
         let script = """
         var config = {
-            address: "\(ethereumConfig.address.lowercased())",
-            chainId: \(ethereumConfig.chainId),
-            rpcUrl: "\(ethereumConfig.rpcUrl)"
+            address: "\(address.lowercased())",
+            chainId: \(chainId),
+            rpcUrl: "\(rpcUrl)"
         };
         ethereum.setConfig({ethereum: config});
         """
@@ -140,32 +137,4 @@ public enum ProviderNetwork: String, Decodable {
     case ethereum
     case solana
     case cosmos
-}
-
-public struct EthereumConfig {
-    public let address: String
-    public let chainId: Int
-    public let rpcUrl: String
-
-    public init(address: String, chainId: Int, rpcUrl: String) {
-        self.address = address
-        self.chainId = chainId
-        self.rpcUrl = rpcUrl
-    }
-}
-
-public struct SolanaConfig {
-    public let cluster: String
-
-    public init(cluster: String) {
-        self.cluster = cluster
-    }
-}
-
-public struct CosmosConfig {
-    public let chainId: String
-
-    public init(chainId: String) {
-        self.chainId = chainId
-    }
 }

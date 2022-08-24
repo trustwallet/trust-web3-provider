@@ -14,32 +14,24 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "http://restake.app/osmosis"
+        return "http://localhost:3000/"
     }
 
     static let wallet = HDWallet(mnemonic: ".", passphrase: "")!
 
-    var provider = TrustWeb3Provider(
-        ethereum: EthereumConfig(
-            address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
-            chainId: 1,
-            rpcUrl: "https://cloudflare-eth.com"
-        ),
-        solana: SolanaConfig(
-            cluster: "mainnet-beta"
-        ),
-        cosmos: CosmosConfig(
-            chainId: "kava_2222-10"
-        )
+    var current: TrustWeb3Provider = TrustWeb3Provider(
+        address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
+        chainId: 1,
+        rpcUrl: "https://cloudflare-eth.com"
     )
 
-    var ethereumConfigs: [Int: EthereumConfig] = [
-        42161: EthereumConfig(
+    var providers: [Int: TrustWeb3Provider] = [
+        42161: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 42161,
             rpcUrl: "https://arb1.arbitrum.io/rpc"
         ),
-        250: EthereumConfig(
+        250: TrustWeb3Provider(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 250,
             rpcUrl: "https://rpc.ftm.tools"
@@ -47,13 +39,14 @@ class DAppWebViewController: UIViewController {
     ]
 
     var cosmosChains = ["osmosis-1", "cosmoshub", "cosmoshub-4", "kava_2222-10", "evmos_9001-2"]
+    var currentCosmosChain = "osmosis-1"
 
     lazy var webview: WKWebView = {
         let config = WKWebViewConfiguration()
 
         let controller = WKUserContentController()
-        controller.addUserScript(provider.providerScript)
-        controller.addUserScript(provider.injectScript)
+        controller.addUserScript(current.providerScript)
+        controller.addUserScript(current.injectScript)
         controller.add(self, name: TrustWeb3Provider.scriptHandlerName)
 
         config.userContentController = controller
@@ -94,7 +87,7 @@ class DAppWebViewController: UIViewController {
     }
 
     var cosmosCoin: CoinType {
-        switch provider.cosmos.chainId {
+        switch currentCosmosChain {
         case "osmosis-1":
             return .osmosis
         case "cosmoshub", "cosmoshub-4":
@@ -131,8 +124,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
         switch method {
         case .requestAccounts:
             if network == .cosmos {
-                if let chainId = extractCosmosChainId(json: json), provider.cosmos.chainId != chainId {
-                    provider.cosmos = CosmosConfig(chainId: chainId)
+                if let chainId = extractCosmosChainId(json: json), currentCosmosChain != chainId {
+                    currentCosmosChain = chainId
                 }
             }
 
@@ -222,7 +215,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 print("extract chain info error")
                 return
             }
-            if ethereumConfigs[chainId] != nil {
+            if providers[chainId] != nil {
                 handleSwitchEthereumChain(id: id, chainId: chainId)
             } else {
                 handleAddChain(id: id, name: name, chainId: chainId, rpcUrls: rpcUrls)
@@ -262,11 +255,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
-        let provider = self.provider
         alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
             switch network {
             case .ethereum:
-                let address = provider.ethereum.address
+                let address = self.current.address
                 webview?.tw.set(network: network.rawValue, address: address)
                 webview?.tw.send(network: network, results: [address], to: id)
             case .solana:
@@ -398,7 +390,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
-            self.ethereumConfigs[chainId] = EthereumConfig(address: self.provider.ethereum.address, chainId: chainId, rpcUrl: rpcUrls[0])
+            self.providers[chainId] = TrustWeb3Provider(address: self.current.address, chainId: chainId, rpcUrl: rpcUrls[0])
             print("\(name) added")
             self.webview.tw.sendNull(network: .ethereum, id: id)
         }))
@@ -406,20 +398,20 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     func handleSwitchEthereumChain(id: Int64, chainId: Int) {
-        guard let config = ethereumConfigs[chainId] else {
+        guard let provider = providers[chainId] else {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
             webview.tw.send(network: .ethereum, error: "Unknown chain id", to: id)
             return
         }
 
-        if chainId == provider.ethereum.chainId {
+        if chainId == current.chainId {
             print("No need to switch, already on chain \(chainId)")
             webview.tw.sendNull(network: .ethereum, id: id)
         } else {
 
             let alert = UIAlertController(
                 title: "Switch Chain",
-                message: "ChainId: \(chainId)\nRPC: \(config.rpcUrl)",
+                message: "ChainId: \(chainId)\nRPC: \(provider.rpcUrl)",
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
@@ -427,8 +419,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
-                self.provider.ethereum = config
-                self.webview.tw.set(ethereumConfig: config)
+                self.current = provider
+                self.webview.tw.set(address: provider.address, chainId: provider.chainId, rpcUrl: provider.rpcUrl)
                 self.webview.tw.emitChange(chainId: chainId)
                 self.webview.tw.sendNull(network: .ethereum, id: id)
             }))
@@ -443,7 +435,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             return
         }
 
-        if provider.cosmos.chainId == chainId {
+        if currentCosmosChain == chainId {
             print("No need to switch, already on chain \(chainId)")
             webview.tw.sendNull(network: .cosmos, id: id)
         } else {
@@ -457,7 +449,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
-                self.provider.cosmos = CosmosConfig(chainId: chainId)
+                self.currentCosmosChain = chainId
                 self.webview.tw.sendNull(network: .cosmos, id: id)
             }))
             present(alert, animated: true, completion: nil)
