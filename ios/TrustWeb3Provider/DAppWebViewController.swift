@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "http://localhost:3000/"
+        return "http://restake.app/osmosis"
     }
 
     static let wallet = HDWallet(mnemonic: ".", passphrase: "")!
@@ -671,6 +671,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     private func cosmosSigningInputMessage(data: Data) -> CosmosSigningInput? {
+        let valueMap = [
+            "signer": Self.wallet.getAddressForCoin(coin: cosmosCoin),
+            "value": data.base64EncodedString()
+        ]
+        guard let valueEncoded = try? JSONSerialization.data(withJSONObject: valueMap) else { return nil }
+        guard let value = String(data: valueEncoded, encoding: .utf8) else { return nil }
+
         return CosmosSigningInput.with {
             $0.accountNumber = UInt64(0)
             $0.chainID = ""
@@ -680,7 +687,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 CosmosMessage.with {
                     $0.rawJsonMessage = CosmosMessage.RawJSON.with {
                         $0.type = "sign/MsgSignData"
-                        $0.value = data.base64EncodedString()
+                        $0.value = value
                     }
                 }
             ]

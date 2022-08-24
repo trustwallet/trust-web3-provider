@@ -52,12 +52,6 @@ public struct TrustWeb3Provider {
             window.keplr = trustwallet.cosmos;
 
             const getDefaultCosmosProvider = (chainId) => {
-                var config = {
-                    cosmos: {
-                        chainId: "\(cosmos.chainId)"
-                    }
-                };
-                trustwallet.cosmos.setConfig(config);
                 return trustwallet.cosmos;
             }
             window.getOfflineSigner = getDefaultCosmosProvider;

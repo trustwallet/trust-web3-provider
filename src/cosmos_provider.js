@@ -20,28 +20,9 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     this.mode = "extension";
     this.isKeplr = true;
     this.version = "0.10.16";
-    
-    this.setConfig(config);
-    console.log(`constructor`);
-  }
-
-  enable(chainIds) {
-    console.log(`==> enabled for ${chainIds}`);
-  }
-
-  setConfig(config) {
-    this.chainId = config.chainId;
-  }
-
-  updateChainId(chainId) {
-    const config = {
-      chainId: chainId
-    };
-    this.setConfig(config);
   }
 
   getKey(chainId) {
-    this.updateChainId(chainId);
     return this.getAccounts().then((accounts) => {
       return accounts[0];
     });
@@ -68,17 +49,14 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   getOfflineSigner(chainId) {
-    this.updateChainId(chainId)
     return this;
   }
 
   getOfflineSignerOnlyAmino(chainId) {
-    this.updateChainId(chainId)
     return this;
   }
 
   getOfflineSignerAuto(chainId) {
-    this.updateChainId(chainId)
     return this;
   }
 
@@ -90,7 +68,6 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     let signerAddress = "";
     let signDoc = {};
     if (param3) {
-      this.updateChainId(param1);
       signerAddress = param2;
       signDoc = param3;
     } else {
@@ -103,7 +80,6 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
 
   _signAmino(signerAddress, signDoc) {
     return this._request("signAmino", signDoc).then((signature) => {
-      // FIXME assgin signature to signDoc
       return { signed: signDoc, signature: JSON.parse(signature) };
     });
   }
@@ -112,7 +88,6 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     let signerAddress = "";
     let signDoc = {};
     if (param3) {
-      this.updateChainId(param1);
       signerAddress = param2;
       signDoc = param3;
     } else {
@@ -131,8 +106,6 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
       account_number: signDoc.accountNumber.toString(),
     };
     return this._request("signDirect", object).then((signature) => {
-      console.log(`==> signature: ${signature}`);
-      // FIXME assgin signature to signDoc
       return { signed: signDoc, signature: JSON.parse(signature) };
     });
   }
@@ -140,8 +113,11 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   signArbitrary(chainId, signerAddress, data) {
     const buffer = Buffer.from(data);
     const hex = Utils.bufferToHex(buffer);
-    return this._request("signArbitrary", { data: hex }).then((signature) => {
-      return { signed: signDoc, signature: JSON.parse(signature) };
+
+    return this._request("signArbitrary", { data: hex }).then((result) => {
+      const signature = JSON.parse(result).signature;
+      const signDoc = {}
+      return { signDoc, signature };
     });
   }
 
