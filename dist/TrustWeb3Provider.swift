@@ -52,10 +52,13 @@ public struct TrustWeb3Provider {
             window.keplr = trustwallet.cosmos;
 
             const getDefaultCosmosProvider = (chainId) => {
-                return trustwallet.cosmos;
+                return trustwallet.cosmos.getOfflineSigner(chainId);
+            }
+            const getAminoOnlyCosmosProvider = (chainId) => {
+                return trustwallet.cosmos.getOfflineSignerOnlyAmino(chainId);
             }
             window.getOfflineSigner = getDefaultCosmosProvider;
-            window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
+            window.getOfflineSignerOnlyAmino = getAminoOnlyCosmosProvider;
             window.getOfflineSignerAuto = getDefaultCosmosProvider;
         })();
         """

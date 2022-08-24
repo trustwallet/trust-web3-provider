@@ -10,6 +10,7 @@ import BaseProvider from "./base_provider";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
 import { Buffer } from "buffer";
+const { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } = require('./cosmjs');
 
 export class TrustCosmosWeb3Provider extends BaseProvider {
   constructor(config) {
@@ -22,26 +23,20 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     this.version = "0.10.16";
   }
 
-  getKey(chainId) {
-    return this.getAccounts().then((accounts) => {
-      return accounts[0];
-    });
+  enable(chainIds) {
+    console.log(`==> enabled for ${chainIds}`);
   }
 
-  getAccounts() {
-    return this._request("requestAccounts", { chainId: this.chainId }).then(
-      (response) => {
-        const account = JSON.parse(response);
-        return [
-          {
-            algo: "secp256k1",
-            address: account.address,
-            bech32Address: account.address,
-            pubkey: Buffer.from(account.pubKey, "hex")
-          }
-        ];
-      }
-    );
+  getKey(chainId) {
+    return this._request("requestAccounts", { chainId: chainId }).then((response) => {
+      const account = JSON.parse(response);
+      return {
+        algo: "secp256k1",
+        address: account.address,
+        bech32Address: account.address,
+        pubKey: Buffer.from(account.pubKey, "hex")
+      };
+    });
   }
 
   experimentalSuggestChain(chainInfo) {
@@ -49,56 +44,24 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   getOfflineSigner(chainId) {
-    return this;
+    return new CosmJSOfflineSigner(chainId, this);
   }
 
   getOfflineSignerOnlyAmino(chainId) {
-    return this;
+    return new CosmJSOfflineSignerOnlyAmino(chainId, this);
   }
 
   getOfflineSignerAuto(chainId) {
-    return this;
+    return new CosmJSOfflineSigner(chainId, this);
   }
 
-  sign(signerAddress, signDoc) {
-    return this.signAmino(signerAddress, signDoc);
-  }
-
-  signAmino(param1, param2, param3) {
-    let signerAddress = "";
-    let signDoc = {};
-    if (param3) {
-      signerAddress = param2;
-      signDoc = param3;
-    } else {
-      signerAddress = param1;
-      signDoc = param2;
-    }
-    
-    return this._signAmino(signerAddress, signDoc);
-  }
-
-  _signAmino(signerAddress, signDoc) {
+  signAmino(chainId, signerAddress, signDoc) {
     return this._request("signAmino", signDoc).then((signature) => {
       return { signed: signDoc, signature: JSON.parse(signature) };
     });
   }
 
-  signDirect(param1, param2, param3) {
-    let signerAddress = "";
-    let signDoc = {};
-    if (param3) {
-      signerAddress = param2;
-      signDoc = param3;
-    } else {
-      signerAddress = param1;
-      signDoc = param2;
-    }
-    
-    return this._signDirect(signerAddress, signDoc);
-  }
-
-  _signDirect(signerAddress, signDoc) {
+  signDirect(chainId, signerAddress, signDoc) {
     const object = {
       body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
       auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes),
