@@ -14,7 +14,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://restake.app/evmos"
+        return "http://localhost:3000/"
     }
 
     static let wallet = HDWallet(mnemonic: ".", passphrase: "")!
@@ -29,7 +29,7 @@ class DAppWebViewController: UIViewController {
             cluster: "mainnet-beta"
         ),
         cosmos: CosmosConfig(
-            chainId: "cosmoshub-4"
+            chainId: "kava_2222-10"
         )
     )
 
@@ -46,7 +46,7 @@ class DAppWebViewController: UIViewController {
         )
     ]
 
-    var cosmosChains = ["osmosis-1", "cosmoshub-4", "kava_2222-10", "evmos_9001-2"]
+    var cosmosChains = ["osmosis-1", "cosmoshub", "cosmoshub-4", "kava_2222-10", "evmos_9001-2"]
 
     lazy var webview: WKWebView = {
         let config = WKWebViewConfiguration()
@@ -97,7 +97,7 @@ class DAppWebViewController: UIViewController {
         switch provider.cosmos.chainId {
         case "osmosis-1":
             return .osmosis
-        case "cosmoshub-4":
+        case "cosmoshub", "cosmoshub-4":
             return .cosmos
         case "kava_2222-10":
             return .kava
@@ -180,7 +180,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             case .solana:
                 handleSolanaSignMessage(id: id, data: data)
             case .cosmos:
-                fatalError()
+                handleCosmosSignMessage(id: id, data: data)
             }
         case .signPersonalMessage:
             guard let data = extractMessage(json: json) else {
@@ -334,6 +334,24 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
+    func handleCosmosSignMessage(id: Int64, data: Data) {
+        let alert = UIAlertController(
+            title: "Sign Cosmos Message",
+            message: String(data: data, encoding: .utf8) ?? data.hexString,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
+            webview?.tw.send(network: .solana, error: "Canceled", to: id)
+        }))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
+            guard let input: CosmosSigningInput = self.cosmosSigningInputMessage(data: data) else { return }
+            let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
+            guard let signature = self.cosmosSignature(from: input, output) else { return }
+            webview?.tw.send(network: .cosmos, result: signature, to: id)
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+
     func handleSignCosmosTransaction(_ input: CosmosSigningInput, network: ProviderNetwork, id: Int64) {
         let alert = UIAlertController(
             title: "Sign Transaction",
@@ -345,17 +363,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
-            let pubkey = PrivateKey(data: input.privateKey)!.getPublicKeySecp256k1(compressed: true)
-            let signature: [String: Any] = [
-                "pub_key": [
-                    "type": self.cosmosCoin == .nativeEvmos ? "ethermint/PubKeyEthSecp256k1" : "tendermint/PubKeySecp256k1", // Evmos might be different
-                    "value": pubkey.data.base64EncodedString()
-                ],
-                "signature": output.signature.base64EncodedString()
-            ]
-            guard let signatureEncoded = try? JSONSerialization.data(withJSONObject: signature) else { return }
-            guard let signatureResult = String(data: signatureEncoded, encoding: .utf8) else { return }
-            webview?.tw.send(network: .cosmos, result: signatureResult, to: id)
+            guard let signature = self.cosmosSignature(from: input, output) else { return }
+            webview?.tw.send(network: .cosmos, result: signature, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -661,6 +670,28 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
+    private func cosmosSigningInputMessage(data: Data) -> CosmosSigningInput? {
+        return CosmosSigningInput.with {
+            $0.accountNumber = UInt64(0)
+            $0.chainID = ""
+            $0.memo = ""
+            $0.sequence = UInt64(0)
+            $0.messages = [
+                CosmosMessage.with {
+                    $0.rawJsonMessage = CosmosMessage.RawJSON.with {
+                        $0.type = "sign/MsgSignData"
+                        $0.value = data.base64EncodedString()
+                    }
+                }
+            ]
+            $0.fee = CosmosFee.with {
+                $0.gas = UInt64(0)
+                $0.amounts = []
+            }
+            $0.privateKey = Self.wallet.getKeyForCoin(coin: cosmosCoin).data
+        }
+    }
+
     private func parseCosmosAmounts(_ amounts: [[String: Any]]) -> [CosmosAmount] {
         return amounts.compactMap { feeAmount -> CosmosAmount? in
             guard
@@ -694,6 +725,21 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 }
             }
         }
+    }
+
+    private func cosmosSignature(from input: CosmosSigningInput, _ output: CosmosSigningOutput) -> String? {
+        let pubkey = PrivateKey(data: input.privateKey)!.getPublicKeySecp256k1(compressed: true)
+        let signature: [String: Any] = [
+            "pub_key": [
+                "type": self.cosmosCoin == .nativeEvmos ? "ethermint/PubKeyEthSecp256k1" : "tendermint/PubKeySecp256k1", // Evmos might be different
+                "value": pubkey.data.base64EncodedString()
+            ],
+            "signature": output.signature.base64EncodedString()
+        ]
+        guard let signatureEncoded = try? JSONSerialization.data(withJSONObject: signature) else { return nil }
+        guard let signatureResult = String(data: signatureEncoded, encoding: .utf8) else { return nil }
+
+        return signatureResult
     }
 }
 

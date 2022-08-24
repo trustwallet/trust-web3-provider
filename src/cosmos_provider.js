@@ -67,6 +67,21 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     return this._request("experimentalSuggestChain", chainInfo);
   }
 
+  getOfflineSigner(chainId) {
+    this.updateChainId(chainId)
+    return this;
+  }
+
+  getOfflineSignerOnlyAmino(chainId) {
+    this.updateChainId(chainId)
+    return this;
+  }
+
+  getOfflineSignerAuto(chainId) {
+    this.updateChainId(chainId)
+    return this;
+  }
+
   sign(signerAddress, signDoc) {
     return this.signAmino(signerAddress, signDoc);
   }
@@ -122,6 +137,14 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     });
   }
 
+  signArbitrary(chainId, signerAddress, data) {
+    const buffer = Buffer.from(data);
+    const hex = Utils.bufferToHex(buffer);
+    return this._request("signArbitrary", { data: hex }).then((signature) => {
+      return { signed: signDoc, signature: JSON.parse(signature) };
+    });
+  }
+
   sendTx(chainId, tx, mode) {
     const tx_bytes = Buffer.from(tx).toString("base64");
     console.log(`==> final tx hash: ${tx_bytes}`);
@@ -161,6 +184,8 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
           return this.postMessage("signTransaction", id, payload);
         case "signDirect":
           return this.postMessage("signRawTransaction", id, payload);
+        case "signArbitrary":
+          return this.postMessage("signMessage", id, payload);
         case "sendTx":
           return this.postMessage("sendRawTransaction", id, payload);
         default:
