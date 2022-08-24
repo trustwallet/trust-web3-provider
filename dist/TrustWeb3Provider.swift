@@ -7,6 +7,12 @@
 import Foundation
 import WebKit
 
+public enum ProviderNetwork: String, Decodable {
+    case ethereum
+    case solana
+    case cosmos
+}
+
 public struct TrustWeb3Provider {
     public static let scriptHandlerName = "_tw_"
 
@@ -131,10 +137,4 @@ public extension TypeWrapper where T == WKWebView {
     func removeScriptHandler() {
         value.configuration.userContentController.removeScriptMessageHandler(forName: TrustWeb3Provider.scriptHandlerName)
     }
-}
-
-public enum ProviderNetwork: String, Decodable {
-    case ethereum
-    case solana
-    case cosmos
 }
