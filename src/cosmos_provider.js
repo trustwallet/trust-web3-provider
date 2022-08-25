@@ -1,4 +1,4 @@
-// Copyright © 2017-2020 Trust Wallet.
+// Copyright © 2017-2022 Trust Wallet.
 //
 // This file is part of Trust. The full Trust copyright notice, including
 // terms governing use, modification, and redistribution, is contained in the
@@ -10,7 +10,7 @@ import BaseProvider from "./base_provider";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
 import { Buffer } from "buffer";
-const { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } = require('./cosmjs');
+import CosmJSOfflineSigner from "./cosmjs_adapter";
 
 export class TrustCosmosWeb3Provider extends BaseProvider {
   constructor(config) {
@@ -28,15 +28,17 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   getKey(chainId) {
-    return this._request("requestAccounts", { chainId: chainId }).then((response) => {
-      const account = JSON.parse(response);
-      return {
-        algo: "secp256k1",
-        address: account.address,
-        bech32Address: account.address,
-        pubKey: Buffer.from(account.pubKey, "hex")
-      };
-    });
+    return this._request("requestAccounts", { chainId: chainId }).then(
+      (response) => {
+        const account = JSON.parse(response);
+        return {
+          algo: "secp256k1",
+          address: account.address,
+          bech32Address: account.address,
+          pubKey: Buffer.from(account.pubKey, "hex"),
+        };
+      }
+    );
   }
 
   experimentalSuggestChain(chainInfo) {
@@ -48,7 +50,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   getOfflineSignerOnlyAmino(chainId) {
-    return new CosmJSOfflineSignerOnlyAmino(chainId, this);
+    return new CosmJSOfflineSigner(chainId, this);
   }
 
   getOfflineSignerAuto(chainId) {
@@ -79,7 +81,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
 
     return this._request("signArbitrary", { data: hex }).then((result) => {
       const signature = JSON.parse(result).signature;
-      const signDoc = {}
+      const signDoc = {};
       return { signDoc, signature };
     });
   }

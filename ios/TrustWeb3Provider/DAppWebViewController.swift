@@ -14,10 +14,10 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "http://localhost:3000/"
+        return "https://restake.app/evmos"
     }
 
-    static let wallet = HDWallet(mnemonic: ".", passphrase: "")!
+    static let wallet = HDWallet(strength: 128, passphrase: "")!
 
     var current: TrustWeb3Provider = TrustWeb3Provider(
         address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",

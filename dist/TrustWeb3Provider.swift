@@ -57,11 +57,9 @@ public struct TrustWeb3Provider {
             const getDefaultCosmosProvider = (chainId) => {
                 return trustwallet.cosmos.getOfflineSigner(chainId);
             }
-            const getAminoOnlyCosmosProvider = (chainId) => {
-                return trustwallet.cosmos.getOfflineSignerOnlyAmino(chainId);
-            }
+
             window.getOfflineSigner = getDefaultCosmosProvider;
-            window.getOfflineSignerOnlyAmino = getAminoOnlyCosmosProvider;
+            window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
             window.getOfflineSignerAuto = getDefaultCosmosProvider;
         })();
         """
