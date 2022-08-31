@@ -8,12 +8,14 @@ import Foundation
 
 enum DAppMethod: String, Decodable, CaseIterable {
     case signRawTransaction
+    case signTransaction
     case signMessage
     case signTypedMessage
     case signPersonalMessage
+    case sendRawTransaction
     case ecRecover
     case requestAccounts
     case watchAsset
     case addEthereumChain
-    case switchEthereumChain
+    case switchChain
 }

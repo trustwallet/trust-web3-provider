@@ -10,6 +10,7 @@ import WebKit
 public enum ProviderNetwork: String, Decodable {
     case ethereum
     case solana
+    case cosmos
 }
 
 public struct TrustWeb3Provider {
@@ -44,12 +45,22 @@ public struct TrustWeb3Provider {
 
             trustwallet.ethereum = new trustwallet.Provider(config);
             trustwallet.solana = new trustwallet.SolanaProvider(config);
+            trustwallet.cosmos = new trustwallet.CosmosProvider(config);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
             };
 
             window.ethereum = trustwallet.ethereum;
+            window.keplr = trustwallet.cosmos;
+
+            const getDefaultCosmosProvider = (chainId) => {
+                return trustwallet.cosmos.getOfflineSigner(chainId);
+            }
+
+            window.getOfflineSigner = getDefaultCosmosProvider;
+            window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
+            window.getOfflineSignerAuto = getDefaultCosmosProvider;
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -106,7 +117,7 @@ public extension TypeWrapper where T == WKWebView {
     }
 
     func send(network: ProviderNetwork, result: String, to id: Int64) {
-        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, \"%@\")", id, result)
+        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, \'%@\')", id, result)
         value.evaluateJavaScript(script)
     }
 
