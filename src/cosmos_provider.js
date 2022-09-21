@@ -27,6 +27,10 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     console.log(`==> enabled for ${chainIds}`);
   }
 
+  experimentalSuggestChain(chainInfo) {
+    console.log(`==> experimentalSuggestChain isn't implemented`);
+  }
+
   getKey(chainId) {
     return this._request("requestAccounts", { chainId: chainId }).then(
       (response) => {
@@ -38,11 +42,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
           pubKey: Buffer.from(account.pubKey, "hex"),
         };
       }
-    );
-  }
-
-  experimentalSuggestChain(chainInfo) {
-    return this._request("experimentalSuggestChain", chainInfo);
+      );
   }
 
   getOfflineSigner(chainId) {
@@ -58,20 +58,18 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   signAmino(chainId, signerAddress, signDoc) {
-    return this._request("signAmino", signDoc).then((signature) => {
-      return { signed: signDoc, signature: JSON.parse(signature) };
+    return this._request("signAmino", {chainId: chainId, sign_doc: signDoc}).then((signatures) => {
+      return { signed: signDoc, signature: JSON.parse(signatures)[0] };
     });
   }
 
   signDirect(chainId, signerAddress, signDoc) {
     const object = {
       body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
-      auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes),
-      chain_id: signDoc.chainId,
-      account_number: signDoc.accountNumber.toString(),
+      auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes)
     };
-    return this._request("signDirect", object).then((signature) => {
-      return { signed: signDoc, signature: JSON.parse(signature) };
+    return this._request("signDirect", {chainId: chainId, sign_doc: object}).then((signatures) => {
+      return { signed: signDoc, signature: JSON.parse(signatures)[0] };
     });
   }
 
@@ -79,8 +77,8 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     const buffer = Buffer.from(data);
     const hex = Utils.bufferToHex(buffer);
 
-    return this._request("signArbitrary", { data: hex }).then((result) => {
-      const signature = JSON.parse(result).signature;
+    return this._request("signArbitrary", { chainId: chainId, data: hex }).then((result) => {
+      const signature = JSON.parse(result)[0].signature;
       const signDoc = {};
       return { signDoc, signature };
     });
@@ -88,22 +86,19 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
 
   sendTx(chainId, tx, mode) {
     const tx_bytes = Buffer.from(tx).toString("base64");
-    console.log(`==> final tx hash: ${tx_bytes}`);
-    return this._request("sendTx", { raw: tx_bytes, mode: mode }).then(
-      (tx_hash) => {
-        return Buffer.from(tx_hash, "hex");
-      }
-    );
+    return this._request("sendTx", { chainId: chainId, raw: tx_bytes, mode: mode }).then((tx_hash) => {
+      return Buffer.from(tx_hash, "hex");
+    });
   }
 
   /**
    * @private Internal rpc handler
    */
-  _request(method, payload) {
+   _request(method, payload) {
     if (this.isDebug) {
       console.log(
         `==> _request method: ${method}, payload ${JSON.stringify(payload)}`
-      );
+        );
     }
     return new Promise((resolve, reject) => {
       const id = Utils.genId();
@@ -118,25 +113,23 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
 
       switch (method) {
         case "requestAccounts":
-          return this.postMessage("requestAccounts", id, payload);
-        case "experimentalSuggestChain":
-          return this.postMessage("switchChain", id, payload);
+        return this.postMessage("requestAccounts", id, payload);
         case "signAmino":
-          return this.postMessage("signTransaction", id, payload);
+        return this.postMessage("signTransaction", id, payload);
         case "signDirect":
-          return this.postMessage("signRawTransaction", id, payload);
+        return this.postMessage("signTransaction", id, payload);
         case "signArbitrary":
-          return this.postMessage("signMessage", id, payload);
+        return this.postMessage("signMessage", id, payload);
         case "sendTx":
-          return this.postMessage("sendRawTransaction", id, payload);
+        return this.postMessage("sendTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(
             4200,
             `Trust does not support calling ${payload.method} yet.`
-          );
-      }
-    });
+            );
+        }
+      });
   }
 }
 
