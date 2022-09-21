@@ -28,7 +28,7 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   experimentalSuggestChain(chainInfo) {
-    console.log(`==> experimentalSuggestChain isn't implemented`);
+    console.log("==> experimentalSuggestChain isn't implemented");
   }
 
   getKey(chainId) {
