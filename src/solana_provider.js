@@ -64,8 +64,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   signTransaction(tx) {
     return this._request("signRawTransaction", {
       data: JSON.stringify(tx),
-      raw: bs58.encode(tx.serializeMecccccbcuntdcccevgddftivtdbfbuuklccunrichgklf
-        ssage()),
+      raw: bs58.encode(tx.serializeMessage()),
     })
       .then((signatureEncoded) => {
         const signature = bs58.decode(signatureEncoded);
