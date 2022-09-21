@@ -15,9 +15,11 @@ public enum ProviderNetwork: String, Decodable {
 
 public struct TrustWeb3ProviderConfig: Equatable {
     public let ethereum: EthereumConfig
+    public let solana: SolanaConfig
 
-    public init(ethereum: EthereumConfig) {
+    public init(ethereum: EthereumConfig, solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta")) {
         self.ethereum = ethereum
+        self.solana = solana
     }
 
     public struct EthereumConfig: Equatable {
@@ -29,6 +31,14 @@ public struct TrustWeb3ProviderConfig: Equatable {
             self.address = address
             self.chainId = chainId
             self.rpcUrl = rpcUrl
+        }
+    }
+
+    public struct SolanaConfig: Equatable {
+        public let cluster: String
+
+        public init(cluster: String) {
+            self.cluster = cluster
         }
     }
 }
@@ -56,9 +66,8 @@ public struct TrustWeb3Provider {
                     rpcUrl: "\(config.ethereum.rpcUrl)"
                 },
                 solana: {
-                    cluster: "mainnet-beta"
-                },
-                isDebug: true
+                    cluster: "\(config.solana.cluster)"
+                }
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
@@ -116,11 +125,7 @@ public extension TypeWrapper where T == WKWebView {
                 address: "\(config.ethereum.address)",
                 chainId: \(config.ethereum.chainId),
                 rpcUrl: "\(config.ethereum.rpcUrl)"
-            },
-            solana: {
-                cluster: "mainnet-beta"
-            },
-            isDebug: true
+            }
         };
         ethereum.setConfig(config);
         """
