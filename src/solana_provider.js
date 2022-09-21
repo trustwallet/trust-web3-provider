@@ -23,7 +23,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     this.publicKey = null;
     this.isConnected = false;
     this.connection = new Connection(
-      Web3.clusterApiUrl(config.cluster),
+      Web3.clusterApiUrl(config.solana.cluster),
       "confirmed"
     );
   }
