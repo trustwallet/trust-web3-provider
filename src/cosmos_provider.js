@@ -27,6 +27,10 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     console.log(`==> enabled for ${chainIds}`);
   }
 
+  experimentalSuggestChain(chainInfo) {
+    console.log("==> experimentalSuggestChain isn't implemented");
+  }
+
   getKey(chainId) {
     return this._request("requestAccounts", { chainId: chainId }).then(
       (response) => {
@@ -39,10 +43,6 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
         };
       }
     );
-  }
-
-  experimentalSuggestChain(chainInfo) {
-    return this._request("experimentalSuggestChain", chainInfo);
   }
 
   getOfflineSigner(chainId) {
@@ -58,8 +58,11 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
   }
 
   signAmino(chainId, signerAddress, signDoc) {
-    return this._request("signAmino", signDoc).then((signature) => {
-      return { signed: signDoc, signature: JSON.parse(signature) };
+    return this._request("signAmino", {
+      chainId: chainId,
+      sign_doc: signDoc,
+    }).then((signatures) => {
+      return { signed: signDoc, signature: JSON.parse(signatures)[0] };
     });
   }
 
@@ -67,11 +70,12 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     const object = {
       body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
       auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes),
-      chain_id: signDoc.chainId,
-      account_number: signDoc.accountNumber.toString(),
     };
-    return this._request("signDirect", object).then((signature) => {
-      return { signed: signDoc, signature: JSON.parse(signature) };
+    return this._request("signDirect", {
+      chainId: chainId,
+      sign_doc: object,
+    }).then((signatures) => {
+      return { signed: signDoc, signature: JSON.parse(signatures)[0] };
     });
   }
 
@@ -79,21 +83,24 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     const buffer = Buffer.from(data);
     const hex = Utils.bufferToHex(buffer);
 
-    return this._request("signArbitrary", { data: hex }).then((result) => {
-      const signature = JSON.parse(result).signature;
-      const signDoc = {};
-      return { signDoc, signature };
-    });
+    return this._request("signArbitrary", { chainId: chainId, data: hex }).then(
+      (result) => {
+        const signature = JSON.parse(result)[0].signature;
+        const signDoc = {};
+        return { signDoc, signature };
+      }
+    );
   }
 
   sendTx(chainId, tx, mode) {
     const tx_bytes = Buffer.from(tx).toString("base64");
-    console.log(`==> final tx hash: ${tx_bytes}`);
-    return this._request("sendTx", { raw: tx_bytes, mode: mode }).then(
-      (tx_hash) => {
-        return Buffer.from(tx_hash, "hex");
-      }
-    );
+    return this._request("sendTx", {
+      chainId: chainId,
+      raw: tx_bytes,
+      mode: mode,
+    }).then((tx_hash) => {
+      return Buffer.from(tx_hash, "hex");
+    });
   }
 
   /**
@@ -119,16 +126,14 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
       switch (method) {
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, payload);
-        case "experimentalSuggestChain":
-          return this.postMessage("switchChain", id, payload);
         case "signAmino":
           return this.postMessage("signTransaction", id, payload);
         case "signDirect":
-          return this.postMessage("signRawTransaction", id, payload);
+          return this.postMessage("signTransaction", id, payload);
         case "signArbitrary":
           return this.postMessage("signMessage", id, payload);
         case "sendTx":
-          return this.postMessage("sendRawTransaction", id, payload);
+          return this.postMessage("sendTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

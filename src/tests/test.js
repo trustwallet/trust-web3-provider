@@ -66,7 +66,7 @@ describe("TrustWeb3Provider constructor tests", () => {
     expect(provider.isDebug).toBeTruthy();
     expect(provider.isTrust).toBeTruthy();
     expect(provider.isPhantom).toBeFalsy();
-    console.log(provider.connection);
+
     expect(provider.connection.rpcEndpoint).toEqual(
       "https://api.mainnet-beta.solana.com/"
     );

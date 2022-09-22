@@ -13,12 +13,39 @@ public enum ProviderNetwork: String, Decodable {
     case cosmos
 }
 
+public struct TrustWeb3ProviderConfig: Equatable {
+    public let ethereum: EthereumConfig
+    public let solana: SolanaConfig
+
+    public init(ethereum: EthereumConfig, solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta")) {
+        self.ethereum = ethereum
+        self.solana = solana
+    }
+
+    public struct EthereumConfig: Equatable {
+        public let address: String
+        public let chainId: Int
+        public let rpcUrl: String
+
+        public init(address: String, chainId: Int, rpcUrl: String) {
+            self.address = address
+            self.chainId = chainId
+            self.rpcUrl = rpcUrl
+        }
+    }
+
+    public struct SolanaConfig: Equatable {
+        public let cluster: String
+
+        public init(cluster: String) {
+            self.cluster = cluster
+        }
+    }
+}
+
 public struct TrustWeb3Provider {
     public static let scriptHandlerName = "_tw_"
-
-    public let address: String
-    public let chainId: Int
-    public let rpcUrl: String
+    public let config: TrustWeb3ProviderConfig
 
     public var providerJsUrl: URL {
         return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
@@ -34,12 +61,12 @@ public struct TrustWeb3Provider {
         (function() {
             var config = {
                 ethereum: {
-                    address: "\(address)",
-                    chainId: \(chainId),
-                    rpcUrl: "\(rpcUrl)"
+                    address: "\(config.ethereum.address)",
+                    chainId: \(config.ethereum.chainId),
+                    rpcUrl: "\(config.ethereum.rpcUrl)"
                 },
                 solana: {
-                    cluster: "mainnet-beta"
+                    cluster: "\(config.solana.cluster)"
                 }
             };
 
@@ -66,10 +93,8 @@ public struct TrustWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(address: String, chainId: Int, rpcUrl: String) {
-        self.address = address
-        self.chainId = chainId
-        self.rpcUrl = rpcUrl
+    public init(config: TrustWeb3ProviderConfig) {
+        self.config = config
     }
 }
 
@@ -93,14 +118,16 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
-    func set(address: String, chainId: Int, rpcUrl: String) {
+    func set(config: TrustWeb3ProviderConfig) {
         let script = """
         var config = {
-            address: "\(address.lowercased())",
-            chainId: \(chainId),
-            rpcUrl: "\(rpcUrl)"
+            ethereum: {
+                address: "\(config.ethereum.address)",
+                chainId: \(config.ethereum.chainId),
+                rpcUrl: "\(config.ethereum.rpcUrl)"
+            }
         };
-        ethereum.setConfig({ethereum: config});
+        ethereum.setConfig(config);
         """
         value.evaluateJavaScript(script)
     }
