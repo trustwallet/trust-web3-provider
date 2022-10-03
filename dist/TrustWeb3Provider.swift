@@ -7,48 +7,51 @@
 import Foundation
 import WebKit
 
-public enum ProviderNetwork: String, Decodable {
-    case ethereum
-    case solana
-    case cosmos
-}
-
-public struct TrustWeb3ProviderConfig: Equatable {
-    public let ethereum: EthereumConfig
-    public let solana: SolanaConfig
-
-    public init(ethereum: EthereumConfig, solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta")) {
-        self.ethereum = ethereum
-        self.solana = solana
-    }
-
-    public struct EthereumConfig: Equatable {
-        public let address: String
-        public let chainId: Int
-        public let rpcUrl: String
-
-        public init(address: String, chainId: Int, rpcUrl: String) {
-            self.address = address
-            self.chainId = chainId
-            self.rpcUrl = rpcUrl
-        }
-    }
-
-    public struct SolanaConfig: Equatable {
-        public let cluster: String
-
-        public init(cluster: String) {
-            self.cluster = cluster
-        }
-    }
-}
-
 public struct TrustWeb3Provider {
+    public struct Config: Equatable {
+        public let ethereum: EthereumConfig
+        public let solana: SolanaConfig
+
+        public init(ethereum: EthereumConfig, solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta")) {
+            self.ethereum = ethereum
+            self.solana = solana
+        }
+
+        public struct EthereumConfig: Equatable {
+            public let address: String
+            public let chainId: Int
+            public let rpcUrl: String
+
+            public init(address: String, chainId: Int, rpcUrl: String) {
+                self.address = address
+                self.chainId = chainId
+                self.rpcUrl = rpcUrl
+            }
+        }
+
+        public struct SolanaConfig: Equatable {
+            public let cluster: String
+
+            public init(cluster: String) {
+                self.cluster = cluster
+            }
+        }
+    }
+
+    private class dummy {}
+    private let filename = "trust-min"    
     public static let scriptHandlerName = "_tw_"
-    public let config: TrustWeb3ProviderConfig
+    public let config: Config
 
     public var providerJsUrl: URL {
-        return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
+#if COCOAPODS
+        let bundle = Bundle(for: TrustWeb3Provider.dummy.self)
+        let bundleURL = bundle.resourceURL?.appendingPathComponent("TrustWeb3Provider.bundle")
+        let resourceBundle = Bundle(url: bundleURL!)!
+        return resourceBundle.url(forResource: filename, withExtension: "js")!
+#else
+        return Bundle.module.url(forResource: filename, withExtension: "js")!
+#endif
     }
 
     public var providerScript: WKUserScript {
@@ -93,73 +96,7 @@ public struct TrustWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(config: TrustWeb3ProviderConfig) {
+    public init(config: Config) {
         self.config = config
-    }
-}
-
-public struct TypeWrapper<T> {
-    let value: T
-
-    init(value: T) {
-        self.value = value
-    }
-}
-
-public extension WKWebView {
-    var tw: TypeWrapper<WKWebView> {
-        return TypeWrapper(value: self)
-    }
-}
-
-public extension TypeWrapper where T == WKWebView {
-    func set(network: String, address: String) {
-        let script = String(format: "trustwallet.\(network).setAddress(\"%@\");", address.lowercased())
-        value.evaluateJavaScript(script)
-    }
-
-    func set(config: TrustWeb3ProviderConfig) {
-        let script = """
-        var config = {
-            ethereum: {
-                address: "\(config.ethereum.address)",
-                chainId: \(config.ethereum.chainId),
-                rpcUrl: "\(config.ethereum.rpcUrl)"
-            }
-        };
-        ethereum.setConfig(config);
-        """
-        value.evaluateJavaScript(script)
-    }
-
-    func emitChange(chainId: Int) {
-        let string = "0x" + String(chainId, radix: 16)
-        let script = String(format: "trustwallet.ethereum.emitChainChanged(\"%@\");", string)
-        value.evaluateJavaScript(script)
-    }
-
-    func send(network: ProviderNetwork, error: String, to id: Int64) {
-        let script = String(format: "trustwallet.\(network.rawValue).sendError(%ld, \"%@\")", id, error)
-        value.evaluateJavaScript(script)
-    }
-
-    func send(network: ProviderNetwork, result: String, to id: Int64) {
-        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, \'%@\')", id, result)
-        value.evaluateJavaScript(script)
-    }
-
-    func sendNull(network: ProviderNetwork, id: Int64) {
-        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, null)", id)
-        value.evaluateJavaScript(script)
-    }
-
-    func send(network: ProviderNetwork, results: [String], to id: Int64) {
-        let array = results.map { String(format: "\"%@\"", $0) }
-        let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, [%@])", id, array.joined(separator: ","))
-        value.evaluateJavaScript(script)
-    }
-
-    func removeScriptHandler() {
-        value.configuration.userContentController.removeScriptMessageHandler(forName: TrustWeb3Provider.scriptHandlerName)
     }
 }

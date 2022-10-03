@@ -1,0 +1,27 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-12
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: brew install xcbeautify
+
+    - name: Test Pod build
+      run: |
+        pod install
+        set -o pipefail && xcodebuild -workspace PodsTest.xcworkspace -scheme PodsTest -destination "platform=iOS Simulator,name=iPhone 13" test | xcbeautify
+      working-directory: ios/PodsTest
+
+    - name: Test SPM build
+      run: |
+        set -o pipefail && xcodebuild -project TrustWeb3Provider.xcodeproj -scheme TrustWeb3Provider-Example -destination "platform=iOS Simulator,name=iPhone 13" | xcbeautify
+      working-directory: ios
