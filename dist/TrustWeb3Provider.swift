@@ -70,12 +70,14 @@ public struct TrustWeb3Provider {
                 },
                 solana: {
                     cluster: "\(config.solana.cluster)"
-                }
+                },
+                isDebug: true
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
             trustwallet.solana = new trustwallet.SolanaProvider(config);
             trustwallet.cosmos = new trustwallet.CosmosProvider(config);
+            trustwallet.aptos = new trustwallet.AptosProvider(config);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
@@ -83,6 +85,8 @@ public struct TrustWeb3Provider {
 
             window.ethereum = trustwallet.ethereum;
             window.keplr = trustwallet.cosmos;
+            window.aptos = trustwallet.aptos;
+            window.martian = trustwallet.aptos;
 
             const getDefaultCosmosProvider = (chainId) => {
                 return trustwallet.cosmos.getOfflineSigner(chainId);

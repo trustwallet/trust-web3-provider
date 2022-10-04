@@ -20,7 +20,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://app.uniswap.org"
+        return "https://app.animeswap.org/#/swap?chain=aptos_devnet"
     }
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
@@ -204,6 +204,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 handleSolanaSignMessage(id: id, data: data)
             case .cosmos:
                 handleCosmosSignMessage(id: id, data: data)
+            case .aptos:
+                return
             }
         case .signPersonalMessage:
             guard let data = extractMessage(json: json) else {
@@ -260,7 +262,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     return
                 }
                 handleSwitchEthereumChain(id: id, chainId: chainId)
-            case .solana:
+            case .solana, .aptos:
                 fatalError()
             case .cosmos:
                 guard
@@ -299,6 +301,14 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 let address = Self.wallet.getAddressForCoin(coin: self.cosmosCoin)
                 let json = try! JSONSerialization.data(
                     withJSONObject: ["pubKey": pubKey, "address": address]
+                )
+                let jsonString = String(data: json, encoding: .utf8)!
+                webview?.tw.send(network: network, result: jsonString, to: id)
+            case .aptos:
+                let pubKey = Self.wallet.getKeyForCoin(coin: .aptos).getPublicKeySecp256k1(compressed: true).description
+                let address = Self.wallet.getAddressForCoin(coin: .aptos)
+                let json = try! JSONSerialization.data(
+                    withJSONObject: ["publicKey": pubKey, "address": address]
                 )
                 let jsonString = String(data: json, encoding: .utf8)!
                 webview?.tw.send(network: network, result: jsonString, to: id)
