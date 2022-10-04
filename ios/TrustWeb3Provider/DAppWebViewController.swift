@@ -29,20 +29,16 @@ class DAppWebViewController: UIViewController {
         )
     )
 
-    var configs: [Int: TrustWeb3ProviderConfig] = [
-        42161: TrustWeb3ProviderConfig(
-            ethereum: .init(
-                address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
-                chainId: 42161,
-                rpcUrl: "https://arb1.arbitrum.io/rpc"
-            )
+    var ethConfigs: [Int: TrustWeb3ProviderConfig.EthereumConfig] = [
+        42161: .init(
+            address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
+            chainId: 42161,
+            rpcUrl: "https://arb1.arbitrum.io/rpc"
         ),
-        250: TrustWeb3ProviderConfig(
-            ethereum: .init(
-                address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
-                chainId: 250,
-                rpcUrl: "https://rpc.ftm.tools"
-            )
+        250: .init(
+            address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
+            chainId: 250,
+            rpcUrl: "https://rpc.ftm.tools"
         )
     ]
 
@@ -223,7 +219,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 print("extract chain info error")
                 return
             }
-            if configs[chainId] != nil {
+            if ethConfigs[chainId] != nil {
                 handleSwitchEthereumChain(id: id, chainId: chainId)
             } else {
                 handleAddChain(id: id, name: name, chainId: chainId, rpcUrls: rpcUrls)
@@ -398,12 +394,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
-            self.configs[chainId] = TrustWeb3ProviderConfig(
-                ethereum: .init(
-                    address: self.current.config.ethereum.address,
-                    chainId: chainId,
-                    rpcUrl: rpcUrls[0]
-                )
+            self.ethConfigs[chainId] = .init(
+                address: self.current.config.ethereum.address,
+                chainId: chainId,
+                rpcUrl: rpcUrls[0]
             )
             print("\(name) added")
             self.webview.tw.sendNull(network: .ethereum, id: id)
@@ -412,7 +406,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     func handleSwitchEthereumChain(id: Int64, chainId: Int) {
-        guard let config = configs[chainId] else {
+        guard let ethConfig = ethConfigs[chainId] else {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
             webview.tw.send(network: .ethereum, error: "Unknown chain id", to: id)
             return
@@ -425,7 +419,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
             let alert = UIAlertController(
                 title: "Switch Chain",
-                message: "ChainId: \(chainId)\nRPC: \(config.ethereum.rpcUrl)",
+                message: "ChainId: \(chainId)\nRPC: \(ethConfig.rpcUrl)",
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
@@ -433,6 +427,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
+                let config = TrustWeb3ProviderConfig(ethereum: ethConfig)
                 self.current = TrustWeb3Provider(config: config)
                 self.webview.tw.set(config: config)
                 self.webview.tw.emitChange(chainId: chainId)
