@@ -12,7 +12,7 @@ enum DAppMethod: String, Decodable, CaseIterable {
     case signMessage
     case signTypedMessage
     case signPersonalMessage
-    case sendRawTransaction
+    case sendTransaction
     case ecRecover
     case requestAccounts
     case watchAsset

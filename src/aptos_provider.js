@@ -47,6 +47,19 @@ class TrustAptosWeb3Provider extends BaseProvider {
     });
   }
 
+  async signAndSubmitTransaction(tx) {
+    const signedTx = await this.signTransaction(tx);
+    const signResponse = await this._request("submitTransaction", JSON.parse(signedTx));
+    return signResponse;
+  }
+
+  signTransaction(tx) {
+    return this._request("signTransaction", tx)
+      .catch((error) => {
+        console.log(`<== Error: ${error}`);
+      });
+  }
+
   /**
    * @private Internal rpc handler
    */
@@ -70,6 +83,10 @@ class TrustAptosWeb3Provider extends BaseProvider {
       switch (method) {
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
+        case "signTransaction":
+          return this.postMessage("signTransaction", id, payload);
+        case "submitTransaction":
+            return this.postMessage("sendTransaction", id, payload);
         default:
           // throw errors for unsupported methods
           throw new ProviderRpcError(

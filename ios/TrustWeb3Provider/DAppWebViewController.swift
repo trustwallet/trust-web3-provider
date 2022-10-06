@@ -161,15 +161,41 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
             handleRequestAccounts(network: network, id: id)
         case .signTransaction:
-            guard network == .cosmos else { print("not supported"); return }
+            switch network {
+            case .cosmos:
+                let input: CosmosSigningInput
+                if let params = json["object"] as? [String: Any] {
+                    input = self.cosmosSigningInputAmino(params: params)!
+                } else {
+                    fatalError("data is missing")
+                }
+                handleSignTransaction(network: network, id: id) { [weak webview] in
+                    let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
+                    guard let signature = self.cosmosSignature(from: input, output) else { return }
+                    webview?.tw.send(network: network, result: signature, to: id)
+                }
+            case .aptos:
+                if var params = extractAptosParams(json: json) {
+                    aptosSigningInput(params: params) { [weak self, webview] input in
+                        switch input {
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                        case .success(let input):
+                            self?.handleSignTransaction(network: network, id: id) { [weak webview] in
+                                let output: AptosSigningOutput = AnySigner.sign(input: input, coin: .aptos)
+                                let signature = try! JSONSerialization.jsonObject(with: output.json.data(using: .utf8)!) as! [String: Any]
+                                params["signature"] = signature
 
-            let input: CosmosSigningInput
-            if let params = json["object"] as? [String: Any] {
-                input = self.cosmosSigningInputAmino(params: params)!
-            } else {
-                fatalError("data is missing")
+                                let result = String(data: try! JSONSerialization.data(withJSONObject: params, options: [.withoutEscapingSlashes]), encoding: .utf8)!
+                                webview?.tw.send(network: network, result: result, to: id)
+                            }
+                        }
+                    }
+                }
+            default: break
             }
-            handleSignCosmosTransaction(input, network: network, id: id)
+
+
         case .signRawTransaction:
             switch network {
             case .solana:
@@ -187,7 +213,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     fatalError("data is missing")
                 }
 
-                handleSignCosmosTransaction(input, network: network, id: id)
+                handleSignTransaction(network: network, id: id) { [weak webview] in
+                    let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
+                    guard let signature = self.cosmosSignature(from: input, output) else { return }
+                    webview?.tw.send(network: .cosmos, result: signature, to: id)
+                }
             default:
                 print("\(network.rawValue) doesn't support signRawTransaction")
                 break
@@ -222,16 +252,26 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 return
             }
             handleSignTypedMessage(id: id, data: data, raw: raw)
-        case .sendRawTransaction:
-            guard network == .cosmos else { fatalError("\(network.rawValue) is not supported for this command") }
-            guard
-                let mode = extractMode(json: json),
-                let raw = extractRaw(json: json)
-            else {
-                print("mode or raw json is missing")
-                return
+        case .sendTransaction:
+            switch network {
+            case .cosmos:
+                guard
+                    let mode = extractMode(json: json),
+                    let raw = extractRaw(json: json)
+                else {
+                    print("mode or raw json is missing")
+                    return
+                }
+                handleCosmosSendTransaction(id, mode, raw)
+            case .aptos:
+                guard let tx = json["object"] as? [String: Any] else {
+                    return
+                }
+                handleAptosSendTransaction(tx, id: id)
+            default:
+                break
             }
-            handleCosmosSendRawTransaction(id, mode, raw)
+
         case .ecRecover:
             guard let tuple = extractSignature(json: json) else {
                 print("signature or message is missing")
@@ -384,7 +424,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
-    func handleSignCosmosTransaction(_ input: CosmosSigningInput, network: ProviderNetwork, id: Int64) {
+    func handleSignTransaction(network: ProviderNetwork, id: Int64, onSign: @escaping (() -> Void)) {
         let alert = UIAlertController(
             title: "Sign Transaction",
             message: "Smart contract call",
@@ -393,10 +433,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
             webview?.tw.send(network: network, error: "Canceled", to: id)
         }))
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
-            guard let signature = self.cosmosSignature(from: input, output) else { return }
-            webview?.tw.send(network: .cosmos, result: signature, to: id)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            onSign()
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -503,9 +541,25 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
-    func handleCosmosSendRawTransaction(_ id: Int64,_ mode: String,_ raw: String) {
+    func handleAptosSendTransaction(_ tx: [String: Any], id: Int64) {
+        let url = URL(string: "https://fullnode.devnet.aptoslabs.com/v1/transactions")!
+        tx.postRequest(to: url) { (result: Result<[String: Any], Error>) -> Void in
+            switch result {
+            case .failure(let error):
+                self.webview.tw.send(network: .aptos, error: error.localizedDescription, to: id)
+            case .success(let json):
+                if let _ = json["error_code"] as? String, let message = json["message"] as? String {
+                    self.webview.tw.send(network: .aptos, error: message, to: id)
+                }
+                let data = try! JSONSerialization.data(withJSONObject: json)
+                self.webview.tw.send(network: .aptos, result: String(data: data, encoding: .utf8)!, to: id)
+            }
+        }
+    }
+
+    func handleCosmosSendTransaction(_ id: Int64,_ mode: String,_ raw: String) {
         let url = URL(string: "https://lcd-osmosis.keplr.app/cosmos/tx/v1beta1/txs")!
-        ["mode": mode, "tx_bytes": raw].postRequest(to: url) { result in
+        ["mode": mode, "tx_bytes": raw].postRequest(to: url) { (result: Result<[String: Any], Error>) -> Void in
             switch result {
             case .failure(let error):
                 self.webview.tw.send(network: .cosmos, error: error.localizedDescription, to: id)
@@ -635,6 +689,21 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }
     }
 
+    private func extractAptosParams(json: [String: Any]) -> [String: Any]? {
+        guard let payload = json["object"] as? [String: Any] else {
+            return nil
+        }
+
+        return [
+            "expiration_timestamp_secs": "3664390082",
+            "gas_unit_price": "100",
+            "max_gas_amount": "3296766",
+            "payload": payload,
+            "sender": Self.wallet.getAddressForCoin(coin: .aptos),
+            "sequence_number": "13"
+        ]
+    }
+
     private func signMessage(data: Data, addPrefix: Bool = true) -> Data {
         let message = addPrefix ? Hash.keccak256(data: ethereumMessage(for: data)) : data
         var signed = Self.wallet.getKeyForCoin(coin: .ethereum).sign(digest: message, curve: .secp256k1)!
@@ -655,6 +724,22 @@ extension DAppWebViewController: WKScriptMessageHandler {
     private func ethereumMessage(for data: Data) -> Data {
         let prefix = "\u{19}Ethereum Signed Message:\n\(data.count)".data(using: .utf8)!
         return prefix + data
+    }
+
+    private func aptosSigningInput(params: [String: Any], completion: @escaping ((Result<AptosSigningInput, Error>) -> Void)) {
+        params.postRequest(to: URL(string: "https://fullnode.devnet.aptoslabs.com/v1/transactions/encode_submission")!) { (result: Result<Data, Error>) -> Void in
+            switch result {
+            case .failure(let error):
+                completion(.failure(error))
+            case .success(let data):
+                let input = AptosSigningInput.with {
+                    $0.anyEncoded = String(data: data, encoding: .utf8)!.replacingOccurrences(of: "\"", with: "")
+                    $0.privateKey = Self.wallet.getKeyForCoin(coin: .aptos).data
+                }
+                print(Self.wallet.getKeyForCoin(coin: .aptos).data.hexString)
+                completion(.success(input))
+            }
+        }
     }
 
     private func cosmosSigningInputDirect(params: [String: Any]) -> CosmosSigningInput? {
@@ -819,15 +904,25 @@ extension DAppWebViewController: WKUIDelegate {
 }
 
 extension Dictionary where Key == String {
-    func postRequest(to rpc: URL, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+    func postRequest<T: Any>(to rpc: URL, completion: @escaping (Result<T, Error>) -> Void) {
         do {
             let data = try JSONSerialization.data(withJSONObject: self, options: [])
+            data.postRequest(to: rpc, completion: completion)
+        } catch(let error) {
+            print("error is \(error.localizedDescription)")
+            completion(.failure(error))
+        }
+    }
+}
 
+extension Data {
+    func postRequest<T: Any>(to rpc: URL, contentType: String = "application/json", completion: @escaping (Result<T, Error>) -> Void) {
+        do {
             var request = URLRequest(url: rpc)
             request.httpMethod = "POST"
-            request.httpBody = data
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.httpBody = self
+            request.addValue(contentType, forHTTPHeaderField: "Content-Type")
+            //request.addValue("application/json", forHTTPHeaderField: "Accept")
 
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
@@ -838,7 +933,7 @@ extension Dictionary where Key == String {
 
                 guard
                     let data = data,
-                    let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+                    let result = (try? JSONSerialization.jsonObject(with: data) as? T) ?? data as? T
                 else {
                     return
                 }
