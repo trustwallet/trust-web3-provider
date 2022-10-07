@@ -1,13 +1,16 @@
 package com.trust.web3.demo
 
+import android.graphics.Bitmap
+import android.net.http.SslError
 import android.os.Bundle
+import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        private const val DAPP_URL = "https://js-eth-sign.surge.sh"
+        private const val DAPP_URL = "https://www.magiceden.io/me"
         private const val CHAIN_ID = 56
         private const val RPC_URL = "https://bsc-dataseed2.binance.org"
     }
@@ -32,10 +35,20 @@ class MainActivity : AppCompatActivity() {
             webview.addJavascriptInterface(this, "_tw_")
 
             val webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    super.onPageFinished(view, url)
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
                     view?.evaluateJavascript(provderJs, null)
                     view?.evaluateJavascript(initJs, null)
+                }
+
+                override fun onReceivedSslError(
+                    view: WebView?,
+                    handler: SslErrorHandler?,
+                    error: SslError?
+                ) {
+                    // Ignore SSL certificate errors
+                    handler?.proceed()
+                    println(error.toString())
                 }
             }
             webview.webViewClient = webViewClient
@@ -50,16 +63,22 @@ class MainActivity : AppCompatActivity() {
     private fun loadInitJs(chainId: Int, rpcUrl: String): String {
         val source = """
         (function() {
-            var config = {
-                chainId: $chainId,
-                rpcUrl: "$rpcUrl",
+            var config = {                
+                ethereum: {
+                    chainId: $chainId,
+                    rpcUrl: "$rpcUrl"
+                },
+                solana: {
+                    cluster: "mainnet-beta",
+                },
                 isDebug: true
             };
-            window.ethereum = new trustwallet.Provider(config);
-            window.web3 = new trustwallet.Web3(window.ethereum);
+            trustwallet.ethereum = new trustwallet.Provider(config);
+            trustwallet.solana = new trustwallet.SolanaProvider(config);
             trustwallet.postMessage = (json) => {
                 window._tw_.postMessage(JSON.stringify(json));
             }
+            window.ethereum = trustwallet.ethereum;
         })();
         """
         return  source

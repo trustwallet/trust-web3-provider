@@ -1,0 +1,10 @@
+platform :ios, '13.0'
+
+target 'PodsTest' do
+  use_frameworks!
+  pod 'TrustWeb3Provider', :path => '../../TrustWeb3Provider.podspec'
+
+  target 'PodsTestTests' do
+    inherit! :search_paths
+  end
+end

@@ -43,6 +43,7 @@ node_modules/
 jspm_packages/
 staging/
 .parcel-cache/
+.build/
 
 
 # Android
