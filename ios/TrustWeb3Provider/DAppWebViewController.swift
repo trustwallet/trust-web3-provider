@@ -264,7 +264,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 }
                 handleCosmosSendTransaction(id, mode, raw)
             case .aptos:
-                guard let tx = json["object"] as? [String: Any] else {
+                guard let object = json["object"] as? [String: Any], let tx = object["tx"] as? [String: Any] else {
                     return
                 }
                 handleAptosSendTransaction(tx, id: id)
@@ -690,7 +690,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     private func extractAptosParams(json: [String: Any]) -> [String: Any]? {
-        guard let payload = json["object"] as? [String: Any] else {
+        guard let object = json["object"] as? [String: Any], let payload = json["data"] as? [String: Any] else {
             return nil
         }
 

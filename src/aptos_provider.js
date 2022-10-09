@@ -49,7 +49,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
 
   async signAndSubmitTransaction(tx) {
     const signedTx = await this.signTransaction(tx);
-    const signResponse = await this._request("submitTransaction", JSON.parse(signedTx));
+    const signResponse = await this._request("submitTransaction", { tx: JSON.parse(signedTx) });
     return signResponse;
   }
 
