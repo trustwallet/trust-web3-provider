@@ -54,7 +54,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
   }
 
   signTransaction(tx) {
-    return this._request("signTransaction", tx)
+    return this._request("signTransaction", { data: tx })
       .catch((error) => {
         console.log(`<== Error: ${error}`);
       });
