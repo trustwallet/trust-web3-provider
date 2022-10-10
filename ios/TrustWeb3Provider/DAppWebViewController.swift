@@ -20,7 +20,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://app.animeswap.org/#/?chain=aptos_devnet"
+        return "https://app.enchanter.fi/"
     }
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
@@ -550,9 +550,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
             case .success(let json):
                 if let _ = json["error_code"] as? String, let message = json["message"] as? String {
                     self.webview.tw.send(network: .aptos, error: message, to: id)
+                    return
                 }
-                let data = try! JSONSerialization.data(withJSONObject: json)
-                self.webview.tw.send(network: .aptos, result: data.hexString, to: id)
+                let hash = json["hash"] as! String
+                self.webview.tw.send(network: .aptos, result: hash, to: id)
             }
         }
     }
@@ -700,7 +701,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             "max_gas_amount": "3296766",
             "payload": payload,
             "sender": Self.wallet.getAddressForCoin(coin: .aptos),
-            "sequence_number": "18"
+            "sequence_number": "34"
         ]
     }
 
