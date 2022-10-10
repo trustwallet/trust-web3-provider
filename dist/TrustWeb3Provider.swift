@@ -11,6 +11,7 @@ public struct TrustWeb3Provider {
     public struct Config: Equatable {
         public let ethereum: EthereumConfig
         public let solana: SolanaConfig
+        public let aptos: AptosConfig
 
         public init(
             ethereum: EthereumConfig,
@@ -19,6 +20,7 @@ public struct TrustWeb3Provider {
         ) {
             self.ethereum = ethereum
             self.solana = solana
+            self.aptos = aptos
         }
 
         public struct EthereumConfig: Equatable {
@@ -82,6 +84,9 @@ public struct TrustWeb3Provider {
                 },
                 solana: {
                     cluster: "\(config.solana.cluster)"
+                },
+                aptos: {
+                    network: "\(config.aptos.network)"
                 },
                 isDebug: true
             };

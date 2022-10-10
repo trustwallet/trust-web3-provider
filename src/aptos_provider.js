@@ -16,7 +16,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
     this.providerNetwork = "aptos";
     this.callbacks = new Map();
     this._isConnected = false;
-    this._network = config.network;
+    this._network = config.aptos.network;
     this.isPetra = true;
     this.isMartian = true;
   }
@@ -63,16 +63,16 @@ class TrustAptosWeb3Provider extends BaseProvider {
 
   async signAndSubmitTransaction(tx) {
     const signedTx = await this.signTransaction(tx);
-    return this._request("submitTransaction", { tx: JSON.parse(signedTx) })
+    return this._request("submitTransaction", { tx: signedTx })
       .then((hex) => {
-        return Utils.messageToBuffer(hex).toString();
+        return JSON.parse(Utils.messageToBuffer(hex).toString());
       });
   }
 
   signTransaction(tx) {
     return this._request("signTransaction", { data: tx })
       .then((hex) => {
-        return Utils.messageToBuffer(hex).toString();
+        return JSON.parse(Utils.messageToBuffer(hex).toString());
       });
   }
 
