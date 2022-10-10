@@ -20,7 +20,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://app.animeswap.org/#/swap?chain=aptos_devnet"
+        return "https://app.animeswap.org/#/?chain=aptos_devnet"
     }
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
@@ -186,8 +186,8 @@ extension DAppWebViewController: WKScriptMessageHandler {
                                 let signature = try! JSONSerialization.jsonObject(with: output.json.data(using: .utf8)!) as! [String: Any]
                                 params["signature"] = signature
 
-                                let result = String(data: try! JSONSerialization.data(withJSONObject: params, options: [.withoutEscapingSlashes]), encoding: .utf8)!
-                                webview?.tw.send(network: network, result: result, to: id)
+                                let data = try! JSONSerialization.data(withJSONObject: params, options: [.withoutEscapingSlashes])
+                                webview?.tw.send(network: network, result: data.hexString, to: id)
                             }
                         }
                     }
@@ -552,7 +552,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     self.webview.tw.send(network: .aptos, error: message, to: id)
                 }
                 let data = try! JSONSerialization.data(withJSONObject: json)
-                self.webview.tw.send(network: .aptos, result: String(data: data, encoding: .utf8)!, to: id)
+                self.webview.tw.send(network: .aptos, result: data.hexString, to: id)
             }
         }
     }
@@ -690,7 +690,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     }
 
     private func extractAptosParams(json: [String: Any]) -> [String: Any]? {
-        guard let object = json["object"] as? [String: Any], let payload = json["data"] as? [String: Any] else {
+        guard let object = json["object"] as? [String: Any], let payload = object["data"] as? [String: Any] else {
             return nil
         }
 
@@ -700,7 +700,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             "max_gas_amount": "3296766",
             "payload": payload,
             "sender": Self.wallet.getAddressForCoin(coin: .aptos),
-            "sequence_number": "13"
+            "sequence_number": "18"
         ]
     }
 

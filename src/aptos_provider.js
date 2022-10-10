@@ -16,6 +16,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
     this.providerNetwork = "aptos";
     this.callbacks = new Map();
     this._isConnected = false;
+    this._network = config.network;
     this.isPetra = true;
     this.isMartian = true;
   }
@@ -47,16 +48,31 @@ class TrustAptosWeb3Provider extends BaseProvider {
     });
   }
 
+  network() {
+    return this._network;
+  }
+
+  signMessage(payload) {
+    const buffer = Buffer.from(payload.message);
+    const hex = Utils.bufferToHex(buffer);
+
+    return this._request("signMessage", { data: hex }).then((data) => {
+      return JSON.parse(data);
+    });
+  }
+
   async signAndSubmitTransaction(tx) {
     const signedTx = await this.signTransaction(tx);
-    const signResponse = await this._request("submitTransaction", { tx: JSON.parse(signedTx) });
-    return signResponse;
+    return this._request("submitTransaction", { tx: JSON.parse(signedTx) })
+      .then((hex) => {
+        return Utils.messageToBuffer(hex).toString();
+      });
   }
 
   signTransaction(tx) {
     return this._request("signTransaction", { data: tx })
-      .catch((error) => {
-        console.log(`<== Error: ${error}`);
+      .then((hex) => {
+        return Utils.messageToBuffer(hex).toString();
       });
   }
 
@@ -83,6 +99,8 @@ class TrustAptosWeb3Provider extends BaseProvider {
       switch (method) {
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
+        case "signMessage":
+          return this.postMessage("signMessage", id, payload);
         case "signTransaction":
           return this.postMessage("signTransaction", id, payload);
         case "submitTransaction":
