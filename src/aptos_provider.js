@@ -65,7 +65,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
     const signedTx = await this.signTransaction(tx);
     return this._request("submitTransaction", { tx: signedTx })
       .then((hex) => {
-        return JSON.parse(Utils.messageToBuffer(hex).toString());
+        return { hash: Utils.messageToBuffer(hex).toString() };
       });
   }
 
