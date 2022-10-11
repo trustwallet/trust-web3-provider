@@ -58,11 +58,14 @@ class TrustAptosWeb3Provider extends BaseProvider {
     return this._network;
   }
 
-  signMessage(payload) {
-    var fullMessage = "APTOS"
+  async signMessage(payload) {
+    let prefix = "APTOS";
+    let address = (await this.account()).address;
+
+    var fullMessage = prefix
     let application = window.location.protocol + "//" + window.location.hostname;
-    if (payload.address) {
-      fullMessage += "\naddress: " + this.address;
+    if (payload.address || 1 > 0) {
+      fullMessage += "\naddress: " + address;
     }
     if (payload.application) {
       fullMessage += "\napplication: " + application;
@@ -78,13 +81,13 @@ class TrustAptosWeb3Provider extends BaseProvider {
     return this._request("signMessage", { data: hex })
     .then((hex) => {
       return {
-        address: this.address,
+        address: address,
         application: application,
         chainId: this.chainId,
         fullMessage: fullMessage,
         message: payload.message,
         nonce: payload.nonce,
-        prefix: "APTOS",
+        prefix: prefix,
         signature: Utils.messageToBuffer(hex).toString()
       };
     });
