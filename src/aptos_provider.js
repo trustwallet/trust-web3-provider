@@ -16,9 +16,15 @@ class TrustAptosWeb3Provider extends BaseProvider {
     this.providerNetwork = "aptos";
     this.callbacks = new Map();
     this._isConnected = false;
-    this._network = config.aptos.network;
     this.isPetra = true;
     this.isMartian = true;
+    this.setConfig(config.aptos);
+  }
+
+  setConfig(config) {
+    this._network = config.network;
+    this.address = config.address;
+    this.chainId = config.chainId;
   }
 
   connect() {
@@ -53,11 +59,34 @@ class TrustAptosWeb3Provider extends BaseProvider {
   }
 
   signMessage(payload) {
-    const buffer = Buffer.from(payload.message);
+    var fullMessage = "APTOS"
+    let application = window.location.protocol + "//" + window.location.hostname;
+    if (payload.address) {
+      fullMessage += "\naddress: " + this.address;
+    }
+    if (payload.application) {
+      fullMessage += "\napplication: " + application;
+    }
+    if (payload.chainId) {
+      fullMessage += "\nchainId: " + this.chainId;
+    }
+    fullMessage += "\nmessage: " + payload.message;
+    fullMessage += "\nnonce: " + payload.nonce;
+    const buffer = Buffer.from(fullMessage);
     const hex = Utils.bufferToHex(buffer);
 
-    return this._request("signMessage", { data: hex }).then((data) => {
-      return JSON.parse(data);
+    return this._request("signMessage", { data: hex })
+    .then((hex) => {
+      return {
+        address: this.address,
+        application: application,
+        chainId: this.chainId,
+        fullMessage: fullMessage,
+        message: payload.message,
+        nonce: payload.nonce,
+        prefix: "APTOS",
+        signature: Utils.messageToBuffer(hex).toString()
+      };
     });
   }
 

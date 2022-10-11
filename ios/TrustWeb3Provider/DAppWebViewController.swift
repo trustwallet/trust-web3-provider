@@ -9,12 +9,6 @@ import WebKit
 import WalletCore
 import TrustWeb3Provider
 
-extension TrustWeb3Provider {
-    static func createEthereum(address: String, chainId: Int, rpcUrl: String) -> TrustWeb3Provider {
-        return TrustWeb3Provider(config: .init(ethereum: .init(address: address, chainId: chainId, rpcUrl: rpcUrl)))
-    }
-}
-
 class DAppWebViewController: UIViewController {
 
     @IBOutlet weak var urlField: UITextField!
@@ -25,12 +19,12 @@ class DAppWebViewController: UIViewController {
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
 
-    var current: TrustWeb3Provider = TrustWeb3Provider(config: .init(ethereum: ethereumConfigs[0]))
+    var current: TrustWeb3Provider = TrustWeb3Provider(config: .init(ethereum: ethereumConfigs[0], aptos: aptosConfig))
 
     var providers: [Int: TrustWeb3Provider] = {
         var result = [Int: TrustWeb3Provider]()
         ethereumConfigs.forEach {
-            result[$0.chainId] = TrustWeb3Provider(config: .init(ethereum: $0))
+            result[$0.chainId] = TrustWeb3Provider(config: .init(ethereum: $0, aptos: aptosConfig))
         }
         return result
     }()
@@ -67,6 +61,13 @@ class DAppWebViewController: UIViewController {
             rpcUrl: "https://arb1.arbitrum.io/rpc"
         )
     ]
+    static var aptosConfig: TrustWeb3Provider.Config.AptosConfig {
+        .init(
+            address: wallet.getAddressForCoin(coin: .aptos),
+            network: "Devnet",
+            chainId: 33
+        )
+    }
 
     var cosmosChains = ["osmosis-1", "cosmoshub", "cosmoshub-4", "kava_2222-10", "evmos_9001-2"]
     var currentCosmosChain = "osmosis-1"
@@ -230,12 +231,10 @@ extension DAppWebViewController: WKScriptMessageHandler {
             switch network {
             case .ethereum:
                 handleSignMessage(id: id, data: data, addPrefix: false)
-            case .solana:
-                handleSolanaSignMessage(id: id, data: data)
+            case .solana, .aptos:
+                handleSignMessage(id: id, network: network, data: data)
             case .cosmos:
                 handleCosmosSignMessage(id: id, data: data)
-            case .aptos:
-                return
             }
         case .signPersonalMessage:
             guard let data = extractMessage(json: json) else {
@@ -390,7 +389,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
         present(alert, animated: true, completion: nil)
     }
 
-    func handleSolanaSignMessage(id: Int64, data: Data) {
+    func handleSignMessage(id: Int64, network: ProviderNetwork, data: Data) {
         let alert = UIAlertController(
             title: "Sign Solana Message",
             message: String(data: data, encoding: .utf8) ?? data.hexString,
@@ -400,8 +399,9 @@ extension DAppWebViewController: WKScriptMessageHandler {
             webview?.tw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
-            let signed = Self.wallet.getKeyForCoin(coin: .solana).sign(digest: data, curve: .ed25519)!
-            webview?.tw.send(network: .solana, result: "0x" + signed.hexString, to: id)
+            let coin: CoinType = network == .solana ? .solana : .aptos
+            let signed = Self.wallet.getKeyForCoin(coin: coin).sign(digest: data, curve: .ed25519)!
+            webview?.tw.send(network: network, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -468,7 +468,16 @@ extension DAppWebViewController: WKScriptMessageHandler {
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
-            self.providers[chainId] = TrustWeb3Provider.createEthereum(address: self.current.config.ethereum.address, chainId: chainId, rpcUrl: rpcUrls[0])
+            self.providers[chainId] = TrustWeb3Provider(
+                config: .init(
+                    ethereum: .init(
+                        address: self.current.config.ethereum.address,
+                        chainId: chainId,
+                        rpcUrl: rpcUrls[0]
+                    ),
+                    aptos: Self.aptosConfig
+                )
+            )
             print("\(name) added")
             self.webview.tw.sendNull(network: .ethereum, id: id)
         }))
@@ -500,10 +509,15 @@ extension DAppWebViewController: WKScriptMessageHandler {
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
                 self.current = provider
-                let provider = TrustWeb3Provider.createEthereum(
-                    address: switchToConfig.address,
-                    chainId: switchToConfig.chainId,
-                    rpcUrl: switchToConfig.rpcUrl
+                let provider = TrustWeb3Provider(
+                    config: .init(
+                        ethereum: .init(
+                            address: switchToConfig.address,
+                            chainId: switchToConfig.chainId,
+                            rpcUrl: switchToConfig.rpcUrl
+                        ),
+                        aptos: Self.aptosConfig
+                    )
                 )
                 self.webview.tw.set(config: provider.config)
                 self.webview.tw.emitChange(chainId: chainId)
