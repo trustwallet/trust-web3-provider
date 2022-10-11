@@ -20,7 +20,7 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://bluemove.net/"
+        return "https://app.animeswap.org/#/?chain=aptos_devnet"
     }
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
@@ -736,7 +736,6 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     $0.anyEncoded = String(data: data, encoding: .utf8)!.replacingOccurrences(of: "\"", with: "")
                     $0.privateKey = Self.wallet.getKeyForCoin(coin: .aptos).data
                 }
-                print(Self.wallet.getKeyForCoin(coin: .aptos).data.hexString)
                 completion(.success(input))
             }
         }
@@ -917,34 +916,28 @@ extension Dictionary where Key == String {
 
 extension Data {
     func postRequest<T: Any>(to rpc: URL, contentType: String = "application/json", completion: @escaping (Result<T, Error>) -> Void) {
-        do {
-            var request = URLRequest(url: rpc)
-            request.httpMethod = "POST"
-            request.httpBody = self
-            request.addValue(contentType, forHTTPHeaderField: "Content-Type")
-            //request.addValue("application/json", forHTTPHeaderField: "Accept")
+        var request = URLRequest(url: rpc)
+        request.httpMethod = "POST"
+        request.httpBody = self
+        request.addValue(contentType, forHTTPHeaderField: "Content-Type")
 
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("error is \(error.localizedDescription)")
-                    completion(.failure(error))
-                    return
-                }
-
-                guard
-                    let data = data,
-                    let result = (try? JSONSerialization.jsonObject(with: data) as? T) ?? data as? T
-                else {
-                    return
-                }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("error is \(error.localizedDescription)")
+                completion(.failure(error))
+                return
             }
-            task.resume()
-        } catch(let error) {
-            print("error is \(error.localizedDescription)")
-            completion(.failure(error))
+
+            guard
+                let data = data,
+                let result = (try? JSONSerialization.jsonObject(with: data) as? T) ?? data as? T
+            else {
+                return
+            }
+            DispatchQueue.main.async {
+                completion(.success(result))
+            }
         }
+        task.resume()
     }
 }

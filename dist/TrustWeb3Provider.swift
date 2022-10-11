@@ -90,8 +90,7 @@ public struct TrustWeb3Provider {
                 aptos: {
                     network: "\(config.aptos.network)",
                     chainId: "\(config.aptos.chainId)"
-                },
-                isDebug: true
+                }
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);

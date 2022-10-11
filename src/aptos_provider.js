@@ -79,7 +79,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
     const hex = Utils.bufferToHex(buffer);
 
     return this._request("signMessage", { data: hex })
-    .then((hex) => {
+    .then((signature) => {
       return {
         address: address,
         application: application,
@@ -88,7 +88,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
         message: payload.message,
         nonce: payload.nonce,
         prefix: prefix,
-        signature: Utils.messageToBuffer(hex).toString()
+        signature: signature
       };
     });
   }
