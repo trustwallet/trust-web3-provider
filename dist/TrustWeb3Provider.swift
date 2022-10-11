@@ -16,7 +16,7 @@ public struct TrustWeb3Provider {
         public init(
             ethereum: EthereumConfig,
             solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta"),
-            aptos: AptosConfig = AptosConfig(network: "Devnet", chainId: 33)
+            aptos: AptosConfig = AptosConfig(network: "Devnet", chainId: "33")
         ) {
             self.ethereum = ethereum
             self.solana = solana
@@ -45,9 +45,9 @@ public struct TrustWeb3Provider {
 
         public struct AptosConfig: Equatable {
             public let network: String
-            public let chainId: Int
+            public let chainId: String
 
-            public init(network: String, chainId: Int) {
+            public init(network: String, chainId: String) {
                 self.network = network
                 self.chainId = chainId
             }
