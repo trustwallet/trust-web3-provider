@@ -64,7 +64,7 @@ class TrustAptosWeb3Provider extends BaseProvider {
 
     var fullMessage = prefix
     let application = window.location.protocol + "//" + window.location.hostname;
-    if (payload.address || 1 > 0) {
+    if (payload.address) {
       fullMessage += "\naddress: " + address;
     }
     if (payload.application) {
