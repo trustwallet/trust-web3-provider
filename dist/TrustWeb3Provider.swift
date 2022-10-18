@@ -16,7 +16,7 @@ public struct TrustWeb3Provider {
         public init(
             ethereum: EthereumConfig,
             solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta"),
-            aptos: AptosConfig = AptosConfig(network: "Devnet", chainId: "33")
+            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1")
         ) {
             self.ethereum = ethereum
             self.solana = solana
