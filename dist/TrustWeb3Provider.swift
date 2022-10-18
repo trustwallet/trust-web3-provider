@@ -11,10 +11,16 @@ public struct TrustWeb3Provider {
     public struct Config: Equatable {
         public let ethereum: EthereumConfig
         public let solana: SolanaConfig
+        public let aptos: AptosConfig
 
-        public init(ethereum: EthereumConfig, solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta")) {
+        public init(
+            ethereum: EthereumConfig,
+            solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta"),
+            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1")
+        ) {
             self.ethereum = ethereum
             self.solana = solana
+            self.aptos = aptos
         }
 
         public struct EthereumConfig: Equatable {
@@ -34,6 +40,16 @@ public struct TrustWeb3Provider {
 
             public init(cluster: String) {
                 self.cluster = cluster
+            }
+        }
+
+        public struct AptosConfig: Equatable {
+            public let network: String
+            public let chainId: String
+
+            public init(network: String, chainId: String) {
+                self.network = network
+                self.chainId = chainId
             }
         }
     }
@@ -70,12 +86,17 @@ public struct TrustWeb3Provider {
                 },
                 solana: {
                     cluster: "\(config.solana.cluster)"
+                },
+                aptos: {
+                    network: "\(config.aptos.network)",
+                    chainId: "\(config.aptos.chainId)"
                 }
             };
 
             trustwallet.ethereum = new trustwallet.Provider(config);
             trustwallet.solana = new trustwallet.SolanaProvider(config);
             trustwallet.cosmos = new trustwallet.CosmosProvider(config);
+            trustwallet.aptos = new trustwallet.AptosProvider(config);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
@@ -83,6 +104,8 @@ public struct TrustWeb3Provider {
 
             window.ethereum = trustwallet.ethereum;
             window.keplr = trustwallet.cosmos;
+            window.aptos = trustwallet.aptos;
+            window.martian = trustwallet.aptos;
 
             const getDefaultCosmosProvider = (chainId) => {
                 return trustwallet.cosmos.getOfflineSigner(chainId);
