@@ -105,7 +105,6 @@ public struct TrustWeb3Provider {
             window.ethereum = trustwallet.ethereum;
             window.keplr = trustwallet.cosmos;
             window.aptos = trustwallet.aptos;
-            window.martian = trustwallet.aptos;
 
             const getDefaultCosmosProvider = (chainId) => {
                 return trustwallet.cosmos.getOfflineSigner(chainId);

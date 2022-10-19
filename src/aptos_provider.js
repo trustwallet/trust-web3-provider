@@ -17,7 +17,6 @@ class TrustAptosWeb3Provider extends BaseProvider {
     this.callbacks = new Map();
     this._isConnected = false;
     this.isPetra = true;
-    this.isMartian = true;
     this.setConfig(config.aptos);
   }
 
