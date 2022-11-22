@@ -11,7 +11,7 @@ import ProviderRpcError from "./error";
 import Utils from "./utils";
 import IdMapping from "./id_mapping";
 import isUtf8 from "isutf8";
-import { TypedDataUtils, SignTypedDataVersion } from "@metamask/eth-sig-util";
+import { TypedDataUtils, SignTypedDataVersion, typedSignatureHash } from "@metamask/eth-sig-util";
 import BaseProvider from "./base_provider";
 
 class TrustWeb3Provider extends BaseProvider {
@@ -171,9 +171,10 @@ class TrustWeb3Provider extends BaseProvider {
           return this.personal_sign(payload);
         case "personal_ecRecover":
           return this.personal_ecRecover(payload);
+        case "eth_signTypedData":
+          return this.eth_signTypedData_legacy(payload);
         case "eth_signTypedData_v3":
           return this.eth_signTypedData(payload, SignTypedDataVersion.V3);
-        case "eth_signTypedData":
         case "eth_signTypedData_v4":
           return this.eth_signTypedData(payload, SignTypedDataVersion.V4);
         case "eth_sendTransaction":
@@ -269,6 +270,15 @@ class TrustWeb3Provider extends BaseProvider {
     this.postMessage("ecRecover", payload.id, {
       signature: payload.params[1],
       message: payload.params[0],
+    });
+  }
+
+  eth_signTypedData_legacy(payload) {
+    const message = payload.params[0];
+    const hash = typedSignatureHash(message);
+    this.postMessage("signTypedMessage", payload.id, {
+      data: hash,
+      raw: payload.params[0],
     });
   }
 
