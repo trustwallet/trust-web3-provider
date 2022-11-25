@@ -254,7 +254,12 @@ class TrustWeb3Provider extends BaseProvider {
   }
 
   personal_sign(payload) {
-    const message = payload.params[0];
+    var message;
+    if (this.address === payload.params[0]) {
+      message = payload.params[1];
+    } else {
+      message = payload.params[0];
+    }
     const buffer = Utils.messageToBuffer(message);
     if (buffer.length === 0) {
       // hex it
