@@ -16,7 +16,6 @@ class TrustAptosWeb3Provider extends BaseProvider {
     this.providerNetwork = "aptos";
     this.callbacks = new Map();
     this._isConnected = false;
-    this.isPetra = true;
     this.setConfig(config.aptos);
   }
 
