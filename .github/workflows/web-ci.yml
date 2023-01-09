@@ -1,0 +1,28 @@
+name: Web CI
+
+on:
+  workflow_dispatch:
+  inputs:
+    version:
+      default: "1.0.0"
+      description: New version number
+      required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
+      - name: npm install, build & publish
+        run: |
+          npm install
+          npm build
+          npm version ${{ github.event.inputs.version }}
+          npm run publish-package
+        working-directory: src
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
