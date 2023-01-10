@@ -1,5 +1,5 @@
 {
-  "name": "@trustwallet/trust-web3-provider",
+  "name": "@trustwallet/web3-provider",
   "version": "1.0.0",
   "description": "Trust Web3 Provider",
   "main": "dist/trust-min.js",
