@@ -1,0 +1,34 @@
+name: Web CI
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      version:
+        default: "1.0.0"
+        description: New version number
+        required: false
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
+      - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: npm install, build & publish
+        run: |
+          npm install
+          npm build
+          npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+          npm run publish-package
+        working-directory: src
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

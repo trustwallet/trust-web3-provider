@@ -1,7 +1,11 @@
 {
-  "name": "trust-web3-provider",
+  "name": "@trustwallet/web3-provider",
   "version": "1.0.0",
   "description": "Trust Web3 Provider",
+  "main": "dist/trust-min.js",
+  "files": [
+    "dist/trust-min.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/TrustWallet/trust-web3-provider.git"
@@ -11,6 +15,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js",
+    "publish-package": "mkdir -p dist && cp ../dist/trust-min.js ./dist/trust-min.js && npm publish",
     "lint": "eslint . --fix",
     "test": "jest",
     "lfs-fix": "git rm --cached --force ../dist/trust-min.js && git add ../dist/trust-min.js"
