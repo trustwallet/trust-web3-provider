@@ -13,20 +13,21 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
         with:
-          node-version: "14"
+          node-version: "14.x"
           registry-url: "https://registry.npmjs.org"
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: npm install, build & publish
         run: |
+          npm install web3
           npm install
-          npm build
+          npm run build
           npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           npm run publish-package
         working-directory: src
