@@ -173,9 +173,10 @@ class TrustWeb3Provider extends BaseProvider {
           return this.personal_ecRecover(payload);
         case "eth_signTypedData_v3":
           return this.eth_signTypedData(payload, SignTypedDataVersion.V3);
-        case "eth_signTypedData":
         case "eth_signTypedData_v4":
           return this.eth_signTypedData(payload, SignTypedDataVersion.V4);
+        case "eth_signTypedData":
+          return this.eth_signTypedData(payload, SignTypedDataVersion.V1);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
@@ -244,29 +245,44 @@ class TrustWeb3Provider extends BaseProvider {
   }
 
   eth_sign(payload) {
-    const buffer = Utils.messageToBuffer(payload.params[1]);
+    const [address, message] = payload.params;
+    const buffer = Utils.messageToBuffer(message);
     const hex = Utils.bufferToHex(buffer);
+
     if (isUtf8(buffer)) {
-      this.postMessage("signPersonalMessage", payload.id, { data: hex });
+      this.postMessage("signPersonalMessage", payload.id, {
+        data: hex,
+        address,
+      });
     } else {
-      this.postMessage("signMessage", payload.id, { data: hex });
+      this.postMessage("signMessage", payload.id, { data: hex, address });
     }
   }
 
   personal_sign(payload) {
     var message;
+    let address;
+
     if (this.address === payload.params[0]) {
       message = payload.params[1];
+      address = payload.params[0];
     } else {
       message = payload.params[0];
+      address = payload.params[1];
     }
     const buffer = Utils.messageToBuffer(message);
     if (buffer.length === 0) {
       // hex it
       const hex = Utils.bufferToHex(message);
-      this.postMessage("signPersonalMessage", payload.id, { data: hex });
+      this.postMessage("signPersonalMessage", payload.id, {
+        data: hex,
+        address,
+      });
     } else {
-      this.postMessage("signPersonalMessage", payload.id, { data: message });
+      this.postMessage("signPersonalMessage", payload.id, {
+        data: message,
+        address,
+      });
     }
   }
 
@@ -278,11 +294,29 @@ class TrustWeb3Provider extends BaseProvider {
   }
 
   eth_signTypedData(payload, version) {
-    const message = JSON.parse(payload.params[1]);
-    const hash = TypedDataUtils.eip712Hash(message, version);
+    let address;
+    let data;
+
+    if (this.address === payload.params[0]) {
+      data = payload.params[1];
+      address = payload.params[0];
+    } else {
+      data = payload.params[0];
+      address = payload.params[1];
+    }
+
+    const message = typeof data === "string" ? JSON.parse(data) : data;
+
+    const hash =
+      version !== SignTypedDataVersion.V1
+        ? TypedDataUtils.eip712Hash(message, version)
+        : "";
+
     this.postMessage("signTypedMessage", payload.id, {
       data: "0x" + hash.toString("hex"),
-      raw: payload.params[1],
+      raw: typeof data === "string" ? data : JSON.stringify(data),
+      address,
+      version,
     });
   }
 
