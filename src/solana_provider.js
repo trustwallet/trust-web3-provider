@@ -86,6 +86,35 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     return Promise.all(txs.map((tx) => this.signTransaction(tx)));
   }
 
+  signAllTransactionsV2(txs) {
+    return this._request("signRawTransactionMulti", {
+      transactions: txs.map((tx) => ({
+        data: JSON.stringify(tx),
+        raw: bs58.encode(tx.serializeMessage()),
+      })),
+    })
+      .then((signatureEncoded) => {
+        return signatureEncoded.map((tx) => {
+          const signature = bs58.decode(signatureEncoded);
+
+          tx.addSignature(this.publicKey, signature);
+
+          if (!tx.verifySignatures()) {
+            throw new ProviderRpcError(4300, "Invalid signature");
+          }
+
+          if (this.isDebug) {
+            console.log(`==> signed single ${JSON.stringify(tx)}`);
+          }
+
+          return tx;
+        });
+      })
+      .catch((error) => {
+        console.log(`<== Error: ${error}`);
+      });
+  }
+
   signAndSendTransaction(tx, options) {
     if (this.isDebug) {
       console.log(
@@ -127,6 +156,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         case "signMessage":
           return this.postMessage("signMessage", id, payload);
         case "signRawTransaction":
+        case "signRawTransactionMulti":
           return this.postMessage("signRawTransaction", id, payload);
         case "requestAccounts":
           return this.postMessage("requestAccounts", id, {});
