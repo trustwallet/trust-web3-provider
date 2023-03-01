@@ -62,19 +62,26 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   signTransaction(tx) {
-    return this._request("signRawTransaction", {
-      data: JSON.stringify(tx),
-      raw: bs58.encode(tx.serializeMessage()),
-    })
+    const data = JSON.stringify(tx);
+    const version = typeof tx.version !== "number" ? "legacy" : tx.version;
+
+    const raw = bs58.encode(
+      version === "legacy" ? tx.serializeMessage() : tx.serialize()
+    );
+
+    return this._request("signRawTransaction", { data, raw, version })
       .then((signatureEncoded) => {
         const signature = bs58.decode(signatureEncoded);
         tx.addSignature(this.publicKey, signature);
-        if (!tx.verifySignatures()) {
+
+        if (version === "legacy" && !tx.verifySignatures()) {
           throw new ProviderRpcError(4300, "Invalid signature");
         }
+
         if (this.isDebug) {
           console.log(`==> signed single ${JSON.stringify(tx)}`);
         }
+
         return tx;
       })
       .catch((error) => {
