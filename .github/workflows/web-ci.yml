@@ -45,15 +45,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: 18
-            registry-url: 'https://npm.pkg.github.com'
-            scope: '@trustwallet'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@trustwallet'
 
       - name: Set output
-          id: vars
-          run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
       - name: Build Project
         working-directory: src
