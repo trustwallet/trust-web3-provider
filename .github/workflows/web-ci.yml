@@ -11,8 +11,11 @@ on:
         description: New version number
         required: false
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
-  release:
+  npm-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -29,7 +32,44 @@ jobs:
           npm install
           npm run build
           npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
-          npm run publish-package
+          npm run publish-npm-package
         working-directory: src
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+  github-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+    - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@trustwallet'
+
+    - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+
+    - name: Build Project
+      working-directory: src
+      run: |
+        npm i
+        npm run build
+        npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+        npm run prepare-publish
+
+    - name: Publish
+      working-directory: src
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npm publish
+
+permissions:
+  actions: write
+  contents: write
+  deployments: write
+  packages: write
+
