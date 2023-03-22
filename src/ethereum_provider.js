@@ -263,7 +263,7 @@ class TrustWeb3Provider extends BaseProvider {
     var message;
     let address;
 
-    if (this.address === payload.params[0]) {
+    if (this.address === payload.params[0].toLowerCase()) {
       message = payload.params[1];
       address = payload.params[0];
     } else {
@@ -297,7 +297,7 @@ class TrustWeb3Provider extends BaseProvider {
     let address;
     let data;
 
-    if (this.address === payload.params[0]) {
+    if (this.address === payload.params[0].toLowerCase()) {
       data = payload.params[1];
       address = payload.params[0];
     } else {
