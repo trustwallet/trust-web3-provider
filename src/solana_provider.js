@@ -36,9 +36,9 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         this.setAddress(addresses[0]);
         this.emit("connect");
 
-          resolve({
-              publicKey: addresses[0]
-          })
+        resolve({
+          publicKey: addresses[0]
+        })
       })
     })
   }
