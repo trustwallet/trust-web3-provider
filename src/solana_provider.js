@@ -29,9 +29,12 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   connect() {
-    return new Promise(function (resolve) {
 
-      this._request("requestAccounts").then(function (addresses) {
+    return new Promise(async (resolve, reject) => {
+
+      try {
+
+        var addresses = await this._request("requestAccounts")
 
         this.setAddress(addresses[0]);
         this.emit("connect");
@@ -39,7 +42,10 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         resolve({
           publicKey: addresses[0]
         })
-      })
+      } catch (err) {
+
+        reject(err);
+      }
     })
   }
 
