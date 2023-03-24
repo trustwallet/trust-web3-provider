@@ -177,6 +177,8 @@ class TrustWeb3Provider extends BaseProvider {
           return this.eth_signTypedData(payload, SignTypedDataVersion.V4);
         case "eth_signTypedData":
           return this.eth_signTypedData(payload, SignTypedDataVersion.V1);
+        case "eth_estimateGas":
+          return this.eth_estimateGas(payload);
         case "eth_sendTransaction":
           return this.eth_sendTransaction(payload);
         case "eth_requestAccounts":
@@ -326,6 +328,10 @@ class TrustWeb3Provider extends BaseProvider {
       address,
       version,
     });
+  }
+
+  eth_estimateGas(payload) {
+    this.postMessage("estimateGas", payload.id, {});
   }
 
   eth_sendTransaction(payload) {
