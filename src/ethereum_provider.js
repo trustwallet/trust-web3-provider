@@ -228,6 +228,10 @@ class TrustWeb3Provider extends BaseProvider {
     this.emit("networkChanged", chainId);
   }
 
+  emitAccountChanged(address) {
+    this.emit("accountsChanged", [address]);
+  }
+
   eth_accounts() {
     return this.address ? [this.address] : [];
   }
