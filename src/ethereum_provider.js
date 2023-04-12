@@ -224,7 +224,7 @@ class TrustWeb3Provider extends BaseProvider {
   }
 
   emitChainChanged(chainId) {
-    this.emit("chainChanged", chainId);
+    this.emit("chainChanged", "0x" + chainId.toString(16));
     this.emit("networkChanged", chainId);
   }
 
