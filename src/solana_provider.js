@@ -49,8 +49,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     this.isConnected = true;
   }
 
-  emitAccountChanged(address) {
-
+  emitAccountChanged() {
     this.emit("accountChanged", this.publicKey);
   }
 
