@@ -87,7 +87,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     const version = typeof tx.version !== "number" ? "legacy" : tx.version;
 
     const raw = bs58.encode(
-      version === "legacy" ? tx.serializeMessage() : tx.serialize()
+      version === "legacy" ? tx.serializeMessage() : version === 0 ? tx.message.serialize() : tx.serialize()
     );
 
     return this._request("signRawTransaction", { data, raw, version })
@@ -110,7 +110,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         const version = typeof tx.version !== "number" ? "legacy" : tx.version;
 
         const raw = bs58.encode(
-          version === "legacy" ? tx.serializeMessage() : tx.serialize()
+          version === "legacy" ? tx.serializeMessage() : version === 0 ? tx.message.serialize() : tx.serialize()
         );
 
         return { data, raw, version };
