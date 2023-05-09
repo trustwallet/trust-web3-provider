@@ -12,26 +12,26 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
-		BB30EB5127A8FFF300306DD0 /* TrustWeb3Provider in Frameworks */ = {isa = PBXBuildFile; productRef = BB30EB5027A8FFF300306DD0 /* TrustWeb3Provider */; };
 		BB544C0721B2381C00E8C525 /* DAppMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0621B2381C00E8C525 /* DAppMethod.swift */; };
 		BB544C0921B2402900E8C525 /* WKScriptMessage+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */; };
 		BBC0FD5A27A13A6E00DD4612 /* WalletCore in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5927A13A6E00DD4612 /* WalletCore */; };
 		BBC0FD5C27A13A9700DD4612 /* SwiftProtobuf in Frameworks */ = {isa = PBXBuildFile; productRef = BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */; };
+		DA6C850E2A0A396500F4B967 /* PlasmaWeb3Provider in Frameworks */ = {isa = PBXBuildFile; productRef = DA6C850D2A0A396500F4B967 /* PlasmaWeb3Provider */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		607FACD01AFB9204008FA782 /* TrustWeb3Provider_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrustWeb3Provider_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		607FACD01AFB9204008FA782 /* PlasmaWeb3Provider_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlasmaWeb3Provider_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		607FACD71AFB9204008FA782 /* DAppWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppWebViewController.swift; sourceTree = "<group>"; };
 		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		BB30EB4F27A8FFB400306DD0 /* TrustWeb3Provider */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TrustWeb3Provider; path = ..; sourceTree = "<group>"; };
 		BB544C0221B2124500E8C525 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		BB544C0621B2381C00E8C525 /* DAppMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppMethod.swift; sourceTree = "<group>"; };
 		BB544C0821B2402900E8C525 /* WKScriptMessage+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKScriptMessage+JSON.swift"; sourceTree = "<group>"; };
 		BBF13EF127A112EA00AB8211 /* WalletCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = WalletCore; path = Packages/WalletCore; sourceTree = "<group>"; };
+		DA6C850C2A0A372400F4B967 /* web3-provider */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "web3-provider"; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,8 +40,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBC0FD5A27A13A6E00DD4612 /* WalletCore in Frameworks */,
-				BB30EB5127A8FFF300306DD0 /* TrustWeb3Provider in Frameworks */,
 				BBC0FD5C27A13A9700DD4612 /* SwiftProtobuf in Frameworks */,
+				DA6C850E2A0A396500F4B967 /* PlasmaWeb3Provider in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +62,7 @@
 		607FACD11AFB9204008FA782 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				607FACD01AFB9204008FA782 /* TrustWeb3Provider_Example.app */,
+				607FACD01AFB9204008FA782 /* PlasmaWeb3Provider_Example.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -80,7 +80,7 @@
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
 			name = Example;
-			path = TrustWeb3Provider;
+			path = PlasmaWeb3Provider;
 			sourceTree = "<group>";
 		};
 		607FACD31AFB9204008FA782 /* Supporting Files */ = {
@@ -95,7 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				BBF13EF127A112EA00AB8211 /* WalletCore */,
-				BB30EB4F27A8FFB400306DD0 /* TrustWeb3Provider */,
+				DA6C850C2A0A372400F4B967 /* web3-provider */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -110,9 +110,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		607FACCF1AFB9204008FA782 /* TrustWeb3Provider_Example */ = {
+		607FACCF1AFB9204008FA782 /* PlasmaWeb3Provider_Example */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TrustWeb3Provider_Example" */;
+			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "PlasmaWeb3Provider_Example" */;
 			buildPhases = (
 				607FACCC1AFB9204008FA782 /* Sources */,
 				607FACCD1AFB9204008FA782 /* Frameworks */,
@@ -122,14 +122,14 @@
 			);
 			dependencies = (
 			);
-			name = TrustWeb3Provider_Example;
+			name = PlasmaWeb3Provider_Example;
 			packageProductDependencies = (
 				BBC0FD5927A13A6E00DD4612 /* WalletCore */,
 				BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */,
-				BB30EB5027A8FFF300306DD0 /* TrustWeb3Provider */,
+				DA6C850D2A0A396500F4B967 /* PlasmaWeb3Provider */,
 			);
 			productName = TrustWeb3Provider;
-			productReference = 607FACD01AFB9204008FA782 /* TrustWeb3Provider_Example.app */;
+			productReference = 607FACD01AFB9204008FA782 /* PlasmaWeb3Provider_Example.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -148,7 +148,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "TrustWeb3Provider" */;
+			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "PlasmaWeb3Provider" */;
 			compatibilityVersion = "Xcode 11.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -161,7 +161,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				607FACCF1AFB9204008FA782 /* TrustWeb3Provider_Example */,
+				607FACCF1AFB9204008FA782 /* PlasmaWeb3Provider_Example */,
 			);
 		};
 /* End PBXProject section */
@@ -358,7 +358,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "TrustWeb3Provider" */ = {
+		607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "PlasmaWeb3Provider" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				607FACED1AFB9204008FA782 /* Debug */,
@@ -367,7 +367,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TrustWeb3Provider_Example" */ = {
+		607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "PlasmaWeb3Provider_Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				607FACF01AFB9204008FA782 /* Debug */,
@@ -379,10 +379,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		BB30EB5027A8FFF300306DD0 /* TrustWeb3Provider */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TrustWeb3Provider;
-		};
 		BBC0FD5927A13A6E00DD4612 /* WalletCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = WalletCore;
@@ -390,6 +386,10 @@
 		BBC0FD5B27A13A9700DD4612 /* SwiftProtobuf */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftProtobuf;
+		};
+		DA6C850D2A0A396500F4B967 /* PlasmaWeb3Provider */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PlasmaWeb3Provider;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

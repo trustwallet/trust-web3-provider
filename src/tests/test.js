@@ -1,16 +1,10 @@
-// Copyright © 2017-2020 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 "use strict";
 
 require("../index");
 require("whatwg-fetch");
 const ethUtil = require("ethereumjs-util");
 const Web3 = require("web3");
-const trustwallet = window.trustwallet;
+const plasmawallet = window.plasmawallet;
 
 const mainnet = {
   address: "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F",
@@ -30,15 +24,15 @@ const bsc = {
   rpcUrl: "https://bsc-dataseed1.binance.org",
 };
 
-describe("TrustWeb3Provider constructor tests", () => {
+describe("PlasmaWeb3Provider constructor tests", () => {
   test("test constructor.name", () => {
     const provider = new trustwallet.Provider({ ethereum: {} });
     const web3 = new Web3(provider);
-    expect(web3.currentProvider.constructor.name).toBe("TrustWeb3Provider");
+    expect(web3.currentProvider.constructor.name).toBe("PlasmaWeb3Provider");
   });
 
   test("test Ethereum setAddress", () => {
-    const provider = new trustwallet.Provider({
+    const provider = new plasmawallet.Provider({
       ethereum: {
         chainId: 1,
         rpcUrl: "",
@@ -55,7 +49,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test Solana setAddress", () => {
-    const provider = new trustwallet.SolanaProvider({
+    const provider = new plasmawallet.SolanaProvider({
       solana: {
         cluster: "mainnet-beta",
         isPhantom: false,
@@ -64,7 +58,7 @@ describe("TrustWeb3Provider constructor tests", () => {
     });
     expect(provider.publicKey).toBe(null);
     expect(provider.isDebug).toBeTruthy();
-    expect(provider.isTrust).toBeTruthy();
+    expect(provider.isPlasma).toBeTruthy();
     expect(provider.isPhantom).toBeFalsy();
 
     expect(provider.connection.rpcEndpoint).toEqual(
@@ -81,7 +75,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test setConfig", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: ropsten });
+    const provider = new plasmawallet.Provider({ ethereum: ropsten });
     const web3 = new Web3(provider);
 
     expect(web3.currentProvider.chainId).toEqual("0x3");
@@ -102,7 +96,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_chainId", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: bsc });
+    const provider = new plasmawallet.Provider({ ethereum: bsc });
     const web3 = new Web3(provider);
 
     let request = { jsonrpc: "2.0", method: "eth_chainId", id: 123 };
@@ -121,7 +115,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_accounts", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: mainnet });
+    const provider = new plasmawallet.Provider({ ethereum: mainnet });
     const web3 = new Web3(provider);
     const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
 
@@ -164,11 +158,11 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test personal_sign", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: bsc });
+    const provider = new plasmawallet.Provider({ ethereum: bsc });
     const signed =
       "0xf3a9e21a3238b025b7edf5013876548cfb2f2a838aca573de88c91ea9aecf7190cd6330a0172bd5d106841647831f30065f644eddc2f86091e1bb370c9ff833f1c";
 
-    trustwallet.postMessage = (message) => {
+      plasmawallet.postMessage = (message) => {
       const buffer = Buffer.from(message.object.data);
       if (buffer.length === 0) {
         throw new Error("message is not hex!");
@@ -194,11 +188,11 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test eth_signTypedData_v4", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: mainnet });
+    const provider = new plasmawallet.Provider({ ethereum: mainnet });
     const signed =
       "0x7aff0e37900fc2eb5e78c56b07246a0904b3ba642cab17917d7524110b83fe04296790ff076a7dd31b2a11ded9fcbe3959fe872b7c18fa79f5146807855fcce41b";
 
-    trustwallet.postMessage = (message) => {
+      plasmawallet.postMessage = (message) => {
       provider.sendResponse(message.id, signed);
     };
 
@@ -211,7 +205,7 @@ describe("TrustWeb3Provider constructor tests", () => {
   });
 
   test("test batched sendAsync", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: bsc });
+    const provider = new plasmawallet.Provider({ ethereum: bsc });
     const web3 = new Web3(provider);
     const request = [
       {

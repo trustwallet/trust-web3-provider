@@ -1,13 +1,7 @@
-// Copyright © 2017-2022 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 import Foundation
 import WebKit
 
-public struct TrustWeb3Provider {
+public struct PlasmaWeb3Provider {
     public struct Config: Equatable {
         public let ethereum: EthereumConfig
         public let solana: SolanaConfig
@@ -55,14 +49,14 @@ public struct TrustWeb3Provider {
     }
 
     private class dummy {}
-    private let filename = "trust-min"    
-    public static let scriptHandlerName = "_tw_"
+    private let filename = "plasma-min"    
+    public static let scriptHandlerName = "_pw_"
     public let config: Config
 
     public var providerJsUrl: URL {
 #if COCOAPODS
         let bundle = Bundle(for: TrustWeb3Provider.dummy.self)
-        let bundleURL = bundle.resourceURL?.appendingPathComponent("TrustWeb3Provider.bundle")
+        let bundleURL = bundle.resourceURL?.appendingPathComponent("PlasmaWeb3Provider.bundle")
         let resourceBundle = Bundle(url: bundleURL!)!
         return resourceBundle.url(forResource: filename, withExtension: "js")!
 #else
@@ -93,21 +87,21 @@ public struct TrustWeb3Provider {
                 }
             };
 
-            trustwallet.ethereum = new trustwallet.Provider(config);
-            trustwallet.solana = new trustwallet.SolanaProvider(config);
-            trustwallet.cosmos = new trustwallet.CosmosProvider(config);
-            trustwallet.aptos = new trustwallet.AptosProvider(config);
+            plasmawallet.ethereum = new plasmawallet.Provider(config);
+            plasmawallet.solana = new plasmawallet.SolanaProvider(config);
+            plasmawallet.cosmos = new plasmawallet.CosmosProvider(config);
+            plasmawallet.aptos = new plasmawallet.AptosProvider(config);
 
-            trustwallet.postMessage = (jsonString) => {
-                webkit.messageHandlers._tw_.postMessage(jsonString)
+            plasmawallet.postMessage = (jsonString) => {
+                webkit.messageHandlers._pw_.postMessage(jsonString)
             };
 
-            window.ethereum = trustwallet.ethereum;
-            window.keplr = trustwallet.cosmos;
-            window.aptos = trustwallet.aptos;
+            window.ethereum = plasmawallet.ethereum;
+            window.keplr = plasmawallet.cosmos;
+            window.aptos = plasmawallet.aptos;
 
             const getDefaultCosmosProvider = (chainId) => {
-                return trustwallet.cosmos.getOfflineSigner(chainId);
+                return plasmawallet.cosmos.getOfflineSigner(chainId);
             }
 
             window.getOfflineSigner = getDefaultCosmosProvider;

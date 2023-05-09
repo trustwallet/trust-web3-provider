@@ -29,7 +29,7 @@ class PlasmaWeb3Provider extends BaseProvider {
     try {
       for (var i = 0; i < window.frames.length; i++) {
         const frame = window.frames[i];
-        if (frame.ethereum && frame.ethereum.isTrust) {
+        if (frame.ethereum && frame.ethereum.isPlasma) {
           frame.ethereum.address = lowerAddress;
           frame.ethereum.ready = !!address;
         }

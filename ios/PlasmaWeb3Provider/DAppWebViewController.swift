@@ -7,11 +7,11 @@
 import UIKit
 import WebKit
 import WalletCore
-import TrustWeb3Provider
+import PlasmaWeb3Provider
 
-extension TrustWeb3Provider {
-    static func createEthereum(address: String, chainId: Int, rpcUrl: String) -> TrustWeb3Provider {
-        return TrustWeb3Provider(config: .init(ethereum: .init(address: address, chainId: chainId, rpcUrl: rpcUrl)))
+extension PlasmaWeb3Provider {
+    static func createEthereum(address: String, chainId: Int, rpcUrl: String) -> PlasmaWeb3Provider {
+        return PlasmaWeb3Provider(config: .init(ethereum: .init(address: address, chainId: chainId, rpcUrl: rpcUrl)))
     }
 }
 
@@ -36,32 +36,32 @@ class DAppWebViewController: UIViewController {
     }()
 
     static var ethereumConfigs = [
-        TrustWeb3Provider.Config.EthereumConfig(
+        PlasmaWeb3Provider.Config.EthereumConfig(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 1,
             rpcUrl: "https://cloudflare-eth.com"
         ),
-        TrustWeb3Provider.Config.EthereumConfig(
+        PlasmaWeb3Provider.Config.EthereumConfig(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 10,
             rpcUrl: "https://mainnet.optimism.io"
         ),
-        TrustWeb3Provider.Config.EthereumConfig(
+        PlasmaWeb3Provider.Config.EthereumConfig(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 56,
             rpcUrl: "https://bsc-dataseed4.ninicoin.io"
         ),
-        TrustWeb3Provider.Config.EthereumConfig(
+        PlasmaWeb3Provider.Config.EthereumConfig(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 137,
             rpcUrl: "https://polygon-rpc.com"
         ),
-        TrustWeb3Provider.Config.EthereumConfig(
+        PlasmaWeb3Provider.Config.EthereumConfig(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 250,
             rpcUrl: "https://rpc.ftm.tools"
         ),
-        TrustWeb3Provider.Config.EthereumConfig(
+        PlasmaWeb3Provider.Config.EthereumConfig(
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 42161,
             rpcUrl: "https://arb1.arbitrum.io/rpc"
@@ -216,7 +216,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 handleSignTransaction(network: network, id: id) { [weak webview] in
                     let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
                     guard let signature = self.cosmosSignature(from: input, output) else { return }
-                    webview?.tw.send(network: .cosmos, result: signature, to: id)
+                    webview?.pw.send(network: .cosmos, result: signature, to: id)
                 }
             default:
                 print("\(network.rawValue) doesn't support signRawTransaction")
@@ -278,7 +278,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             let recovered = ecRecover(signature: tuple.signature, message: tuple.message) ?? ""
             print(recovered)
             DispatchQueue.main.async {
-                self.webview.tw.send(network: .ethereum, result: recovered, to: id)
+                self.webview.pw.send(network: .ethereum, result: recovered, to: id)
             }
         case .addEthereumChain:
             guard let (chainId, name, rpcUrls) = extractChainInfo(json: json) else {
@@ -329,11 +329,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             switch network {
             case .ethereum:
                 let address = self.current.config.ethereum.address
-                webview?.tw.set(network: network.rawValue, address: address)
-                webview?.tw.send(network: network, results: [address], to: id)
+                webview?.pw.set(network: network.rawValue, address: address)
+                webview?.pw.send(network: network, results: [address], to: id)
             case .solana:
                 let address = "H4JcMPicKkHcxxDjkyyrLoQj7Kcibd9t815ak4UvTr9M"
-                webview?.tw.send(network: network, results: [address], to: id)
+                webview?.pw.send(network: network, results: [address], to: id)
             case .cosmos:
                 let pubKey = Self.wallet.getKeyForCoin(coin: self.cosmosCoin).getPublicKeySecp256k1(compressed: true).description
                 let address = Self.wallet.getAddressForCoin(coin: self.cosmosCoin)
@@ -341,7 +341,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     withJSONObject: ["pubKey": pubKey, "address": address]
                 )
                 let jsonString = String(data: json, encoding: .utf8)!
-                webview?.tw.send(network: network, result: jsonString, to: id)
+                webview?.pw.send(network: network, result: jsonString, to: id)
             case .aptos:
                 let pubKey = Self.wallet.getKeyForCoin(coin: .aptos).getPublicKeySecp256k1(compressed: true).description
                 let address = Self.wallet.getAddressForCoin(coin: .aptos)
@@ -349,7 +349,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     withJSONObject: ["publicKey": pubKey, "address": address]
                 )
                 let jsonString = String(data: json, encoding: .utf8)!
-                webview?.tw.send(network: network, result: jsonString, to: id)
+                webview?.pw.send(network: network, result: jsonString, to: id)
             }
 
         }))
@@ -363,11 +363,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
+            webview?.pw.send(network: .ethereum, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: addPrefix)
-            webview?.tw.send(network: .ethereum, result: "0x" + signed.hexString, to: id)
+            webview?.pw.send(network: .ethereum, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -379,11 +379,11 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
+            webview?.pw.send(network: .ethereum, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let signed = self.signMessage(data: data, addPrefix: false)
-            webview?.tw.send(network: .ethereum, result: "0x" + signed.hexString, to: id)
+            webview?.pw.send(network: .ethereum, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -395,12 +395,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: .solana, error: "Canceled", to: id)
+            webview?.pw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             let coin: CoinType = network == .solana ? .solana : .aptos
             let signed = Self.wallet.getKeyForCoin(coin: coin).sign(digest: data, curve: .ed25519)!
-            webview?.tw.send(network: network, result: "0x" + signed.hexString, to: id)
+            webview?.pw.send(network: network, result: "0x" + signed.hexString, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -412,13 +412,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: .solana, error: "Canceled", to: id)
+            webview?.pw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             guard let input: CosmosSigningInput = self.cosmosSigningInputMessage(data: data) else { return }
             let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
             guard let signature = self.cosmosSignature(from: input, output) else { return }
-            webview?.tw.send(network: .cosmos, result: signature, to: id)
+            webview?.pw.send(network: .cosmos, result: signature, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -430,7 +430,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: network, error: "Canceled", to: id)
+            webview?.pw.send(network: network, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
             onSign()
@@ -445,13 +445,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: .solana, error: "Canceled", to: id)
+            webview?.pw.send(network: .solana, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak webview] _ in
             guard let decoded = Base58.decodeNoCheck(string: raw) else { return }
             guard let signature = Self.wallet.getKeyForCoin(coin: .solana).sign(digest: decoded, curve: .ed25519) else { return }
             let signatureEncoded = Base58.encodeNoCheck(data: signature)
-            webview?.tw.send(network: .solana, result: signatureEncoded, to: id)
+            webview?.pw.send(network: .solana, result: signatureEncoded, to: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -463,13 +463,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
+            webview?.pw.send(network: .ethereum, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
             guard let `self` = self else { return }
-            self.providers[chainId] = TrustWeb3Provider.createEthereum(address: self.current.config.ethereum.address, chainId: chainId, rpcUrl: rpcUrls[0])
+            self.providers[chainId] = PlasmaWeb3Provider.createEthereum(address: self.current.config.ethereum.address, chainId: chainId, rpcUrl: rpcUrls[0])
             print("\(name) added")
-            self.webview.tw.sendNull(network: .ethereum, id: id)
+            self.webview.pw.sendNull(network: .ethereum, id: id)
         }))
         present(alert, animated: true, completion: nil)
     }
@@ -486,7 +486,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
 
         if chainId == currentConfig.chainId {
             print("No need to switch, already on chain \(chainId)")
-            webview.tw.sendNull(network: .ethereum, id: id)
+            webview.pw.sendNull(network: .ethereum, id: id)
         } else {
             let alert = UIAlertController(
                 title: "Switch Chain",
@@ -494,7 +494,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
+                webview?.pw.send(network: .ethereum, error: "Canceled", to: id)
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
@@ -504,9 +504,9 @@ extension DAppWebViewController: WKScriptMessageHandler {
                     chainId: switchToConfig.chainId,
                     rpcUrl: switchToConfig.rpcUrl
                 )
-                self.webview.tw.set(config: provider.config)
-                self.webview.tw.emitChange(chainId: chainId)
-                self.webview.tw.sendNull(network: .ethereum, id: id)
+                self.webview.pw.set(config: provider.config)
+                self.webview.pw.emitChange(chainId: chainId)
+                self.webview.pw.sendNull(network: .ethereum, id: id)
             }))
             present(alert, animated: true, completion: nil)
         }
@@ -515,13 +515,13 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func handleSwitchCosmosChain(id: Int64, chainId: String) {
         if !cosmosChains.contains(chainId) {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
-            webview.tw.send(network: .ethereum, error: "Unknown chain id", to: id)
+            webview.pw.send(network: .ethereum, error: "Unknown chain id", to: id)
             return
         }
 
         if currentCosmosChain == chainId {
             print("No need to switch, already on chain \(chainId)")
-            webview.tw.sendNull(network: .cosmos, id: id)
+            webview.pw.sendNull(network: .cosmos, id: id)
         } else {
             let alert = UIAlertController(
                 title: "Switch Chain",
@@ -529,12 +529,12 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-                webview?.tw.send(network: .ethereum, error: "Canceled", to: id)
+                webview?.pw.send(network: .ethereum, error: "Canceled", to: id)
             }))
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
                 self.currentCosmosChain = chainId
-                self.webview.tw.sendNull(network: .cosmos, id: id)
+                self.webview.pw.sendNull(network: .cosmos, id: id)
             }))
             present(alert, animated: true, completion: nil)
         }
@@ -545,14 +545,14 @@ extension DAppWebViewController: WKScriptMessageHandler {
         tx.postRequest(to: url) { (result: Result<[String: Any], Error>) -> Void in
             switch result {
             case .failure(let error):
-                self.webview.tw.send(network: .aptos, error: error.localizedDescription, to: id)
+                self.webview.pw.send(network: .aptos, error: error.localizedDescription, to: id)
             case .success(let json):
                 if let _ = json["error_code"] as? String, let message = json["message"] as? String {
-                    self.webview.tw.send(network: .aptos, error: message, to: id)
+                    self.webview.pw.send(network: .aptos, error: message, to: id)
                     return
                 }
                 let hash = json["hash"] as! String
-                self.webview.tw.send(network: .aptos, result: hash, to: id)
+                self.webview.pw.send(network: .aptos, result: hash, to: id)
             }
         }
     }
@@ -562,14 +562,14 @@ extension DAppWebViewController: WKScriptMessageHandler {
         ["mode": mode, "tx_bytes": raw].postRequest(to: url) { (result: Result<[String: Any], Error>) -> Void in
             switch result {
             case .failure(let error):
-                self.webview.tw.send(network: .cosmos, error: error.localizedDescription, to: id)
+                self.webview.pw.send(network: .cosmos, error: error.localizedDescription, to: id)
             case .success(let json):
                 guard let response = json["tx_response"] as? [String: Any],
                       let txHash = response["txhash"] as? String else {
-                    self.webview.tw.send(network: .cosmos, error: "error json parsing", to: id)
+                    self.webview.pw.send(network: .cosmos, error: "error json parsing", to: id)
                     return
                 }
-                self.webview.tw.send(network: .cosmos, result: txHash, to: id)
+                self.webview.pw.send(network: .cosmos, result: txHash, to: id)
             }
         }
     }
