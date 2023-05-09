@@ -1,25 +1,25 @@
 {
-  "name": "@trustwallet/web3-provider",
+  "name": "@plasmawallet/web3-provider",
   "version": "1.0.0",
-  "description": "Trust Web3 Provider",
-  "main": "dist/trust-min.js",
+  "description": "Plasma Web3 Provider",
+  "main": "dist/plasma-min.js",
   "files": [
-    "dist/trust-min.js"
+    "dist/plasma-min.js"
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/TrustWallet/trust-web3-provider.git"
+    "url": "git+ssh://git@github.com/DTechLabs/web3-provider.git"
   },
   "keywords": [],
-  "author": "Trust <support@trustwalletapp.com>",
+  "author": "Plasma <support@plasmapay.com>",
   "license": "MIT",
   "scripts": {
-    "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js",
-    "prepare-publish": "mkdir -p dist && cp ../dist/trust-min.js ./dist/trust-min.js",
+    "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/plasma-min.js",
+    "prepare-publish": "mkdir -p dist && cp ../dist/trust-min.js ./dist/plasma-min.js",
     "publish-npm-package": "npm run prepare-publish && npm publish --access public",
     "lint": "eslint . --fix",
     "test": "jest",
-    "lfs-fix": "git rm --cached --force ../dist/trust-min.js && git add ../dist/trust-min.js"
+    "lfs-fix": "git rm --cached --force ../dist/plasma-min.js && git add ../dist/plasma-min.js"
   },
   "engines": {
     "node": ">=14"

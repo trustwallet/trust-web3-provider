@@ -1,15 +1,9 @@
-// Copyright © 2017-2022 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 "use strict";
 
 import BaseProvider from "./base_provider";
 import Utils from "./utils";
 
-class TrustAptosWeb3Provider extends BaseProvider {
+class PlasmaAptosWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
 
@@ -146,4 +140,4 @@ class TrustAptosWeb3Provider extends BaseProvider {
   }
 }
 
-module.exports = TrustAptosWeb3Provider;
+module.exports = PlasmaAptosWeb3Provider;

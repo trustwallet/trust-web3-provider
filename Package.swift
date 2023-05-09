@@ -3,21 +3,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "TrustWeb3Provider",
+    name: "PlasmaWeb3Provider",
     products: [
         .library(
-            name: "TrustWeb3Provider",
-            targets: ["TrustWeb3Provider"]
+            name: "PlasmaWeb3Provider",
+            targets: ["PlasmaWeb3Provider"]
         )
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "TrustWeb3Provider",
+            name: "PlasmaWeb3Provider",
             dependencies: [],
             path: "dist",
             resources: [
-                .process("trust-min.js", localization: .none)
+                .process("plasma-min.js", localization: .none)
             ]
         )
     ]

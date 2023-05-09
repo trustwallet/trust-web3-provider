@@ -1,9 +1,3 @@
-// Copyright © 2017-2020 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 "use strict";
 
 import BaseProvider from "./base_provider";
@@ -14,7 +8,7 @@ import ProviderRpcError from "./error";
 
 const { PublicKey, Connection } = Web3;
 
-class TrustSolanaWeb3Provider extends BaseProvider {
+class PlasmaSolanaWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
 
@@ -183,4 +177,4 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 }
 
-module.exports = TrustSolanaWeb3Provider;
+module.exports = PlasmaSolanaWeb3Provider;

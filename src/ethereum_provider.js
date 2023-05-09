@@ -1,9 +1,3 @@
-// Copyright © 2017-2022 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 "use strict";
 
 import RPCServer from "./rpc";
@@ -14,7 +8,7 @@ import isUtf8 from "isutf8";
 import { TypedDataUtils, SignTypedDataVersion } from "@metamask/eth-sig-util";
 import BaseProvider from "./base_provider";
 
-class TrustWeb3Provider extends BaseProvider {
+class PlasmaWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
     this.setConfig(config);
@@ -57,7 +51,7 @@ class TrustWeb3Provider extends BaseProvider {
   request(payload) {
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
-    if (!(this instanceof TrustWeb3Provider)) {
+    if (!(this instanceof PlasmaWeb3Provider)) {
       that = window.ethereum;
     }
     return that._request(payload, false);
@@ -119,7 +113,7 @@ class TrustWeb3Provider extends BaseProvider {
     );
     // this points to window in methods like web3.eth.getAccounts()
     var that = this;
-    if (!(this instanceof TrustWeb3Provider)) {
+    if (!(this instanceof PlasmaWeb3Provider)) {
       that = window.ethereum;
     }
     if (Array.isArray(payload)) {
@@ -411,4 +405,4 @@ class TrustWeb3Provider extends BaseProvider {
   }
 }
 
-module.exports = TrustWeb3Provider;
+module.exports = PlasmaWeb3Provider;

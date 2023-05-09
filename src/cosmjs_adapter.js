@@ -1,18 +1,12 @@
-// Copyright © 2017-2022 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 "use strict";
 
 class CosmJSOfflineSigner {
-  constructor(chainId, trustwallet) {
+  constructor(chainId, wallet) {
     this.chainId = chainId;
-    this.trustwallet = trustwallet;
+    this.plasmawallet = wallet;
   }
   async getAccounts() {
-    const key = await this.trustwallet.getKey(this.chainId);
+    const key = await this.twallet.getKey(this.chainId);
     return [
       {
         address: key.bech32Address,
