@@ -41,7 +41,7 @@
     "eslint": "^8.7.0",
     "ethereumjs-util": "^7.0.5",
     "jest": "^27.4.7",
-    "jest-environment-jsdom": "^29.5.0",
+    "jest-environment-jsdom": "^27.5.1",
     "uglify-js": "^3.15.0",
     "web3": "^0.20.7",
     "whatwg-fetch": "^3.6.2"

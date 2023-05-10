@@ -26,7 +26,7 @@ const bsc = {
 
 describe("PlasmaWeb3Provider constructor tests", () => {
   test("test constructor.name", () => {
-    const provider = new trustwallet.Provider({ ethereum: {} });
+    const provider = new plasmawallet.Provider({ ethereum: {} });
     const web3 = new Web3(provider);
     expect(web3.currentProvider.constructor.name).toBe("PlasmaWeb3Provider");
   });
@@ -137,13 +137,13 @@ describe("PlasmaWeb3Provider constructor tests", () => {
   });
 
   test("test eth_sign", (done) => {
-    const provider = new trustwallet.Provider({ ethereum: mainnet });
+    const provider = new plasmawallet.Provider({ ethereum: mainnet });
     const web3 = new Web3(provider);
     const addresses = ["0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"];
     const signed =
       "0x730ec377cfc7090e08366fad4758aad721dbb51e187efe45426a7e56d1ff053947ab1a7b0bd7b138c48a9f3d3b92bd83f4265abbe9876930faaf7fbb980b219d1c";
 
-    trustwallet.postMessage = (message) => {
+      plasmawallet.postMessage = (message) => {
       provider.sendResponse(message.id, signed);
     };
 
