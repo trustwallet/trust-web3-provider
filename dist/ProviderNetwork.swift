@@ -4,18 +4,9 @@
 // terms governing use, modification, and redistribution, is contained in the
 // file LICENSE at the root of the source code distribution tree.
 
-"use strict";
-
-class ProviderRpcError extends Error {
-  constructor(code, message) {
-    super();
-    this.code = code;
-    this.message = message;
-  }
-
-  toString() {
-    return `${this.message} (${this.code})`;
-  }
+public enum ProviderNetwork: String, Decodable {
+    case ethereum
+    case solana
+    case cosmos
+    case aptos
 }
-
-module.exports = ProviderRpcError;

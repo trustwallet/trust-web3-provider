@@ -8,14 +8,66 @@ import Foundation
 import WebKit
 
 public struct TrustWeb3Provider {
-    public static let scriptHandlerName = "_tw_"
+    public struct Config: Equatable {
+        public let ethereum: EthereumConfig
+        public let solana: SolanaConfig
+        public let aptos: AptosConfig
 
-    public let address: String
-    public let chainId: Int
-    public let rpcUrl: String
+        public init(
+            ethereum: EthereumConfig,
+            solana: SolanaConfig = SolanaConfig(cluster: "mainnet-beta"),
+            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1")
+        ) {
+            self.ethereum = ethereum
+            self.solana = solana
+            self.aptos = aptos
+        }
+
+        public struct EthereumConfig: Equatable {
+            public let address: String
+            public let chainId: Int
+            public let rpcUrl: String
+
+            public init(address: String, chainId: Int, rpcUrl: String) {
+                self.address = address
+                self.chainId = chainId
+                self.rpcUrl = rpcUrl
+            }
+        }
+
+        public struct SolanaConfig: Equatable {
+            public let cluster: String
+
+            public init(cluster: String) {
+                self.cluster = cluster
+            }
+        }
+
+        public struct AptosConfig: Equatable {
+            public let network: String
+            public let chainId: String
+
+            public init(network: String, chainId: String) {
+                self.network = network
+                self.chainId = chainId
+            }
+        }
+    }
+
+    private class dummy {}
+    private let filename = "trust-min"    
+    public static let scriptHandlerName = "_tw_"
+    public let config: Config
 
     public var providerJsUrl: URL {
-        return Bundle.module.url(forResource: "trust-min", withExtension: "js")!
+#if COCOAPODS
+        let bundle = Bundle(for: TrustWeb3Provider.dummy.self)
+        let bundleURL = bundle.resourceURL?.appendingPathComponent("TrustWeb3Provider.bundle")
+        let resourceBundle = Bundle(url: bundleURL!)!
+        return resourceBundle.url(forResource: filename, withExtension: "js")!
+#else
+        return Bundle.module.url(forResource: filename, withExtension: "js")!
+#endif
     }
 
     public var providerScript: WKUserScript {
@@ -27,89 +79,46 @@ public struct TrustWeb3Provider {
         let source = """
         (function() {
             var config = {
-                address: "\(address.lowercased())",
-                chainId: \(chainId),
-                rpcUrl: "\(rpcUrl)"
+                ethereum: {
+                    address: "\(config.ethereum.address)",
+                    chainId: \(config.ethereum.chainId),
+                    rpcUrl: "\(config.ethereum.rpcUrl)"
+                },
+                solana: {
+                    cluster: "\(config.solana.cluster)"
+                },
+                aptos: {
+                    network: "\(config.aptos.network)",
+                    chainId: "\(config.aptos.chainId)"
+                }
             };
 
-            window.ethereum = new trustwallet.Provider(config);
-            window.web3 = new trustwallet.Web3(window.ethereum);
+            trustwallet.ethereum = new trustwallet.Provider(config);
+            trustwallet.solana = new trustwallet.SolanaProvider(config);
+            trustwallet.cosmos = new trustwallet.CosmosProvider(config);
+            trustwallet.aptos = new trustwallet.AptosProvider(config);
 
             trustwallet.postMessage = (jsonString) => {
                 webkit.messageHandlers._tw_.postMessage(jsonString)
             };
+
+            window.ethereum = trustwallet.ethereum;
+            window.keplr = trustwallet.cosmos;
+            window.aptos = trustwallet.aptos;
+
+            const getDefaultCosmosProvider = (chainId) => {
+                return trustwallet.cosmos.getOfflineSigner(chainId);
+            }
+
+            window.getOfflineSigner = getDefaultCosmosProvider;
+            window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
+            window.getOfflineSignerAuto = getDefaultCosmosProvider;
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
-    public init(address: String, chainId: Int, rpcUrl: String) {
-        self.address = address
-        self.chainId = chainId
-        self.rpcUrl = rpcUrl
-    }
-}
-
-public struct TypeWrapper<T> {
-    let value: T
-
-    init(value: T) {
-        self.value = value
-    }
-}
-
-public extension WKWebView {
-    var tw: TypeWrapper<WKWebView> {
-        return TypeWrapper(value: self)
-    }
-}
-
-public extension TypeWrapper where T == WKWebView {
-    func set(address: String) {
-        let script = String(format: "ethereum.setAddress(\"%@\");", address.lowercased())
-        value.evaluateJavaScript(script)
-    }
-
-    func set(address: String, chainId: Int, rpcUrl: String) {
-        let script = """
-        var config = {
-            address: "\(address.lowercased())",
-            chainId: \(chainId),
-            rpcUrl: "\(rpcUrl)"
-        };
-        ethereum.setConfig(config);
-        """
-        value.evaluateJavaScript(script)
-    }
-
-    func emitChange(chainId: Int) {
-        let string = "0x" + String(chainId, radix: 16)
-        let script = String(format: "ethereum.emitChainChanged(\"%@\");", string)
-        value.evaluateJavaScript(script)
-    }
-
-    func send(error: String, to id: Int64) {
-        let script = String(format: "ethereum.sendError(%ld, \"%@\")", id, error)
-        value.evaluateJavaScript(script)
-    }
-
-    func send(result: String, to id: Int64) {
-        let script = String(format: "ethereum.sendResponse(%ld, \"%@\")", id, result)
-        value.evaluateJavaScript(script)
-    }
-
-    func sendNull(id: Int64) {
-        let script = String(format: "ethereum.sendResponse(%ld, null)", id)
-        value.evaluateJavaScript(script)
-    }
-
-    func send(results: [String], to id: Int64) {
-        let array = results.map { String(format: "\"%@\"", $0) }
-        let script = String(format: "ethereum.sendResponse(%ld, [%@])", id, array.joined(separator: ","))
-        value.evaluateJavaScript(script)
-    }
-
-    func removeScriptHandler() {
-        value.configuration.userContentController.removeScriptMessageHandler(forName: TrustWeb3Provider.scriptHandlerName)
+    public init(config: Config) {
+        self.config = config
     }
 }

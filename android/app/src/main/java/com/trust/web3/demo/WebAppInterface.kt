@@ -21,6 +21,7 @@ class WebAppInterface(
     private val privateKey =
         PrivateKey("0x4646464646464646464646464646464646464646464646464646464646464646".toHexByteArray())
     private val addr = CoinType.ETHEREUM.deriveAddress(privateKey).toLowerCase()
+    private val pubKey = CoinType.SOLANA.deriveAddress(privateKey)
 
     @JavascriptInterface
     fun postMessage(json: String) {
@@ -28,14 +29,16 @@ class WebAppInterface(
         println(obj)
         val id = obj.getLong("id")
         val method = DAppMethod.fromValue(obj.getString("name"))
+        val network = obj.getString("network")
         when (method) {
             DAppMethod.REQUESTACCOUNTS -> {
                 context.materialAlertDialog {
                     title = "Request Accounts"
                     message = "${dappUrl} requests your address"
                     okButton {
-                        val setAddress = "window.ethereum.setAddress(\"$addr\");"
-                        val callback = "window.ethereum.sendResponse($id, [\"$addr\"])"
+                        val address = if (network == "solana") pubKey else addr
+                        val setAddress = "window.$network.setAddress(\"$address\");"
+                        val callback = "window.$network.sendResponse($id, [\"$address\"])"
                         webView.post {
                             webView.evaluateJavascript(setAddress) {
                                 // ignore
@@ -50,7 +53,10 @@ class WebAppInterface(
             }
             DAppMethod.SIGNMESSAGE -> {
                 val data = extractMessage(obj)
-                handleSignMessage(id, data, addPrefix = false)
+                if (network == "ethereum")
+                    handleSignMessage(id, data, addPrefix = false)
+                else
+                    handleSignSolanaMessage(id, data)
             }
             DAppMethod.SIGNPERSONALMESSAGE -> {
                 val data = extractMessage(obj)
@@ -85,13 +91,26 @@ class WebAppInterface(
 
     private fun handleSignMessage(id: Long, data: ByteArray, addPrefix: Boolean) {
         context.materialAlertDialog {
-            title = "Sign Message"
+            title = "Sign Ethereum Message"
             message = if (addPrefix) String(data, Charsets.UTF_8) else Numeric.toHexString(data)
             cancelButton {
-                webView.sendError("Cancel", id)
+                webView.sendError("ethereum","Cancel", id)
             }
             okButton {
-                webView.sendResult(signEthereumMessage(data, addPrefix), id)
+                webView.sendResult("ethereum", signEthereumMessage(data, addPrefix), id)
+            }
+        }.show()
+    }
+
+    private fun handleSignSolanaMessage(id: Long, data: ByteArray) {
+        context.materialAlertDialog {
+            title = "Sign Solana Message"
+            message = String(data, Charsets.UTF_8) ?: Numeric.toHexString(data)
+            cancelButton {
+                webView.sendError("solana", "Cancel", id)
+            }
+            okButton {
+                webView.sendResult("solana", signSolanaMessage(data), id)
             }
         }.show()
     }
@@ -101,10 +120,10 @@ class WebAppInterface(
             title = "Sign Typed Message"
             message = raw
             cancelButton {
-                webView.sendError("Cancel", id)
+                webView.sendError("ethereum","Cancel", id)
             }
             okButton {
-                webView.sendResult(signEthereumMessage(data, false), id)
+                webView.sendResult("ethereum", signEthereumMessage(data, false), id)
             }
         }.show()
     }
@@ -125,5 +144,11 @@ class WebAppInterface(
                 (this[this.size - 1]) = (this[this.size - 1] + 27).toByte()
             }
         return Numeric.toHexString(signatureData)
+    }
+
+    private fun signSolanaMessage(message: ByteArray): String {
+        val signature = privateKey.sign(message, Curve.ED25519)
+        return Numeric.toHexString(signature)
+
     }
 }

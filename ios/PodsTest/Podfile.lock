@@ -1,0 +1,16 @@
+PODS:
+  - TrustWeb3Provider (1.0.0)
+
+DEPENDENCIES:
+  - TrustWeb3Provider (from `../../TrustWeb3Provider.podspec`)
+
+EXTERNAL SOURCES:
+  TrustWeb3Provider:
+    :path: "../../TrustWeb3Provider.podspec"
+
+SPEC CHECKSUMS:
+  TrustWeb3Provider: 3542a569aa2d28031ac2edfe594e3563376df738
+
+PODFILE CHECKSUM: 6c87b8cefa328e150428f744e344b4b887098d7e
+
+COCOAPODS: 1.11.3

@@ -1,7 +1,11 @@
 {
-  "name": "trust-web3-provider",
+  "name": "@trustwallet/web3-provider",
   "version": "1.0.0",
   "description": "Trust Web3 Provider",
+  "main": "dist/trust-min.js",
+  "files": [
+    "dist/trust-min.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/TrustWallet/trust-web3-provider.git"
@@ -11,18 +15,22 @@
   "license": "MIT",
   "scripts": {
     "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js",
+    "prepare-publish": "mkdir -p dist && cp ../dist/trust-min.js ./dist/trust-min.js",
+    "publish-npm-package": "npm run prepare-publish && npm publish --access public",
     "lint": "eslint . --fix",
-    "test": "jest"
+    "test": "jest",
+    "lfs-fix": "git rm --cached --force ../dist/trust-min.js && git add ../dist/trust-min.js"
   },
   "engines": {
     "node": ">=14"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "^4.0.1",
+    "@solana/web3.js": "^1.5.0",
+    "bs58": "^4.0.1",
     "buffer": "^5.6.0",
-    "eth-sig-util": "^3.0.1",
     "events": "^3.2.0",
-    "isutf8": "^3.1.1",
-    "web3": "^0.20.7"
+    "isutf8": "^3.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.16.12",
@@ -32,7 +40,9 @@
     "eslint": "^8.7.0",
     "ethereumjs-util": "^7.0.5",
     "jest": "^27.4.7",
-    "uglify-js": "^3.15.0"
+    "uglify-js": "^3.15.0",
+    "web3": "^0.20.7",
+    "whatwg-fetch": "^3.6.2"
   },
   "jest": {
     "verbose": true,
