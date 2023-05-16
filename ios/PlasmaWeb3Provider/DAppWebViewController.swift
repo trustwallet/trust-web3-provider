@@ -1,9 +1,3 @@
-// Copyright © 2017-2020 Trust Wallet.
-//
-// This file is part of Trust. The full Trust copyright notice, including
-// terms governing use, modification, and redistribution, is contained in the
-// file LICENSE at the root of the source code distribution tree.
-
 import UIKit
 import WebKit
 import WalletCore
@@ -25,12 +19,12 @@ class DAppWebViewController: UIViewController {
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
 
-    var current: TrustWeb3Provider = TrustWeb3Provider(config: .init(ethereum: ethereumConfigs[0]))
+    var current: PlasmaWeb3Provider = PlasmaWeb3Provider(config: .init(ethereum: ethereumConfigs[0]))
 
-    var providers: [Int: TrustWeb3Provider] = {
-        var result = [Int: TrustWeb3Provider]()
+    var providers: [Int: PlasmaWeb3Provider] = {
+        var result = [Int: PlasmaWeb3Provider]()
         ethereumConfigs.forEach {
-            result[$0.chainId] = TrustWeb3Provider(config: .init(ethereum: $0))
+            result[$0.chainId] = PlasmaWeb3Provider(config: .init(ethereum: $0))
         }
         return result
     }()
@@ -77,7 +71,10 @@ class DAppWebViewController: UIViewController {
         let controller = WKUserContentController()
         controller.addUserScript(current.providerScript)
         controller.addUserScript(current.injectScript)
-        controller.add(self, name: TrustWeb3Provider.scriptHandlerName)
+        #if DEBUG
+        controller.addUserScript(current.injectLogScript)
+        #endif
+        controller.add(self, name: PlasmaWeb3Provider.scriptHandlerName)
 
         config.userContentController = controller
         config.allowsInlineMediaPlayback = true
@@ -172,7 +169,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                 handleSignTransaction(network: network, id: id) { [weak webview] in
                     let output: CosmosSigningOutput = AnySigner.sign(input: input, coin: self.cosmosCoin)
                     guard let signature = self.cosmosSignature(from: input, output) else { return }
-                    webview?.tw.send(network: network, result: signature, to: id)
+                    webview?.pw.send(network: network, result: signature, to: id)
                 }
             case .aptos:
                 if var params = extractAptosParams(json: json) {
@@ -187,7 +184,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
                                 params["signature"] = signature
 
                                 let data = try! JSONSerialization.data(withJSONObject: params, options: [.withoutEscapingSlashes])
-                                webview?.tw.send(network: network, result: data.hexString, to: id)
+                                webview?.pw.send(network: network, result: data.hexString, to: id)
                             }
                         }
                     }
@@ -323,7 +320,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { [weak webview] _ in
-            webview?.tw.send(network: network, error: "Canceled", to: id)
+            webview?.pw.send(network: network, error: "Canceled", to: id)
         }))
         alert.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak webview] _ in
             switch network {
@@ -477,7 +474,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
     func handleSwitchEthereumChain(id: Int64, chainId: Int) {
         guard let provider = providers[chainId] else {
             alert(title: "Error", message: "Unknown chain id: \(chainId)")
-            webview.tw.send(network: .ethereum, error: "Unknown chain id", to: id)
+            webview.pw.send(network: .ethereum, error: "Unknown chain id", to: id)
             return
         }
 
@@ -499,7 +496,7 @@ extension DAppWebViewController: WKScriptMessageHandler {
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 guard let `self` = self else { return }
                 self.current = provider
-                let provider = TrustWeb3Provider.createEthereum(
+                let provider = PlasmaWeb3Provider.createEthereum(
                     address: switchToConfig.address,
                     chainId: switchToConfig.chainId,
                     rpcUrl: switchToConfig.rpcUrl

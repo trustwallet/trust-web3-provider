@@ -16,7 +16,7 @@ public extension WKWebView {
 
 public extension TypeWrapper where T == WKWebView {
     func set(network: String, address: String) {
-        let script = String(format: "trustwallet.\(network).setAddress(\"%@\");", address.lowercased())
+        let script = String(format: "plasmatwallet.\(network).setAddress(\"%@\");", address.lowercased())
         value.evaluateJavaScript(script)
     }
 

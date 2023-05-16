@@ -55,7 +55,7 @@ public struct PlasmaWeb3Provider {
 
     public var providerJsUrl: URL {
 #if COCOAPODS
-        let bundle = Bundle(for: TrustWeb3Provider.dummy.self)
+        let bundle = Bundle(for: PlasmaWeb3Provider.dummy.self)
         let bundleURL = bundle.resourceURL?.appendingPathComponent("PlasmaWeb3Provider.bundle")
         let resourceBundle = Bundle(url: bundleURL!)!
         return resourceBundle.url(forResource: filename, withExtension: "js")!
@@ -69,6 +69,39 @@ public struct PlasmaWeb3Provider {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }
 
+    public var injectLogScript: WKUserScript {
+        let source =
+        """
+        (function() {
+            function captureLog(emoji, type, args) {
+                window.webkit.messageHandlers.logHandler.postMessage(
+                    `${emoji} JS ${type}: ${Object.values(args)
+                      .map(v => typeof(v) === "undefined" ? "undefined" : typeof(v) === "object" ? JSON.stringify(v) : v.toString())
+                      .map(v => v.substring(0, 3000)) // Limit msg to 3000 chars
+                      .join(", ")}`
+                  );
+            }
+
+            let originalLog = console.log;
+            let originalWarn = console.warn;
+            let originalError = console.error;
+            let originalDebug = console.debug;
+
+            window.console.log = function() { captureLog("📗", "log", arguments); originalLog.apply(null, arguments) }
+            window.console.warn = function() { captureLog("📙", "warning", arguments); originalWarn.apply(null, arguments) }
+            window.console.error = function() { captureLog("📕", "error", arguments); originalError.apply(null, arguments) }
+            window.console.debug = function() { captureLog("📘", "debug", arguments); originalDebug.apply(null, arguments) }
+
+            window.addEventListener("error", function(e) {
+                captureLog("💥", "Uncaught", [`${e.message} at ${e.filename}:${e.lineno}:${e.colno}`])
+            });
+        }();
+        """
+        
+        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }
+    
+    
     public var injectScript: WKUserScript {
         let source = """
         (function() {
@@ -107,6 +140,8 @@ public struct PlasmaWeb3Provider {
             window.getOfflineSigner = getDefaultCosmosProvider;
             window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
             window.getOfflineSignerAuto = getDefaultCosmosProvider;
+        
+            window.bottomOffset = 50;
         })();
         """
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)

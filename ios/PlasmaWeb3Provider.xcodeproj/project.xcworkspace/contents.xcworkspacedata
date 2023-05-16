@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:TrustWeb3Provider.xcodeproj">
+      location = "self:/Users/yuri/Plasma/web3-provider/ios/PlasmaWeb3Provider.xcodeproj">
    </FileRef>
 </Workspace>
