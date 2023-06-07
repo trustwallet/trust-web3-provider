@@ -10,11 +10,13 @@ import TrustWeb3Provider from "./ethereum_provider";
 import TrustSolanaWeb3Provider from "./solana_provider";
 import TrustCosmosWeb3Provider from "./cosmos_provider";
 import TrustAptosWeb3Provider from "./aptos_provider";
+import TrustImmutableXWeb3Provider from "./immutablex_provider";
 
 window.trustwallet = {
   Provider: TrustWeb3Provider,
   SolanaProvider: TrustSolanaWeb3Provider,
   CosmosProvider: TrustCosmosWeb3Provider,
   AptosProvider: TrustAptosWeb3Provider,
+  ImmutableXProvider: TrustImmutableXWeb3Provider,
   postMessage: null,
 };
