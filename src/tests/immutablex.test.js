@@ -81,18 +81,18 @@ describe("TrustImmutableXWeb3Provider tests", () => {
     };
     
     const provider = new trustwallet.ImmutableXProvider({ ethereum: mainnet });
-    expect(provider.rest.url).toEqual("https://api.x.immutable.com");
+    expect(provider.rest.basePath).toEqual("https://api.x.immutable.com");
     
     provider.setConfig({ ethereum: goerli });
-    expect(provider.rest.url).toEqual("https://api.sandbox.x.immutable.com");
+    expect(provider.rest.basePath).toEqual("https://api.sandbox.x.immutable.com");
     
     // Step 1 - get encoded details to allow clients to register the user offchain
-    const response = await provider.rest.getSignableRegistration(signableRegistrationRequest);
+    const response = await provider.getSignableRegistration(signableRegistrationRequest);
     expect (response.signable_message).toEqual("Only sign this key linking request from Immutable X");
     expect(response.payload_hash).toEqual("3ac5f68fa5a1d969cb2b670de816f44cf79faa180911bd8a360eb3dc36d14c");
 
     // Step 2 - register the user
-    // const registerResponse = await provider.rest.registerUser(registrationReguest);
+    // const registerResponse = await provider.registerUser(registrationReguest);
     // console.log(registerResponse);
     // expect(registerResponse.tx_hash).toBeTruthy();
   });
@@ -103,50 +103,15 @@ describe("TrustImmutableXWeb3Provider tests", () => {
 
     const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
 
-    const response = await provider.rest.getStarkKey(user);
+    const response = await provider.getUser(user);
     expect(response.accounts[0]).toEqual("0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36");
-  });
-
-  test("test ImmutableX get balances for a user", async () => {
-    const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
-    const web3 = new Web3(provider);
-
-    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
-
-    const response = await provider.rest.getBalances(user);
-    const result = response.result[0];
-    expect(response.remaining).toEqual(0);
-    expect(response.cursor).toBeTruthy();
-    expect(result.balance).toEqual('0');
-    expect(result.preparing_withdrawal).toEqual('0');
-    expect(result.withdrawable).toEqual('0');
-  });
-
-  test("test ImmutableX get token balance for a user", async () => {
-    const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
-    const web3 = new Web3(provider);
-
-    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
-    const token = "0x4e420c0c2911e88f45d7b6f6166a7ee40c010cd6";
-
-    let response = await provider.rest.getTokenBalances(user, "eth");
-    expect(response.symbol).toEqual("ETH");
-    expect(response.balance).toEqual("0");
-    expect(response.preparing_withdrawal).toEqual("0");
-    expect(response.withdrawable).toEqual("0");
-
-    response = await provider.rest.getTokenBalances(user, token);
-    expect(response.symbol).toEqual("APE");
-    expect(response.balance).toEqual("0");
-    expect(response.preparing_withdrawal).toEqual("0");
-    expect(response.withdrawable).toEqual("0");
   });
 
   test("test ImmutableX get a list of tokens", async () => {
     const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
     const web3 = new Web3(provider);
 
-    const response = await provider.rest.getTokens();
+    const response = await provider.getTokens();
     expect(response.result.length).toBeGreaterThan(0);
     expect(response.cursor).toBeTruthy();
   });
@@ -157,19 +122,19 @@ describe("TrustImmutableXWeb3Provider tests", () => {
 
     const token = "0x4e420c0c2911e88f45d7b6f6166a7ee40c010cd6";
 
-    const response = await provider.rest.getTokenDetails(token);
+    const response = await provider.getTokenDetails(token);
     expect(response.name).toEqual("ApeCoin");
     expect(response.image_url).toBeTruthy();
     expect(response.symbol).toEqual("APE");
     expect(response.decimals).toEqual("18");
     expect(response.quantum).toEqual("100000000");
   });
-
+  
   test("test ImmutableX get a list of assets", async () => {
     const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
     const web3 = new Web3(provider);
 
-    const response = await provider.rest.getAssets();
+    const response = await provider.getAssets();
     expect(response.result.length).toBeGreaterThan(0);
     expect(response.cursor).toBeTruthy();
   });
@@ -181,11 +146,67 @@ describe("TrustImmutableXWeb3Provider tests", () => {
     const asset = "0x729731d42f95ddb7bd9c903607a3298b9835297e";
     const tokenId = "96";
 
-    const response = await provider.rest.getAssetDetails(asset, tokenId);
+    const response = await provider.getAssetDetails(asset, tokenId);
     expect(response.token_address).toEqual(asset);
     expect(response.token_id).toEqual(tokenId);
     expect(response.name).toEqual("Bored Ape 96");
     expect(response.metadata.attributes.length).toBeGreaterThan(0);
     expect(response.collection.name).toEqual("Bored Ape Club");
+  });
+
+  test("test ImmutableX get balances for a user", async () => {
+    const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
+    const web3 = new Web3(provider);
+
+    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
+
+    const response = await provider.getBalances(user);
+    const result = response.result[0];
+    expect(response.remaining).toEqual(0);
+    expect(response.cursor).toBeTruthy();
+    expect(result.balance).toEqual('0');
+    expect(result.preparing_withdrawal).toEqual('0');
+    expect(result.withdrawable).toEqual('0');
+  });    
+  
+  test("test ImmutableX get token balance for a user", async () => {
+    const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
+    const web3 = new Web3(provider);
+
+    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
+    const token = "0x4e420c0c2911e88f45d7b6f6166a7ee40c010cd6";
+
+    let response = await provider.getTokenBalances(user, "eth");
+    expect(response.symbol).toEqual("ETH");
+    expect(response.balance).toEqual("0");
+    expect(response.preparing_withdrawal).toEqual("0");
+    expect(response.withdrawable).toEqual("0");
+
+    response = await provider.getTokenBalances(user, token);
+    expect(response.symbol).toEqual("APE");
+    expect(response.balance).toEqual("0");
+    expect(response.preparing_withdrawal).toEqual("0");
+    expect(response.withdrawable).toEqual("0");
+  });
+
+  test("test ImmutableX get collections", async () => {
+    const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
+    const web3 = new Web3(provider);
+
+    let response = await provider.getCollections();
+    expect(response.result.length).toBeGreaterThan(0);
+    expect(response.cursor).toBeTruthy();
+  });
+
+  test("test ImmutableX get collection details", async () => {
+    const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
+    const web3 = new Web3(provider);
+
+    const collection = "0x32e75f01d0a6c2f9227d0231dcaf3bab507f90ec";
+
+    let response = await provider.getCollectionDetails(collection);
+    expect(response.name).toEqual("Illuvitars");
+    expect(response.project_id).toEqual(198);
+    expect(response.project_owner_address).toEqual("0x7ff892ccec1a860a89618c5eaa3392af001f8fa3");
   });
 }) ;

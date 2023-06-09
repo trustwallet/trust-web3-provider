@@ -18,7 +18,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
     this.setConfig(config);
-    this.providerNetwork = "ethereum";
+    this.providerNetwork = "immutablex";
     this.callbacks = new Map();
     this.wrapResults = new Map();
 
@@ -91,6 +91,206 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
     return new ImmutableX(config);
   }
 
+  /**
+   * @private Private internal request handler
+   */
+  _request(payload) {
+    switch (payload.method) {
+      case "getSignableRegistration":
+        return this.rest.post(
+          payload.path,
+          payload.request
+        );
+      case "registerUser":
+        return this.rest.post(
+          payload.path,
+          payload.request
+        );
+      case "getUser":
+        return this.rest.get(payload.path)
+      case "getTokens":
+        return this.rest.get(payload.path);
+      case "getTokenDetails":
+        return this.rest.get(payload.path);
+      case "getAssets":
+        return this.rest.get(payload.path);
+      case "getAssetDetails":
+        return this.rest.get(payload.path);
+      case "getBalances":
+        return this.rest.get(payload.path);
+      case "getTokenBalances":
+        return this.rest.get(payload.path);
+      case "getCollections":
+        return this.rest.get(payload.path);
+      case "getCollectionDetails":
+        return this.rest.get(payload.path);
+      default:
+        break;
+    }
+
+  }
+
+  /**
+   * Get encoded details to allow registration of the user offchain.
+   * @param {object} request - The user's Ethereum and Stark keys.
+   *   request requires:
+   *   {
+   *      "ether_key": "string",
+   *      "stark_key": "string",
+   *   }
+   * @returns {object} The request response.
+   */
+  getSignableRegistration(request) {
+    const payload = {
+      method: "getSignableRegistration",
+      path: "/v1/signable-registration-offchain",
+      request: request
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Registers a user's addresses with ImmutableX.
+   * @param {object} request - The data required to register an address.
+   *  request requires:
+   *   {
+   *      "ether_key": "string",
+   *      "eth_signature": "string",
+   *      "stark_key": "string",
+   *      "stark_signature": "string"
+   *   }
+   * @returns {object} The request response.
+   */
+  registerUser(request) {
+    const payload = {
+      method: "registerUser",
+      path: "/v1/users",
+      request: request
+    };
+    return this._request(payload);
+  }
+  
+  /**
+   * Gets Stark keys for a given registered user.
+   * @param {string} user - The Ethereum address of the user.
+   * @returns {object} The request response.
+   */
+  getUser(user) {
+    const payload = {
+      method: "getUser",
+      path: `/v1/users/${user}`
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Gets a list of tokens.
+   * @returns {object} The request response.
+   */
+  getTokens() {
+    const payload = {
+      method: "getTokens",
+      path: "/v1/tokens"
+    };
+    return this._request(payload);
+  }
+  
+  /**
+   * Get the details for a given token.
+   * @param {string} token - The token contract address
+   * @returns {object} The request response.
+   */
+  getTokenDetails(token) {
+    const payload = {
+      method: "getTokenDetails",
+      path: `/v1/tokens/${token}`
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Get a list of assets.
+   * @returns The request response.
+   */
+  getAssets() {
+    const payload = {
+      method: "getAssets",
+      path: "/v1/assets"
+    };
+    return this._request(payload);
+  }
+  
+  /**
+   * Get the details for a given asset.
+   * @param {string} asset - The address of the ERC721 contract.
+   * @param {string} tokenId - Either ERC721 token ID or internal IMX ID.
+   * @returns {object} The request response.
+   */
+  getAssetDetails(asset, tokenId) {
+    const payload = {
+      method: "getAssetDetails",
+      path: `/v1/assets/${asset}/${tokenId}`
+    };
+    return this._request(payload);
+  }
+  
+  /**
+   * Get a list of balances for a given user.
+   * @param {string} user - The Ethereum address of the user.
+   * @returns {object} The request response.
+   */
+  getBalances(user) {
+    // NOTE: /v1/balances is deprecated
+    const payload = {
+      method: "getBalances",
+      path: `/v2/balances/${user}`
+    };
+    return this._request(payload);
+  }
+  
+  /**
+   * Get the balance for a given user of a given token.
+   * @param {string} user - The Ethereum address of the user.
+   * @param {string} token - The address of the token contract or 'eth'.
+   * @returns {object} The request resppnse.
+   */
+  getTokenBalances(user, token) {
+    const payload = {
+      method: "getTokenBalances",
+      path: `/v2/balances/${user}/${token}`
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Get a list of collections. 
+   * @returns {object} The request response.
+   */
+  getCollections() {
+    const payload = {
+      method: "getCollections",
+      path: "/v1/collections"
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Get the details for a given collection. 
+   * @param {string} collection - Collection contract address.
+   * @returns {object} The request response.
+   */
+  getCollectionDetails(collection) {
+    const payload = {
+      method: "getCollectionDetails",
+      path: `/v1/collections/${collection}`
+    }
+    return this._request(payload);
+  }
+  
+  /**
+   * 
+   * @param {string} chainId 
+   */
   emitConnect(chainId) {
     this.emit("connect", { chainId: chainId });
   }
