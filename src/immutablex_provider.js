@@ -10,6 +10,7 @@ import { ImmutableX, Config } from "@imtbl/core-sdk";
 
 import BaseProvider from "./base_provider";
 import ImmutableXRESTServer from "./immutablex_rest";
+import ProviderRpcError from "./error";
 
 /**
  * Trust Wallet Web3 provider for ImmutableX.
@@ -97,41 +98,37 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   _request(payload) {
     switch (payload.method) {
       case "getSignableRegistration":
-        return this.rest.post(
-          payload.path,
-          payload.request
-        );
       case "registerUser":
         return this.rest.post(
           payload.path,
           payload.request
         );
       case "getUser":
-        return this.rest.get(payload.path)
       case "getTokens":
-        return this.rest.get(payload.path);
       case "getTokenDetails":
-        return this.rest.get(payload.path);
       case "getAssets":
-        return this.rest.get(payload.path);
       case "getAssetDetails":
-        return this.rest.get(payload.path);
       case "getBalances":
-        return this.rest.get(payload.path);
       case "getTokenBalances":
-        return this.rest.get(payload.path);
       case "getCollections":
-        return this.rest.get(payload.path);
       case "getCollectionDetails":
+      case "getMints":
+      case "getMintDetails":
+      case "getNftPrimarySales":
+      case "getNftPrimarySaleTransaction":
         return this.rest.get(payload.path);
       default:
-        break;
+        // Throw error for unsupported method
+        throw new ProviderRpcError(
+          4200,
+          `Trust does not support calling ${payload.method} yet.`
+        );
     }
-
   }
 
   /**
    * Get encoded details to allow registration of the user offchain.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getSignableRegistrationOffchain}
    * @param {object} request - The user's Ethereum and Stark keys.
    *   request requires:
    *   {
@@ -151,6 +148,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
 
   /**
    * Registers a user's addresses with ImmutableX.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/registerUser}
    * @param {object} request - The data required to register an address.
    *  request requires:
    *   {
@@ -172,6 +170,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   
   /**
    * Gets Stark keys for a given registered user.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/registerUser}
    * @param {string} user - The Ethereum address of the user.
    * @returns {object} The request response.
    */
@@ -185,18 +184,30 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
 
   /**
    * Gets a list of tokens.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/listTokens}
+   * @param {object} params - Optional query parameters
    * @returns {object} The request response.
    */
-  getTokens() {
+  getTokens(params = {}) {
+    let path = "/v1/tokens";
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+    
     const payload = {
       method: "getTokens",
-      path: "/v1/tokens"
+      path: path,
+
     };
     return this._request(payload);
   }
   
   /**
    * Get the details for a given token.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getToken}
    * @param {string} token - The token contract address
    * @returns {object} The request response.
    */
@@ -210,46 +221,76 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
 
   /**
    * Get a list of assets.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/listAssets}
+   * @param {object} params - Optional query parameters
    * @returns The request response.
    */
-  getAssets() {
+  getAssets(params = {}) {
+    let path = "/v1/assets";
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+
     const payload = {
       method: "getAssets",
-      path: "/v1/assets"
+      path: path
     };
     return this._request(payload);
   }
   
   /**
    * Get the details for a given asset.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getAsset}
    * @param {string} asset - The address of the ERC721 contract.
    * @param {string} tokenId - Either ERC721 token ID or internal IMX ID.
    * @returns {object} The request response.
    */
-  getAssetDetails(asset, tokenId) {
+  getAssetDetails(asset, tokenId, params = {}) {
+    let path = `/v1/assets/${asset}/${tokenId}`;
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+
     const payload = {
       method: "getAssetDetails",
-      path: `/v1/assets/${asset}/${tokenId}`
+      path: path
     };
     return this._request(payload);
   }
   
   /**
    * Get a list of balances for a given user.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/listBalances}
    * @param {string} user - The Ethereum address of the user.
+   * @param {object} params - Optional query parameters
    * @returns {object} The request response.
    */
-  getBalances(user) {
+  getBalances(user, params = {}) {
     // NOTE: /v1/balances is deprecated
+    let path = `/v2/balances/${user}`
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+
     const payload = {
       method: "getBalances",
-      path: `/v2/balances/${user}`
+      path: path
     };
     return this._request(payload);
   }
   
   /**
    * Get the balance for a given user of a given token.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getBalance}
    * @param {string} user - The Ethereum address of the user.
    * @param {string} token - The address of the token contract or 'eth'.
    * @returns {object} The request resppnse.
@@ -263,19 +304,30 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   }
 
   /**
-   * Get a list of collections. 
+   * Get a list of collections.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/listCollections}
+   * @param {object} params - Optional query parameters
    * @returns {object} The request response.
    */
-  getCollections() {
+  getCollections(params = {}) {
+    let path = "/v1/collections";
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+
     const payload = {
       method: "getCollections",
-      path: "/v1/collections"
+      path: path
     };
     return this._request(payload);
   }
 
   /**
-   * Get the details for a given collection. 
+   * Get the details for a given collection.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getCollection}
    * @param {string} collection - Collection contract address.
    * @returns {object} The request response.
    */
@@ -286,9 +338,82 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
     }
     return this._request(payload);
   }
+
+  /**
+   * Get information about token mints.
+   * Use getAssets() for information about tokens that have already been minted.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/listMints}
+   * @param {object} params - Optional query parameters.
+   * @returns {object} The request response.
+   */
+  getMints(params = {}) {
+    let path = "/v1/mints";
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+
+    const payload = {
+      method: "getMints",
+      path: path
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Get the details for a mint with a given ID.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getMint}
+   * @param {string} mintId - The mint transaction id (returned from getMints).
+   * @returns {object} The request response.
+   */
+  getMintDetails(mintId) {
+    const payload = {
+      method: "getMintDetails",
+      path: `/v1/mints/${mintId}`
+    }
+    return this._request(payload);
+  }
+
+  /**
+   * Get a list of NFT primary sales transactions.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getNftPrimaryTransactions}
+   * @param {object} params - Optional query parameters.
+   * @returns {object} The request response.
+   */
+  getNftPrimarySales(params = {}) {
+    let path = "/v2/nft/primary"
+
+    // Construct path with query parameters if supplied
+    const queryParams = new URLSearchParams(params).toString();
+    if (Object.keys(params).length > 0) {
+      path = path + `?${queryParams}`;
+    }
+
+    const payload = {
+      method: "getNftPrimarySales",
+      path: path
+    }
+    return this._request(payload);
+  }
+
+  /**
+   * Get transaction information for a given NFT transaction ID.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getNftPrimaryTransaction}
+   * @param {string} transactionId - The sale transaction ID (returned from getNftPrimarySales).
+   * @returns {object} The request response.
+   */
+  getNftPrimarySaleTransaction(transactionId) {
+    const payload = {
+      method: "getNftPrimarySaleTransaction",
+      path: `/v2/nft/primary/${transactionId}`
+    }
+    return this._request(payload);
+  }
   
   /**
-   * 
+   * Emit `connect` event
    * @param {string} chainId 
    */
   emitConnect(chainId) {
