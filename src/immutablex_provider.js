@@ -92,6 +92,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
     }
     // Set the base path for the ImmutableX REST endpoints
     this.basePath = config.apiConfiguration.basePath;
+    this.imtblConfig = config;
     return new ImmutableX(config);
   }
 
@@ -499,6 +500,14 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
       path: `/v2/nft/primary/${transactionId}`
     }
     return this._request(payload);
+  }
+
+  /**
+   * Gets the ImmutableX core contract address for the connected network
+   * @returns {string} The address of the ImmutableX core contract
+   */
+  getCoreContractAddress() {
+    return this.imtblConfig.ethConfiguration.coreContractAddress;
   }
 
   /**

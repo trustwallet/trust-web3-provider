@@ -69,6 +69,11 @@ describe("TrustImmutableXWeb3Provider tests", () => {
     expect(provider.on).not.toBeUndefined;
   });
 
+  test("test ImmutableX get core contract address", async () => {
+    const address = provider.getCoreContractAddress();
+    expect(address).toEqual("0x7917eDb51ecD6CdB3F9854c3cc593F33de10c623");
+  });
+
   test("test ImmutableX register user", async () => {
     const signableRegistrationRequest = {
       "ether_key": "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
