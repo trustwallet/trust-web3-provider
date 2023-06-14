@@ -16,13 +16,16 @@ import ProviderRpcError from "./error";
  * Trust Wallet Web3 provider for ImmutableX.
  */
 class TrustImmutableXWeb3Provider extends BaseProvider {
+
+  /**
+   * Constructor.
+   * @param {object} config - Provider configuration.
+   * @emits connect
+   */
   constructor(config) {
     super(config);
     this.setConfig(config);
     this.providerNetwork = "immutablex";
-    this.callbacks = new Map();
-    this.wrapResults = new Map();
-
     this.emitConnect(this.chainId);
   }
 
@@ -93,17 +96,20 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   }
 
   /**
-   * @private Private internal request handler
+   * @private Private internal request handler.
+   * @param {object} - The request payload.
    */
   _request(payload) {
     switch (payload.method) {
       case "getSignableRegistration":
       case "registerUser":
+      case "getSignableDeposit":
+      case "getSignableWithdrawal":
         return this.rest.post(
           payload.path,
           payload.request
         );
-      case "getUser":
+      case "getStarkKeys":
       case "getTokens":
       case "getTokenDetails":
       case "getAssets":
@@ -129,13 +135,22 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   /**
    * Get encoded details to allow registration of the user offchain.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/getSignableRegistrationOffchain}
-   * @param {object} request - The user's Ethereum and Stark keys.
-   *   request requires:
+   * @param {object} request - The user's Ethereum and Stark keys:
    *   {
    *      "ether_key": "string",
    *      "stark_key": "string",
    *   }
-   * @returns {object} The request response.
+   * @returns {object} The request response:
+   *   {
+   *     "payload_hash": "string",
+   *     "signable_message": "string"
+   *   }
+   * 
+   *   When registering a user on ImmutableX:
+   * 
+   *   - The payload_hash must be signed by the user's Stark key.
+   * 
+   *   - The signable_message must be signed by the user's Ethereum key.
    */
   getSignableRegistration(request) {
     const payload = {
@@ -149,15 +164,19 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   /**
    * Registers a user's addresses with ImmutableX.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/registerUser}
-   * @param {object} request - The data required to register an address.
-   *  request requires:
+   * @param {object} request - The data required to register an address:
    *   {
    *      "ether_key": "string",
    *      "eth_signature": "string",
    *      "stark_key": "string",
    *      "stark_signature": "string"
    *   }
-   * @returns {object} The request response.
+   * @returns {object} The request response:
+   *   {
+   *      "tx_hash": "string"
+   *   }
+   * 
+   *   Note: Returns an empty string if the user is already registered.
    */
   registerUser(request) {
     const payload = {
@@ -173,11 +192,80 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
    * @see {@link https://docs.x.immutable.com/reference/#/operations/registerUser}
    * @param {string} user - The Ethereum address of the user.
    * @returns {object} The request response.
+   *   { 
+   *     "accounts": [
+   *       "string"
+   *     ]
+   *   }
    */
-  getUser(user) {
+  getStarkKeys(user) {
     const payload = {
-      method: "getUser",
+      method: "getStarkKeys",
       path: `/v1/users/${user}`
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Gets details of a signable deposit.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getSignableDeposit}
+   * @param {object} request - Details of the signable deposit:
+   *   {
+   *     "amount": "string",
+   *     "token": {
+   *       "data": null,
+   *       "type": "ETH | ERC20 | ERC721"
+   *     },
+   *     "user": "string"
+   *   }
+   * @returns {object} The request response:
+   *   {
+   *     "amount": "string",
+   *     "asset_id": "string",
+   *     "nonce": 0,
+   *     "stark_key": "string",
+   *     "vault_id": 0
+   *   }
+   */
+  getSignableDeposit(request) {
+    const payload = {
+      method: "getSignableDeposit",
+      path: "/v1/signable-deposit-details",
+      request: request
+    };
+    return this._request(payload);
+  }
+
+  /**
+   * Gets details of a signable withdrawal.
+   * @see {@link https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal}
+   * @param {object} request - Details of the signable withdrawal:
+   *   {
+   *     "amount": "string",
+   *     "token": {
+   *       "data": null,
+   *       "type": "ETH | ERC20 | ERC721"
+   *     },
+   *     "user": "string"
+   *   }
+   * @returns {object} The request response:
+   *   {
+   *     "amount": "string",
+   *     "asset_id": "string",
+   *     "nonce": 0,
+   *     "payload_hash": "string",
+   *     "readable_transaction": "string",
+   *     "signable_message": "string",
+   *     "stark_key": "string",
+   *     "vault_id": 0,
+   *     "verification_signature": "string"
+   *   }
+   */
+  getSignableWithdrawal(request) {
+    const payload = {
+      method: "getSignableWithdrawal",
+      path: "/v1/signable-withdrawal-details",
+      request: request
     };
     return this._request(payload);
   }
@@ -185,7 +273,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   /**
    * Gets a list of tokens.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/listTokens}
-   * @param {object} params - Optional query parameters
+   * @param {object} params - Optional query parameters.
    * @returns {object} The request response.
    */
   getTokens(params = {}) {
@@ -208,7 +296,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   /**
    * Get the details for a given token.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/getToken}
-   * @param {string} token - The token contract address
+   * @param {string} token - The token contract address.
    * @returns {object} The request response.
    */
   getTokenDetails(token) {
@@ -222,7 +310,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   /**
    * Get a list of assets.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/listAssets}
-   * @param {object} params - Optional query parameters
+   * @param {object} params - Optional query parameters.
    * @returns The request response.
    */
   getAssets(params = {}) {
@@ -246,6 +334,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
    * @see {@link https://docs.x.immutable.com/reference/#/operations/getAsset}
    * @param {string} asset - The address of the ERC721 contract.
    * @param {string} tokenId - Either ERC721 token ID or internal IMX ID.
+   * @param {object} params - Optional query parameters.
    * @returns {object} The request response.
    */
   getAssetDetails(asset, tokenId, params = {}) {
@@ -268,7 +357,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
    * Get a list of balances for a given user.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/listBalances}
    * @param {string} user - The Ethereum address of the user.
-   * @param {object} params - Optional query parameters
+   * @param {object} params - Optional query parameters.
    * @returns {object} The request response.
    */
   getBalances(user, params = {}) {
@@ -306,7 +395,7 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
   /**
    * Get a list of collections.
    * @see {@link https://docs.x.immutable.com/reference/#/operations/listCollections}
-   * @param {object} params - Optional query parameters
+   * @param {object} params - Optional query parameters.
    * @returns {object} The request response.
    */
   getCollections(params = {}) {
@@ -411,10 +500,18 @@ class TrustImmutableXWeb3Provider extends BaseProvider {
     }
     return this._request(payload);
   }
+
+  /**
+   * Get an timestamp required with IMX-Timestamp Header/Params.
+   * @returns {string} Timestamp.
+   */
+  getIMXTimestamp() {
+    return Math.floor(Date.now() / 1000).toString();
+  }
   
   /**
-   * Emit `connect` event
-   * @param {string} chainId 
+   * Emit `connect` event.
+   * @param {string} chainId - The chain ID of the network.
    */
   emitConnect(chainId) {
     this.emit("connect", { chainId: chainId });

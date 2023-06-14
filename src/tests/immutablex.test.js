@@ -15,19 +15,17 @@ const Web3 = require("web3");
 const trustwallet = window.trustwallet;
 
 const mainnet = {
-  address: "0xE440902aFC5e361E3A33152D8c67E5E07dA1A524",
+  address: "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
   chainId: 1,
 };
 
 const goerli = {
-  address: "0xE440902aFC5e361E3A33152D8c67E5E07dA1A524",
+  address: "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
   chainId: 5,
 }
 
 // const ethKey = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
 // const starkKey = "0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36";
-// const signature = "0x32c32bf7229342179dc3f13f716f7d4fdaf3b67afbecf18d5ddb1a6adeebeee654f9b3e17c0fda98e6369fcb991a7f57fca36e061805c5a2c817619902f190541c";
-
 
 describe("TrustImmutableXWeb3Provider tests", () => {
   let provider;
@@ -36,7 +34,7 @@ describe("TrustImmutableXWeb3Provider tests", () => {
   beforeEach(() => {
     provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
     web3 = new Web3(provider);
-    jest.setTimeout(5000);
+    // jest.setTimeout(5000);
   });
     
   test("test ImmutableX constructor.name", () => {
@@ -102,8 +100,135 @@ describe("TrustImmutableXWeb3Provider tests", () => {
 
   test("test ImmutableX get Stark key", async () => {
     const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
-    const response = await provider.getUser(user);
+    const response = await provider.getStarkKeys(user);
     expect(response.accounts[0]).toEqual("0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36");
+  });
+
+  test("test ImmutableX get signable ETH deposit", async () => {
+    const amount = 100;
+    const depositRequest = {
+      "amount": (amount * 10**8).toString(),
+      "token": {
+        "type": "ETH",
+        "data": {
+          "decimals": 18
+        },
+      },
+      "user": provider.ethAddress,
+    }
+
+    const response = await provider.getSignableDeposit(depositRequest);
+    const starkKey = await provider.getStarkKeys(provider.ethAddress);
+    expect(response.stark_key).toEqual(starkKey.accounts[0]);
+    expect(response.amount).toEqual(amount.toString());
+    expect(response).toHaveProperty("vault_id");
+    expect(response).toHaveProperty("asset_id");
+    expect(response).toHaveProperty("nonce");
+  });
+
+  test("test ImmutableX get signable ERC20 deosit", async () => {
+    const amount = "100000000";
+    const depositRequest = {
+      "amount": amount,
+      "token": {
+        "type": "ERC20",
+        "data": {
+          "decimals": 6,
+          "token_address": "0x07865c6e87b9f70255377e024ace6630c1eaa37f", // USDC
+        },
+      },
+      "user": provider.ethAddress,
+    }
+
+    const response = await provider.getSignableDeposit(depositRequest);
+    const starkKey = await provider.getStarkKeys(provider.ethAddress);
+    expect(response.stark_key).toEqual(starkKey.accounts[0]);
+    expect(response.amount).toEqual(amount);
+    expect(response).toHaveProperty("vault_id");
+    expect(response).toHaveProperty("asset_id");
+    expect(response).toHaveProperty("nonce");
+  });
+
+  test("test ImmutableX get signable ERC721 deposit", async () => {
+    const amount = "1";
+    const depositRequest = {
+      "amount": amount,
+      "token": {
+        "type": "ERC721",
+        "data": {
+          "token_address": "0x729731d42f95ddb7bd9c903607a3298b9835297e", // Copy of Bored Ape collection on IMX
+          "token_id": "96"
+        },
+      },
+      "user": provider.ethAddress,
+    }
+
+    const response = await provider.getSignableDeposit(depositRequest);
+    const starkKey = await provider.getStarkKeys(provider.ethAddress);
+    expect(response.stark_key).toEqual(starkKey.accounts[0]);
+    expect(response.amount).toEqual(amount);
+    expect(response).toHaveProperty("vault_id");
+    expect(response).toHaveProperty("asset_id");
+    expect(response).toHaveProperty("nonce");
+  });
+
+  test("test ImmutableX get signable ETH withdrawal", async () => {
+    const amount = 100;
+    const withdrawalRequest = {
+      "amount": (amount * 10**8).toString(),
+      "token": {
+        "type": "ETH",
+        "data": {
+          "decimals": 18
+        },
+      },
+      "user": provider.ethAddress,
+    }
+
+    const response = await provider.getSignableWithdrawal(withdrawalRequest);
+    const starkKey = await provider.getStarkKeys(provider.ethAddress);
+    expect(response.code).toEqual("insufficient_balance");
+    expect(response.message).toEqual("Insufficient balance. Transaction amount: 100, balance: 0");
+  });
+
+  test("test ImmutableX get signable ERC20 withdrawal", async () => {
+    const amount = "100000000";
+    const withdrawalRequest = {
+      "amount": amount,
+      "token": {
+        "type": "ERC20",
+        "data": {
+          "decimals": 6,
+          "token_address": "0x07865c6e87b9f70255377e024ace6630c1eaa37f", // USDC
+        },
+      },
+      "user": provider.ethAddress,
+    }
+
+    const response = await provider.getSignableWithdrawal(withdrawalRequest);
+    const starkKey = await provider.getStarkKeys(provider.ethAddress);
+    expect(response.code).toEqual("insufficient_balance");
+    expect(response.message).toEqual("Insufficient balance. Transaction amount: 100000000, balance: 0");
+  });
+
+  test("test ImmutableX get signable ERC721 withdrawal", async () => {
+    const amount = "1";
+    const withdrawalRequest = {
+      "amount": amount,
+      "token": {
+        "type": "ERC721",
+        "data": {
+          "token_address": "0x729731d42f95ddb7bd9c903607a3298b9835297e", // Copy of Bored Ape collection on IMX
+          "token_id": "96"
+        },
+      },
+      "user": provider.ethAddress,
+    }
+
+    const response = await provider.getSignableWithdrawal(withdrawalRequest);
+    const starkKey = await provider.getStarkKeys(provider.ethAddress);
+    expect(response.code).toEqual("insufficient_balance");
+    expect(response.message).toEqual("Insufficient balance. Transaction amount: 1, balance: 0");
   });
 
   test("test ImmutableX get tokens", async () => {
