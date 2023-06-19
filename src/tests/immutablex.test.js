@@ -8,24 +8,23 @@
 
 require("../index");
 require("whatwg-fetch");
-// const ethUtil = require("ethereumjs-util");
 
 const Web3 = require("web3");
 
 const trustwallet = window.trustwallet;
 
+const ethKey = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
+const starkKey = "0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36";
+
 const mainnet = {
-  address: "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
+  address: ethKey,
   chainId: 1,
 };
 
 const goerli = {
-  address: "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
+  address: ethKey,
   chainId: 5,
 }
-
-// const ethKey = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
-// const starkKey = "0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36";
 
 describe("TrustImmutableXWeb3Provider tests", () => {
   let provider;
@@ -34,7 +33,6 @@ describe("TrustImmutableXWeb3Provider tests", () => {
   beforeEach(() => {
     provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
     web3 = new Web3(provider);
-    // jest.setTimeout(5000);
   });
     
   test("test ImmutableX constructor.name", () => {
@@ -76,14 +74,14 @@ describe("TrustImmutableXWeb3Provider tests", () => {
 
   test("test ImmutableX register user", async () => {
     const signableRegistrationRequest = {
-      "ether_key": "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
-      "stark_key": "0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36",
+      "ether_key": ethKey,
+      "stark_key": starkKey,
     };
 
     const registrationReguest = {
-      "ether_key": "0xe440902afc5e361e3a33152d8c67e5e07da1a524",
+      "ether_key": ethKey,
       "eth_signature": "0x59ae577a76f1143a58cc8a31513ff3c3661ffec1c0fc364ec572adde30004970318036dac720e6409a3b593dc42672d51010ea9363a0f60ae6b75fde1e9df7f100",
-      "stark_key": "0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36",
+      "stark_key": starkKey,
       "stark_signature": "0x05b3be71fe07865c725545de6e95f7d535cf97c1566c83e3ec83bed19b6f1b8600d6b4b27ce386aeaf406474fd774d3e0688666ee59645d10689da4be90bf5ac",
     };
     
@@ -104,13 +102,13 @@ describe("TrustImmutableXWeb3Provider tests", () => {
   });
 
   test("test ImmutableX get Stark key", async () => {
-    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
+    const user = ethKey;
     const response = await provider.getStarkKeys(user);
-    expect(response.accounts[0]).toEqual("0x05b7ef3490154934d95c02d7e53bed472bc7e954fe701d6837dc50e66c6e9e36");
+    expect(response.accounts[0]).toEqual(starkKey);
   });
 
   test("test ImmutableX get signable ETH deposit", async () => {
-    const amount = 100;
+    const amount = "100";
     const depositRequest = {
       "amount": (amount * 10**8).toString(),
       "token": {
@@ -310,7 +308,7 @@ describe("TrustImmutableXWeb3Provider tests", () => {
   });
   
   test("test ImmutableX get balances", async () => {
-    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
+    const user = ethKey;
 
     let response = await provider.getBalances(user);
     let result = response.result[0];
@@ -329,7 +327,7 @@ describe("TrustImmutableXWeb3Provider tests", () => {
     const provider = new trustwallet.ImmutableXProvider({ ethereum: goerli });
     const web3 = new Web3(provider);
 
-    const user = "0xe440902afc5e361e3a33152d8c67e5e07da1a524";
+    const user = ethKey;
     const token = "0x4e420c0c2911e88f45d7b6f6166a7ee40c010cd6";
 
     let response = await provider.getTokenBalances(user, "eth");
