@@ -337,7 +337,15 @@ class TrustWeb3Provider extends BaseProvider {
   }
 
   wallet_watchAsset(payload) {
-    this.postMessage("watchAsset", payload.id, payload.params);
+    let options = payload.params.options;
+    this.postMessage("watchAsset", payload.id, {
+      type: payload.type,
+      contract: options.address,
+      symbol: options.symbol,
+      decimals: options.decimals || 0,
+      image: options.image,
+      params: payload.params,
+    });
   }
 
   wallet_addEthereumChain(payload) {
