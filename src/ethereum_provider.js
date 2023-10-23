@@ -264,8 +264,8 @@ class TrustWeb3Provider extends BaseProvider {
     let address;
 
     if (
-      typeof payload.params[0].toLowerCase() === "string" &&
-      this.address === payload.params[0].toLowerCase()
+      typeof payload.params?.[0].toLowerCase() === "string" &&
+      this.address === payload.params?.[0].toLowerCase()
     ) {
       message = payload.params[1];
       address = payload.params[0];
@@ -301,8 +301,8 @@ class TrustWeb3Provider extends BaseProvider {
     let data;
 
     if (
-      typeof payload.params[0] === "string" &&
-      this.address === payload.params[0].toLowerCase()
+      typeof payload.params?.[0] === "string" &&
+      this.address === payload.params?.[0].toLowerCase()
     ) {
       data = payload.params[1];
       address = payload.params[0];
