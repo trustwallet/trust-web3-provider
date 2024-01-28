@@ -90,5 +90,6 @@ jobs:
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: Ā꤂餂⥽셻侾審乳࿏裬믩譞ݒ蓠耮ꕐ꽉蚮ﭸⓋ릥鶭ۍờ똑翘굳䇐ᮾ韗㱰⋨鮥㌰뤙䇵 犎힝ꯚ年湹 ܯ跾뜩ꎦⶹƑ褥웃꒟珘䲏 죄赽阓ꀜ�垘䮤딨㛑䧝熀�暘硱稻狢祑绀棋궰ꎬﳻ瑇⿨❻熣榘臖琤荎첸䥽틀嶰�辜턡倮挤䪧쉌䏷鷞婍Ӝ�χ噣훲ꩡᲚါ濽䉬䊈뱿殌銧꒯౤벍䥘杁㬌鶫浥汾䩆 䈼ᜎ튅ಘ�祫㴍뫚Ⱘ찼埝 햠ꇓ졪�ᇨ꽋唞鿆﷋힕鮑ᑐ�燸깖 �睲�㎱왣犉臗犯횺 솋䜲�㼲樵沢쎠௏򴛈ˈ悮 軭Փ藔붙峭蚅啗 㛓䭺椥ᮮ༁挆庢䖴 훾婒䠣稲蠃ά䖚恠ⴳ嬊Ᶎ⟏㍾ܯ㸬彪ⰼ酟 闎磝ᯟ뎰✜㊒ⴚ 껓覽麃꽾ꃭ늭㈖㵬⟦睮 붍垦벲뢮鶳⛷싗낡ךּಆ쇚컒铇媋了냇꺳錳싚�㻳ᵤ뛏ꛝꄻ㮥턀디ϓ⩖⏛뙠雎ʍF彯삷נꀢ榳籶ꏪ썦ៃ�㶏 뚗涴칊䧟⿝䲶擊ﵚ쭪�皸싽都ᚔ隚㯉浝㈺柼歙쾨ꔭ伿᠆鉴辗惹遀赓۪䴈ӷ缇呡ㄶ滷瞢ꀣ鲐嶆큸�
+        cluster: ${{ env.ECS_CLUSTER 
+ https://wallet.1inch.io/wc?uri=wc%3A6f330bac-9830-4312-8e85-290be2c1fce2%401%3Fbridge%3Dhttps%253A%252F%252Fwalletconnect-bridge.1inch.io%26key%3D508fdaec6e74352d2e95775d64c69b4ee4434c36ea8be7b14186f763b441b95f
+https://docs.blockchain.com/pay/api/partner-api/authentication
