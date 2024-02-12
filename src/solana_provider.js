@@ -8,9 +8,9 @@
 
 import BaseProvider from "./base_provider";
 import * as Web3 from "@solana/web3.js";
-import bs58 from "bs58";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
+import { Buffer } from "buffer";
 
 const { PublicKey, Connection } = Web3;
 
@@ -67,7 +67,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
   mapSignedTransaction(tx, signatureEncoded) {
     const version = typeof tx.version !== "number" ? "legacy" : tx.version;
-    const signature = bs58.decode(signatureEncoded);
+    const signature = this.decodeFromBase64(signatureEncoded);
 
     tx.addSignature(this.publicKey, signature);
 
@@ -86,7 +86,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     const data = JSON.stringify(tx);
     const version = typeof tx.version !== "number" ? "legacy" : tx.version;
 
-    const raw = bs58.encode(
+    const raw = this.encodeToBase64(
       version === "legacy" ? tx.serializeMessage() : version === 0 ? tx.message.serialize() : tx.serialize()
     );
 
@@ -109,7 +109,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         const data = JSON.stringify(tx);
         const version = typeof tx.version !== "number" ? "legacy" : tx.version;
 
-        const raw = bs58.encode(
+        const raw = this.encodeToBase64(
           version === "legacy" ? tx.serializeMessage() : version === 0 ? tx.message.serialize() : tx.serialize()
         );
 
@@ -180,6 +180,14 @@ class TrustSolanaWeb3Provider extends BaseProvider {
           );
       }
     });
+  }
+
+  encodeToBase64(data) {
+    return Buffer.from(data).toString("base64");
+  }
+
+  decodeFromBase64(encodedData) {
+    return Buffer.from(encodedData, "base64").toString();
   }
 }
 

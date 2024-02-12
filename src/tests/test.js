@@ -210,6 +210,18 @@ describe("TrustWeb3Provider constructor tests", () => {
     });
   });
 
+  test("base64test", () => {
+    const provider = new trustwallet.SolanaProvider({
+      solana: {
+        cluster: "mainnet-beta",
+        isPhantom: false,
+      },
+      isDebug: true,
+    });
+    expect(provider.encodeToBase64("11111")).toEqual("MTExMTE=");
+    expect(provider.decodeFromBase64("MTExMTE=")).toEqual("11111");
+  });
+
   test("test batched sendAsync", (done) => {
     const provider = new trustwallet.Provider({ ethereum: bsc });
     const web3 = new Web3(provider);
