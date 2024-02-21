@@ -349,6 +349,8 @@ class TrustWeb3Provider extends BaseProvider {
       contract: options.address,
       symbol: options.symbol,
       decimals: options.decimals || 0,
+      image: options.image,
+      params: payload.params,
     });
   }
 
