@@ -1,0 +1,5 @@
+{https://github.com/trustwallet/trust-web3-provider.git
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+  }
+}
