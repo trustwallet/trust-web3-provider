@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "exclude": ["package.json", "rollup.config.js", "tsconfig.json", "tests", "./dist"],
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist/types",
+    "emitDeclarationOnly": true
+  }
+}

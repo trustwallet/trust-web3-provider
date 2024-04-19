@@ -1,0 +1,22 @@
+{
+  "name": "@trustwallet/web3-provider-core",
+  "version": "4.0.0",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "unpkg": "dist/index.umd.js",
+  "types": "dist/types/index.d.ts",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:clean": "rm -rf dist",
+    "build:types": "tsc",
+    "build:source": "bun build:clean; rollup --config ./rollup.config.js; bun run build:types",
+    "dev": "bun build:clean; rollup -w --config ./rollup.config.js",
+    "build": "bun build ./index.ts --outdir ./dist"
+  },
+  "dependencies": { "@types/uuid": "^9.0.8", "events": "^3.3.0", "uuid": "9.0.1" }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@trustwallet/web3-provider-solana",
+  "version": "4.0.0",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "unpkg": "dist/index.umd.js",
+  "types": "dist/types/index.d.ts",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:clean": "rm -rf dist",
+    "build:types": "tsc",
+    "build:source": "bun build:clean; rollup --config ./rollup.config.js; bun run build:types",
+    "dev": "bun build ./index.ts --outdir ./dist --watch"
+  },
+  "dependencies": {
+    "@solana/wallet-standard-features": "^1.1.0",
+    "@solana/web3.js": "^1.58.0",
+    "@wallet-standard/base": "^1.0.1",
+    "@wallet-standard/features": "^1.0.3",
+    "bs58": "^4.0.1"
+  },
+  "devDependencies": {
+    "@trustwallet/web3-provider-core": "workspace:*",
+    "@types/bs58": "^4.0.1"
+  }
+}
