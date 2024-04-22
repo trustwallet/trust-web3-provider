@@ -3,6 +3,7 @@ const webpack = require('webpack');
 
 module.exports = {
     mode: 'development',
+    devtool: 'cheap-module-source-map',
     entry: '/src/initialize.ts',
     output: {
         filename: 'index.js',
