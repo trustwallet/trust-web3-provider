@@ -22,10 +22,10 @@ jobs:
     - name: Test Pod build
       run: |
         pod install
-        set -o pipefail && xcodebuild -workspace PodsTest.xcworkspace -scheme PodsTest -destination "platform=iOS Simulator,name=iPhone 13" test | xcbeautify
+        set -o pipefail && xcodebuild -workspace PodsTest.xcworkspace -scheme PodsTest -destination "platform=iOS Simulator,name=iPhone 14 Pro" test | xcbeautify
       working-directory: ios/PodsTest
 
     - name: Test SPM build
       run: |
-        set -o pipefail && xcodebuild -project TrustWeb3Provider.xcodeproj -scheme TrustWeb3Provider-Example -destination "platform=iOS Simulator,name=iPhone 13" | xcbeautify
+        set -o pipefail && xcodebuild -project TrustWeb3Provider.xcodeproj -scheme TrustWeb3Provider-Example -destination "platform=iOS Simulator,name=iPhone 14 Pro" | xcbeautify
       working-directory: ios
