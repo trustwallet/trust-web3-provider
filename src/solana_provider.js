@@ -91,7 +91,14 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       })
     ).toString("base64");
 
-    return this._request("signRawTransaction", { data, raw, version })
+    const rawMessage = Buffer.from(tx.message.serialize()).toString("base64");
+
+    return this._request("signRawTransaction", {
+      data,
+      raw,
+      rawMessage,
+      version,
+    })
       .then((signatureEncoded) =>
         this.mapSignedTransaction(tx, signatureEncoded)
       )
@@ -110,6 +117,10 @@ class TrustSolanaWeb3Provider extends BaseProvider {
         const data = JSON.stringify(tx);
         const version = tx.version;
 
+        const rawMessage = Buffer.from(tx.message.serialize()).toString(
+          "base64"
+        );
+
         const raw = Buffer.from(
           tx.serialize({
             requireAllSignatures: false,
@@ -117,7 +128,7 @@ class TrustSolanaWeb3Provider extends BaseProvider {
           })
         ).toString("base64");
 
-        return { data, raw, version };
+        return { data, raw, rawMessage, version };
       }),
     })
       .then((signaturesEncoded) =>
