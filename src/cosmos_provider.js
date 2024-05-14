@@ -61,21 +61,25 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     return this._request("signAmino", {
       chainId: chainId,
       sign_doc: signDoc,
-    }).then((signatures) => {
-      return { signed: signDoc, signature: JSON.parse(signatures)[0] };
+    }).then((response) => {
+      const { signed, signature } = JSON.parse(response);
+      return { signed, signature };
     });
   }
 
   signDirect(chainId, signerAddress, signDoc) {
     const object = {
-      body_bytes: Utils.bufferToHex(signDoc.bodyBytes),
-      auth_info_bytes: Utils.bufferToHex(signDoc.authInfoBytes),
+      bodyBytes: Utils.bufferToHex(signDoc.bodyBytes),
+      authInfoBytes: Utils.bufferToHex(signDoc.authInfoBytes),
     };
+
     return this._request("signDirect", {
+      signerAddress,
       chainId: chainId,
       sign_doc: object,
-    }).then((signatures) => {
-      return { signed: signDoc, signature: JSON.parse(signatures)[0] };
+    }).then((response) => {
+      const { signature } = JSON.parse(response);
+      return { signed: signDoc, signature };
     });
   }
 
@@ -83,13 +87,14 @@ export class TrustCosmosWeb3Provider extends BaseProvider {
     const buffer = Buffer.from(data);
     const hex = Utils.bufferToHex(buffer);
 
-    return this._request("signArbitrary", { chainId: chainId, data: hex }).then(
-      (result) => {
-        const signature = JSON.parse(result)[0].signature;
-        const signDoc = {};
-        return { signDoc, signature };
-      }
-    );
+    return this._request("signArbitrary", {
+      chainId: chainId,
+      data: hex,
+      signerAddress,
+    }).then((response) => {
+      const signDoc = {};
+      return { signDoc, signature: response };
+    });
   }
 
   sendTx(chainId, tx, mode) {
