@@ -315,7 +315,10 @@ class TrustWeb3Provider extends BaseProvider {
 
     const { chainId } = message.domain || {};
 
-    if (!chainId || Number(chainId) !== Number(this.chainId)) {
+    if (
+      typeof chainId !== "undefined" &&
+      Number(chainId) !== Number(this.chainId)
+    ) {
       throw new Error(
         "Provided chainId does not match the currently active chain"
       );
