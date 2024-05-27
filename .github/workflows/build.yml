@@ -1,0 +1,39 @@
+name: Build Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        default: "4.0.0"
+        description: New version number >= 4.0.0
+        required: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  generate-releases:
+    name: NPM Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: oven-sh/setup-bun@v1
+      - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: build packages
+        run: |
+          bun install
+          bun run build:packages
+          bun run test
+          npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+          bun run publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+permissions:
+  actions: write
+  contents: write
+  deployments: write
+  packages: write
