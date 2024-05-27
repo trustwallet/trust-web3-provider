@@ -27,8 +27,10 @@ jobs:
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: Setup npm for authentication
-        run: echo "//registry.npmjs.org/:_authToken=\${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - name: Set up Git user information
+        run: |
+          git config --global user.email "support@trustwallet.com"
+          git config --global user.name "Trust"
       - name: build packages
         run: |
           bun install
