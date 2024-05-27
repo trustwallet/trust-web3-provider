@@ -20,6 +20,10 @@ jobs:
         with:
           ref: main
       - uses: oven-sh/setup-bun@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
@@ -28,9 +32,9 @@ jobs:
       - name: build packages
         run: |
           bun install
+          npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run build:packages
           bun run test
-          npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run publish
 permissions:
   actions: write
