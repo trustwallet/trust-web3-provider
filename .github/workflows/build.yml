@@ -16,10 +16,6 @@ jobs:
     name: NPM Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
       - uses: actions/checkout@v4
         with:
           ref: main
@@ -27,6 +23,8 @@ jobs:
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Setup npm for authentication
+        run: echo "//registry.npmjs.org/:_authToken=\${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - name: build packages
         run: |
           bun install
@@ -34,8 +32,6 @@ jobs:
           bun run test
           npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 permissions:
   actions: write
   contents: write
