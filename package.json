@@ -1,5 +1,6 @@
 {
   "name": "@trustwallet/web3-provider",
+  "private": true,
   "module": "index.ts",
   "type": "module",
   "scripts": {
@@ -26,7 +27,7 @@
     "rollup": "2.78.0",
     "rollup-plugin-esbuild": "4.9.3",
     "simple-scaffold": "2.2.1",
-    "typescript": "4.7.4",
+    "typescript": "^5.0.0",
     "typescript-eslint": "^7.10.0"
   },
   "peerDependencies": {

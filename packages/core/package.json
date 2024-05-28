@@ -19,5 +19,9 @@
     "dev": "bun build:clean; rollup -w --config ./rollup.config.js",
     "build": "bun build ./index.ts --outdir ./dist"
   },
-  "dependencies": { "@types/uuid": "^9.0.8", "events": "^3.3.0", "uuid": "9.0.1" }
+  "dependencies": {
+    "@types/uuid": "^9.0.8",
+    "events": "^3.3.0",
+    "uuid": "9.0.1"
+  }
 }
