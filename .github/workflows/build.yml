@@ -39,7 +39,7 @@ jobs:
           bun run rename ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 permissions:
   actions: write
   contents: write
