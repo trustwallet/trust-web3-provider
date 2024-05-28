@@ -38,6 +38,8 @@ jobs:
           bun run build:packages
           bun run test
           bun run publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
   actions: write
   contents: write
