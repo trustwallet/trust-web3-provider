@@ -34,8 +34,7 @@ jobs:
       - name: build packages
         run: |
           bun install
-          npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
-          bun run build:packages
+          bun run build:packages ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run test
           bun run publish
         env:
