@@ -18,7 +18,7 @@ directories.forEach((directory) => {
   console.log(`Publishing ${directory}`);
 
   try {
-    execSync(`npm publish --dry-run --access public`, {
+    execSync(`npm publish --access public`, {
       stdio: 'inherit',
       cwd: dirPath,
     });
