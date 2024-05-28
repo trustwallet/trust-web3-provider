@@ -34,6 +34,10 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
 
   publicKey!: PublicKey | null;
 
+  isTrust: boolean = true;
+
+  isTrustWallet: boolean = true;
+
   static bufferToHex(buffer: Buffer | Uint8Array | string) {
     return '0x' + Buffer.from(buffer).toString('hex');
   }
@@ -67,6 +71,11 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
 
       if (typeof config.disableMobileAdapter !== 'undefined') {
         this.#disableMobileAdapter = config.disableMobileAdapter;
+      }
+
+      if (typeof config.isTrust !== 'undefined') {
+        this.isTrust = config.isTrust;
+        this.isTrustWallet = config.isTrust;
       }
     }
 
