@@ -15,7 +15,7 @@ directories.forEach((directory) => {
   console.log(`Publishing ${directory}`);
 
   try {
-    execSync('npm publish', { stdio: 'inherit', cwd: dirPath });
+    execSync('npm publish --access public', { stdio: 'inherit', cwd: dirPath });
     console.log(`Published ${directory}`);
   } catch (error) {
     console.error(`Failed to build ${directory}`);

@@ -1,7 +1,6 @@
 {
   "name": "@trustwallet/web3-provider",
   "module": "index.ts",
-  "private": "true",
   "type": "module",
   "scripts": {
     "lint": "eslint .",
