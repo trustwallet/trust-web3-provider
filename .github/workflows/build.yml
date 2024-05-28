@@ -36,7 +36,8 @@ jobs:
           bun install
           bun run build:packages
           bun run test
-          bun run publish ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+          bun run rename ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+          bun run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:

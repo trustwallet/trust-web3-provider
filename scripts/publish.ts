@@ -2,9 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 
+/**
+ * Executes publish to npm
+ */
 const subpackagesDir = path.resolve(__dirname, '../packages');
-
-const version = process.argv[2];
 
 const directories = fs
   .readdirSync(subpackagesDir, { withFileTypes: true })
@@ -14,10 +15,10 @@ const directories = fs
 directories.forEach((directory) => {
   const dirPath = path.join(subpackagesDir, directory);
 
-  console.log(`Publishing ${directory}, version: ${version}`);
+  console.log(`Publishing ${directory}`);
 
   try {
-    execSync(`npm version ${version} && npm publish --access public`, {
+    execSync(`npm publish --dry-run --access public`, {
       stdio: 'inherit',
       cwd: dirPath,
     });
