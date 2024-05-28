@@ -175,7 +175,9 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
     );
   }
 
-  async signMessage(message: Uint8Array): Promise<{ signature: Uint8Array }> {
+  async signMessage(
+    message: Uint8Array,
+  ): Promise<{ signature: Uint8Array; publicKey: string | undefined }> {
     const data = SolanaProvider.bufferToHex(message);
 
     const res = await this.#privateRequest<string>({
@@ -184,7 +186,8 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
     });
 
     return {
-      signature: new Uint8Array(SolanaProvider.messageToBuffer(res).buffer),
+      signature: Buffer.from(SolanaProvider.messageToBuffer(res).buffer),
+      publicKey: this.publicKey?.toBase58(),
     };
   }
 
