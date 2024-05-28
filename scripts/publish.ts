@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 
 const subpackagesDir = path.resolve(__dirname, '../packages');
 
-const version = process.argv[3];
+const version = process.argv[2];
 
 const directories = fs
   .readdirSync(subpackagesDir, { withFileTypes: true })
