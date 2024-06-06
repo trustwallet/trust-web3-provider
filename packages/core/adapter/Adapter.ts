@@ -15,7 +15,7 @@ export interface IAdapterRequestParams {
   method: string;
 }
 
-export type IHandler = (params: IHandlerParams) => Promise<any>;
+export type IHandler = (params: IHandlerParams) => Promise<any> | void;
 
 export type AdapterStrategyType = keyof typeof AdapterStrategy;
 
@@ -51,7 +51,7 @@ export abstract class Adapter {
   request(
     params: IAdapterRequestParams | ICallbackAdapterRequestParams,
     network: string,
-  ): Promise<any> {
+  ): Promise<any> | void {
     if (!this.#handler) {
       throw new Error('No handler defined for Adapter');
     }

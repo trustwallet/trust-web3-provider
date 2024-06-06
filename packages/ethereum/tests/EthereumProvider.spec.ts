@@ -25,6 +25,19 @@ test('Ethereum Provider → eth_requestAccounts', async () => {
   expect(accounts).toEqual([account]);
 });
 
+test('Ethereum Provider → eth_requestAccounts callback', async () => {
+  const provider = new Web3Provider({
+    strategy: AdapterStrategy.CALLBACK,
+  }).registerProvider(ethereum);
+
+  provider.setHandler((params: IHandlerParams) => {
+    provider.sendResponse(params.id!, [account]);
+  });
+
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+  expect(accounts).toEqual([account]);
+});
+
 test('Ethereum Provider → unsupported method returns error', async () => {
   const method = 'eth_newFilter';
   const ethereum = new EthereumProvider({ unsupportedMethods: [method] });

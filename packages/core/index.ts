@@ -16,14 +16,21 @@ import { PromiseAdapter } from './adapter/PromiseAdapter';
 export class Web3Provider {
   #adapter!: Adapter;
 
-  constructor(params: { strategy: AdapterStrategyType; handler: IHandler }) {
+  constructor(params: { strategy: AdapterStrategyType; handler?: IHandler }) {
     const adapter =
       params.strategy === AdapterStrategy.CALLBACK
         ? new CallbackAdapter()
         : new PromiseAdapter();
 
-    adapter.setHandler(params.handler);
+    if (params.handler) {
+      adapter.setHandler(params.handler);
+    }
+
     this.setAdapter(adapter);
+  }
+
+  setHandler(handler: IHandler) {
+    this.#adapter.setHandler(handler);
   }
 
   private setAdapter(adapter: Adapter) {
@@ -39,6 +46,18 @@ export class Web3Provider {
   registerProviders(providers: BaseProvider[]) {
     providers.forEach((provider) => this.registerProvider(provider));
     return this;
+  }
+
+  sendResponse(requestId: string, response: any) {
+    if (this.#adapter.getStrategy() === 'CALLBACK') {
+      (this.#adapter as CallbackAdapter).sendResponse(requestId, response);
+    }
+  }
+
+  sendError(requestId: string, error: any) {
+    if (this.#adapter.getStrategy() === 'CALLBACK') {
+      (this.#adapter as CallbackAdapter).sendError(requestId, error);
+    }
   }
 }
 

@@ -6,7 +6,7 @@ export class PromiseAdapter extends Adapter {
     super(AdapterStrategy.PROMISES);
   }
 
-  request(params: IRequestArguments, network: string): Promise<any> {
+  request(params: IRequestArguments, network: string): Promise<any> | void {
     return super.request(params as IAdapterRequestParams, network);
   }
 }

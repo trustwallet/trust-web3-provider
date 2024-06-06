@@ -9,6 +9,20 @@
 
 ```
 
-### Cosmos Package Description
+### Cosmos JavaScript Provider Implementation
 
-TBD
+### Config Object
+
+```typescript
+const config: {
+  disableMobileAdapter?: boolean;
+  isKeplr?: boolean;
+  isTrust?: boolean;
+} = {};
+```
+
+### Usage
+
+```typescript
+const cosmos = new CosmosProvider(config);
+```

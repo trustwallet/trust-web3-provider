@@ -15,12 +15,8 @@
 
 ```
 
-Welcome to the Trust Wallet Web3 Provider repository. A set of providers and
-javascript wrappers designed to facilitate web3 interactions between dApps and
-Wallets.
-
-This library allows you to handle dApps requests on your wallet and send the
-response back by implementing providers for you, including EIP-1193.
+A modular TypeScript library designed to offer Web3 interfaces, enabling your
+wallet to connect with decentralized applications.
 
 ```
  +----------------+            +------------------+           +---------------+
@@ -33,7 +29,14 @@ response back by implementing providers for you, including EIP-1193.
 
 ## Supported chains
 
-- Cosmos
-- Solana
-- Binance Chain
-- Ethereum
+- Cosmos [Docs](/packages/cosmos/README.md)
+- Solana - _Wallet Standard fully compatible_ [Docs](/packages/solana/README.md)
+- Ethereum _EIP-1193_ [Docs](/packages/ethereum/README.md)
+
+# Useful links
+
+[Using the library](/docs/USAGE.md)
+
+[Contributing](/docs/BUILD.md)
+
+[Adding a new chain](/docs/NEW.md)
