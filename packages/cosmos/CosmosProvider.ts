@@ -182,6 +182,8 @@ export class CosmosProvider extends BaseProvider implements ICosmosProvider {
     return { signed: signDoc, signature: signature as string };
   }
 
+  experimentalSuggestChain() {}
+
   getOfflineSignerDirect(chainId: string) {
     return {
       getAccounts: async () => {

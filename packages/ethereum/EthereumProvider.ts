@@ -112,7 +112,7 @@ export class EthereumProvider
   /**
    * @deprecated Use request() method instead.
    */
-  send(payload: IRequestArguments) {
+  _send(payload: IRequestArguments) {
     const response: { result: any; jsonrpc: string } = {
       jsonrpc: '2.0',
       result: null,
@@ -136,6 +136,39 @@ export class EthereumProvider
     }
 
     return response;
+  }
+
+  /**
+   * @deprecated Use request() method instead.
+   */
+  send(methodOrPayload: unknown, callbackOrArgs?: unknown): unknown {
+    if (
+      typeof methodOrPayload === 'string' &&
+      (!callbackOrArgs || Array.isArray(callbackOrArgs))
+    ) {
+      return new Promise((resolve, reject) => {
+        try {
+          this.request({
+            method: methodOrPayload,
+            params: callbackOrArgs as unknown[],
+          })
+            .then(resolve)
+            .catch(reject);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    } else if (
+      methodOrPayload &&
+      typeof methodOrPayload === 'object' &&
+      typeof callbackOrArgs === 'function'
+    ) {
+      return this.request(methodOrPayload as IRequestArguments).then(
+        callbackOrArgs as (...args: unknown[]) => void,
+      );
+    }
+
+    return this._send(methodOrPayload as IRequestArguments);
   }
 
   internalRequest<T>(args: IRequestArguments): Promise<T> {
