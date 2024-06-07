@@ -11,4 +11,4 @@
 
 ### Core Package Description
 
-TBD
+Handler strategy and handler registration
