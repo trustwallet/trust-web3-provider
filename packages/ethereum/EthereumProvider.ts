@@ -146,14 +146,20 @@ export class EthereumProvider
       typeof methodOrPayload === 'string' &&
       (!callbackOrArgs || Array.isArray(callbackOrArgs))
     ) {
+      const context = this;
+
       return new Promise((resolve, reject) => {
         try {
-          this.request({
+          const req = context.request({
             method: methodOrPayload,
             params: callbackOrArgs as unknown[],
-          })
-            .then(resolve)
-            .catch(reject);
+          });
+
+          if (req instanceof Promise) {
+            req.then(resolve).catch(reject);
+          } else {
+            resolve(req);
+          }
         } catch (error) {
           reject(error);
         }
@@ -191,9 +197,15 @@ export class EthereumProvider
     };
 
     if (this.mobileAdapter) {
-      return this.handleStaticRequests(args, () =>
+      const req = this.handleStaticRequests(args, () =>
         this.mobileAdapter.request(args),
-      ) as Promise<T>;
+      );
+
+      if (req instanceof Promise) {
+        return req;
+      } else {
+        return Promise.resolve(req) as Promise<T>;
+      }
     }
 
     return this.handleStaticRequests(args, next) as Promise<T>;
