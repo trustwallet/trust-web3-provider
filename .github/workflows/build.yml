@@ -1,4 +1,5 @@
 name: Build Packages
+
 on:
   workflow_dispatch:
     inputs:
@@ -22,10 +23,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@trustwallet"
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@trustwallet'
       - name: Set output
-	jobs:
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: build packages
+        run: |
           bun install
           bun run build:packages
           bun run test
