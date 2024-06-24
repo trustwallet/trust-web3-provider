@@ -33,7 +33,7 @@ export class EthereumProvider
 
   isTrustWallet: boolean = true;
 
-  providers: object[] | null = null;
+  providers: object[] | undefined;
 
   constructor(config?: IEthereumProviderConfig) {
     super();
