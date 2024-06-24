@@ -548,7 +548,7 @@ test('Ethereum Provider → Mobile Adapter → wallet_watchAsset → payload is 
 
   await ethereum.request<string>({
     method: 'wallet_watchAsset',
-    params: [params],
+    params: params,
   });
 
   expect(handler).toHaveBeenCalledWith(
