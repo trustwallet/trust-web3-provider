@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
       - uses: oven-sh/setup-bun@v1
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
           registry-url: "https://npm.pkg.github.com"
