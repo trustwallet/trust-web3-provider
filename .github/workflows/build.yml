@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        default: "4.0.0"
+        default: '4.0.0'
         description: New version number >= 4.0.0
         required: true
 
@@ -20,11 +20,11 @@ jobs:
         with:
           ref: main
       - uses: oven-sh/setup-bun@v1
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@trustwallet"
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@trustwallet'
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
