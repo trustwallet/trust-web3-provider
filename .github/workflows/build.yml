@@ -1,5 +1,4 @@
 name: Build Packages
-
 on:
   workflow_dispatch:
     inputs:
@@ -12,28 +11,25 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  generate-releases:
-    name: NPM Release
+  github-release:
+    name: Github Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
       - uses: oven-sh/setup-bun@v1
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@trustwallet'
+          node-version: '20.x'
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@trustwallet"
       - name: Set output
-        id: vars
-        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: build packages
-        run: |
+	jobs:
           bun install
           bun run build:packages
           bun run test
-          npm version ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+          bun run rename ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
