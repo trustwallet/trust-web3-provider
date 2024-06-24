@@ -85,3 +85,7 @@ export interface IWatchAsset {
     decimals: number;
   };
 }
+
+export interface IPermissionRes {
+  caveats: { type: string; value: string }[];
+}

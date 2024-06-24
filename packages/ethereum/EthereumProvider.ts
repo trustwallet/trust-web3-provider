@@ -1,6 +1,6 @@
 import type IEthereumProvider from './types/EthereumProvider';
 
-import type { IRequestArguments } from './types';
+import type { IPermissionRes, IRequestArguments } from './types';
 
 import { BaseProvider } from '@trustwallet/web3-provider-core';
 import type { IEthereumProviderConfig } from './types/EthereumProvider';
@@ -67,8 +67,7 @@ export class EthereumProvider
       this.mobileAdapter = new MobileAdapter(this);
     }
 
-    this.on('onResponseReady', this.onResponseReady.bind(this));
-
+    super.on('onResponseReady', this.onResponseReady.bind(this));
     this.connect();
   }
 
@@ -255,6 +254,12 @@ export class EthereumProvider
       case 'eth_requestAccounts':
       case 'requestAccounts':
         this.#address = (response as string[])[0];
+        break;
+      case 'wallet_requestPermissions':
+        this.#address = (
+          response as IPermissionRes[]
+        )[0]?.caveats?.[0]?.value?.[0];
+        break;
     }
   }
 

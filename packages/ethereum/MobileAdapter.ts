@@ -51,13 +51,6 @@ export class MobileAdapter {
 
   constructor(provider: EthereumProvider) {
     this.provider = provider;
-    provider.on('onResponseReady', this.onResponseReady.bind(this));
-  }
-
-  onResponseReady(req: IRequestArguments, response: unknown) {
-    if (!response) {
-      return;
-    }
   }
 
   request<T>(args: IRequestArguments): Promise<T> {
@@ -71,6 +64,11 @@ export class MobileAdapter {
     }
 
     switch (args.method) {
+      case 'wallet_requestPermissions':
+        return this.provider.internalRequest({
+          method: 'wallet_requestPermissions',
+          params: args.params,
+        });
       case 'eth_requestAccounts':
         return this.provider.internalRequest({
           method: 'requestAccounts',

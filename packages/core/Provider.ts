@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import type { CallbackAdapter } from './adapter/CallbackAdapter';
 import type { PromiseAdapter } from './adapter/PromiseAdapter';
 import { Adapter, AdapterStrategy } from './adapter/Adapter';
+import { RPCError } from './exceptions/RPCError';
 
 export interface IRequestArguments {
   method: string;
@@ -36,16 +37,20 @@ export abstract class BaseProvider
    * @param args
    */
   async request<T>(args: IRequestArguments): Promise<T> {
-    if (!this.adapter) {
-      throw new Error('No adapter set');
+    try {
+      if (!this.adapter) {
+        throw new Error('No adapter set');
+      }
+
+      const res = await this.adapter.request(args, this.getNetwork());
+
+      // Emit internally the response
+      this.emit('onResponseReady', args, res);
+
+      return res as T;
+    } catch (e) {
+      throw new RPCError(4200, `Error Calling Method: ${args.method}`);
     }
-
-    const res = await this.adapter.request(args, this.getNetwork());
-
-    // Emit internally the response
-    this.emit('onResponseReady', args, res);
-
-    return res as T;
   }
 
   abstract getNetwork(): string;

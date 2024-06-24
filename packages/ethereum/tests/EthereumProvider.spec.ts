@@ -662,3 +662,45 @@ test('Ethereum Provider → Mobile Adapter → should fallback to RPC handler', 
     }),
   );
 });
+
+test('Ethereum Provider → Mobile Adapter → permissions attaches address → payload is correct', async () => {
+  const handler = jest.fn((_params: IHandlerParams) =>
+    Promise.resolve([
+      {
+        caveats: [
+          {
+            type: 'restrictReturnedAccounts',
+            value: [account],
+          },
+        ],
+        id: 'eM3kFsO5sXX4ygvoDNJya',
+        date: 1719244991262,
+        invoker: 'https://app.galxe.com',
+        parentCapability: 'eth_accounts',
+      },
+    ]),
+  );
+
+  new Web3Provider({
+    strategy: AdapterStrategy.PROMISES,
+    handler,
+  }).registerProvider(ethereum);
+
+  await ethereum.request<string>({
+    method: 'wallet_requestPermissions',
+  });
+
+  await ethereum.request<string>({
+    method: 'personal_sign',
+    params: [account, '0x123'],
+  });
+
+  expect(handler).toHaveBeenCalledWith(
+    expect.objectContaining({
+      params: {
+        data: `0x123`,
+        address: account,
+      },
+    }),
+  );
+});
