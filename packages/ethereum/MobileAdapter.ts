@@ -103,7 +103,7 @@ export class MobileAdapter {
           params: (args.params as object[])[0],
         });
       case 'wallet_watchAsset': {
-        const { options, type } = (args.params as unknown[])[0] as IWatchAsset;
+        const { options, type } = args.params as unknown as IWatchAsset;
         const { address, symbol, decimals } = options;
 
         return this.provider.internalRequest({
