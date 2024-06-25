@@ -37,6 +37,7 @@ export class EthereumProvider
 
   constructor(config?: IEthereumProviderConfig) {
     super();
+    this.request = this.request.bind(this);
 
     if (config) {
       if (config.chainId) {
