@@ -62,6 +62,7 @@ export abstract class Adapter {
         id: params.id,
         name: params.method,
         params: params.params,
+        object: params.params,
       });
     }
 
@@ -69,6 +70,7 @@ export abstract class Adapter {
       name: params.method,
       network,
       params: params.params,
+      object: params.params,
     });
   }
 

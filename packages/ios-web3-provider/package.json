@@ -1,0 +1,28 @@
+{
+  "name": "@trustwallet/ios-web3-provider",
+  "version": "4.0.0",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "unpkg": "dist/index.umd.js",
+  "types": "dist/types/index.d.ts",
+  "author": "Trust <support@trustwallet.com>",
+  "license": "MIT",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:clean": "rm -rf dist",
+    "build:types": "tsc",
+    "build:source": "bun build:clean; rollup --config ./rollup.config.js; bun run build:types",
+    "dev": "bun build ./index.ts --outdir ./dist --watch"
+  },
+  "dependencies": {
+    "@trustwallet/web3-provider-core": "workspace:*",
+    "@trustwallet/web3-provider-ethereum": "workspace:*",
+    "@trustwallet/web3-provider-solana": "workspace:*",
+    "@trustwallet/web3-provider-cosmos": "workspace:*"
+  },
+  "devDependencies": { }
+}

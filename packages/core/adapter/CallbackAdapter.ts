@@ -5,7 +5,7 @@ import { IRequestArguments } from '../Provider';
 import { Adapter, AdapterStrategy, IAdapterRequestParams } from './Adapter';
 
 export interface ICallbackAdapterRequestParams extends IAdapterRequestParams {
-  id: string;
+  id: number;
 }
 
 export interface IHandlerParams {
@@ -13,6 +13,9 @@ export interface IHandlerParams {
   network: string;
   name: IAdapterRequestParams['method'];
   params: IAdapterRequestParams['params'];
+
+  // Retro compatibility with apps
+  object: IAdapterRequestParams['params'];
 }
 
 interface ICallbackEntry {
@@ -35,26 +38,26 @@ export class CallbackAdapter extends Adapter {
 
   async request(params: IRequestArguments, network: string): Promise<unknown> {
     return new Promise((resolve, reject) => {
-      const id = uuidv4();
-      this.callback.set(id, { reject, resolve });
+      const id = new Date().getTime() + Math.floor(Math.random() * 1000);
+      this.callback.set(id.toString(), { reject, resolve });
       super.request({ ...params, id }, network);
     });
   }
 
-  public sendResponse(requestId: string, response: any) {
-    if (this.callback.has(requestId)) {
-      const callback = this.callback.get(requestId);
-      this.callback.delete(requestId);
+  public sendResponse(requestId: number, response: any) {
+    if (this.callback.has(requestId.toString())) {
+      const callback = this.callback.get(requestId.toString());
+      this.callback.delete(requestId.toString());
       callback?.resolve(response);
     } else {
       console.error(`Unable to find callback for requestId: ${requestId}`);
     }
   }
 
-  public sendError(requestId: string, error: any) {
-    if (this.callback.has(requestId)) {
-      const callback = this.callback.get(requestId);
-      this.callback.delete(requestId);
+  public sendError(requestId: number, error: any) {
+    if (this.callback.has(requestId.toString())) {
+      const callback = this.callback.get(requestId.toString());
+      this.callback.delete(requestId.toString());
       callback?.reject(error);
     } else {
       console.error(`Unable to find callback for requestId: ${requestId}`);

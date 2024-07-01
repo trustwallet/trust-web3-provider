@@ -48,13 +48,13 @@ export class Web3Provider {
     return this;
   }
 
-  sendResponse(requestId: string, response: any) {
+  sendResponse(requestId: number, response: any) {
     if (this.#adapter.getStrategy() === 'CALLBACK') {
       (this.#adapter as CallbackAdapter).sendResponse(requestId, response);
     }
   }
 
-  sendError(requestId: string, error: any) {
+  sendError(requestId: number, error: any) {
     if (this.#adapter.getStrategy() === 'CALLBACK') {
       (this.#adapter as CallbackAdapter).sendError(requestId, error);
     }

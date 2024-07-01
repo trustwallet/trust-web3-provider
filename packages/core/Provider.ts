@@ -10,8 +10,8 @@ export interface IRequestArguments {
 }
 
 export interface IBaseProvider {
-  sendResponse(requestId: string, response: any): void;
-  sendError(requestId: string, response: any): void;
+  sendResponse(requestId: number, response: any): void;
+  sendError(requestId: number, response: any): void;
   setAdapter(adapter: Adapter): IBaseProvider;
   request(args: IRequestArguments): Promise<unknown>;
 }
@@ -49,7 +49,7 @@ export abstract class BaseProvider
 
       return res as T;
     } catch (e) {
-      throw new RPCError(4200, `Error Calling Method: ${args.method}`);
+      throw e;
     }
   }
 
@@ -60,7 +60,7 @@ export abstract class BaseProvider
    * @param requestId
    * @param response
    */
-  sendResponse(requestId: string, response: any) {
+  sendResponse(requestId: number, response: any) {
     if (!this.adapter) {
       throw new Error('Adapter not found');
     }
@@ -77,7 +77,7 @@ export abstract class BaseProvider
    * @param requestId
    * @param response
    */
-  sendError(requestId: string, response: any) {
+  sendError(requestId: number, response: any) {
     if (!this.adapter) {
       throw new Error('Adapter not found');
     }
