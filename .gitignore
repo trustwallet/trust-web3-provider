@@ -173,6 +173,5 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
-packages/ios-web3-provider/swift/trust-min.js
-packages/ios-web3-provider/swift/trust-min.js.map
+
 
