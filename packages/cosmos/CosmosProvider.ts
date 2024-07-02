@@ -210,10 +210,25 @@ export class CosmosProvider extends BaseProvider implements ICosmosProvider {
     return this.getOfflineSignerAmino(chainId);
   }
 
+  getOfflineSignerAuto(chainId: string) {
+    return this.getOfflineSignerAmino(chainId);
+  }
+
   getOfflineSignerAmino(chainId: string) {
     return {
       getAccounts: async () => {
-        return [await this.getKey(chainId)];
+        const key = (await this.getKey(chainId)) as unknown as {
+          pubKey: Buffer;
+          bech32Address: string;
+        };
+
+        return [
+          {
+            address: key.bech32Address,
+            algo: 'secp256k1',
+            pubkey: key.pubKey,
+          },
+        ];
       },
 
       sign: (signerAddress: string, signDoc: StdSignDoc) => {

@@ -78,6 +78,7 @@ public struct TrustWeb3Provider {
     public var injectScript: WKUserScript {
         let source = """
         (function() {
+
             const config = {
                 ethereum: {
                     address: "\(config.ethereum.address)",
@@ -96,13 +97,14 @@ public struct TrustWeb3Provider {
             const strategy = 'CALLBACK';
             try {
                 const core = trustwallet.core(strategy, (params) => {
-                  webkit.messageHandlers._tw_.postMessage(JSON.stringify(params));
+                  webkit.messageHandlers._tw_.postMessage(params);
                 });
+
 
                 // Generate instances
                 const ethereum = trustwallet.ethereum(config.ethereum);
                 const solana = trustwallet.solana(config.solana);
-                const cosmos = trustwallet.cosmos({});
+                const cosmos = trustwallet.cosmos();
                 //const aptos = trustwallet.aptos(config.aptos);
 
                 core.registerProviders([ethereum, solana, cosmos].map(provider => {
@@ -111,10 +113,18 @@ public struct TrustWeb3Provider {
                   return provider;
                 }));
 
+                ethereum.sendResponse = (...params) => {
+                    return core.sendResponse.bind(core)(...params);
+                }
+
+                cosmos.sendResponse = (...params) => {
+                    return core.sendResponse.bind(core)(...params);
+                }
+
                 // Custom methods
-                ethereum.emitChainChanged = (chain) => {
+                ethereum.emitChainChanged = (chainId) => {
                   ethereum.setChainId('0x' + parseInt(chainId || '1').toString(16));
-                  ethereum.emit('chainChanged', this.provider.getChainId());
+                  ethereum.emit('chainChanged', ethereum.getChainId());
                   ethereum.emit('networkChanged', parseInt(chainId || '1'));
                 };
 
@@ -124,10 +134,20 @@ public struct TrustWeb3Provider {
                   ethereum.setRPCUrl(config.ethereum.rpcUrl);
                 };
 
+                cosmos.mode = 'extension';
+                cosmos.providerNetwork = 'cosmos';
+                cosmos.isKeplr = true;
+                cosmos.version = "0.12.106";
+
+                cosmos.enable = (chainIds)  => {
+                    console.log(`==> enabled for ${chainIds}`);
+                };
+
                 // Attach to window
                 trustwallet.ethereum = ethereum;
                 trustwallet.solana = solana;
                 trustwallet.cosmos = cosmos;
+                trustwallet.TrustCosmos = trustwallet.cosmos;
 
                 window.ethereum = trustwallet.ethereum;
                 window.keplr = trustwallet.cosmos;
