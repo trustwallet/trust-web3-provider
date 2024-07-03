@@ -17,6 +17,7 @@ export interface ISolanaProviderConfig {
   enableAdapter?: boolean;
   cluster?: string;
   disableMobileAdapter?: boolean;
+  useLegacySign?: boolean;
 }
 
 export interface ConnectOptions {

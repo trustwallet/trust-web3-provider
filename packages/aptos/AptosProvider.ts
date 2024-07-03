@@ -41,6 +41,10 @@ export class AptosProvider extends BaseProvider implements IAptosProvider {
     if (config) {
       if (config.network) {
         this._network = config.network;
+
+        if (config.chainId) {
+          this.chainId = config.chainId;
+        }
       }
     }
   }
@@ -68,7 +72,10 @@ export class AptosProvider extends BaseProvider implements IAptosProvider {
   }
 
   async account() {
-    const data = await this.request<string>({ method: 'requestAccounts' });
+    const data = await this.request<string>({
+      method: 'requestAccounts',
+      params: {},
+    });
     return JSON.parse(data);
   }
 

@@ -39,7 +39,9 @@ export abstract class BaseProvider
   async request<T>(args: IRequestArguments): Promise<T> {
     try {
       if (!this.adapter) {
-        throw new Error('No adapter set');
+        throw new Error(
+          'No adapter set, maybe you forgot to register the provider?',
+        );
       }
 
       const res = await this.adapter.request(args, this.getNetwork());

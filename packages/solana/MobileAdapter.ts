@@ -3,6 +3,7 @@ import { SolanaProvider } from './SolanaProvider';
 import { isVersionedTransaction } from './adapter/solana';
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { ConnectOptions } from './types/SolanaProvider';
+import * as bs58 from 'bs58';
 
 /**
  * Adapting some requests to legacy mobile API
@@ -12,9 +13,11 @@ import { ConnectOptions } from './types/SolanaProvider';
  */
 export class MobileAdapter {
   private provider!: SolanaProvider;
+  private useLegacySign = false;
 
-  constructor(provider: SolanaProvider) {
+  constructor(provider: SolanaProvider, useLegacySign = false) {
     this.provider = provider;
+    this.useLegacySign = useLegacySign;
   }
 
   async connect(
@@ -32,6 +35,10 @@ export class MobileAdapter {
   async signTransaction<T extends Transaction | VersionedTransaction>(
     tx: T,
   ): Promise<T> {
+    if (this.useLegacySign) {
+      return (await this.legacySign<T>(tx)) as T;
+    }
+
     const data = JSON.stringify(tx);
 
     let version: string | number = 'legacy';
@@ -59,6 +66,34 @@ export class MobileAdapter {
     });
 
     return this.provider.mapSignedTransaction<T>(tx, signatureEncoded);
+  }
+
+  async legacySign<T extends Transaction | VersionedTransaction>(tx: T) {
+    const data = JSON.stringify(tx);
+
+    const version =
+      typeof (tx as VersionedTransaction).version !== 'number'
+        ? 'legacy'
+        : (tx as VersionedTransaction).version;
+
+    const raw = bs58.encode(
+      version === 'legacy'
+        ? (tx as Transaction).serializeMessage()
+        : version === 0
+        ? (tx as VersionedTransaction).message.serialize()
+        : tx.serialize(),
+    );
+
+    try {
+      const signatureEncoded = await this.provider.internalRequest<string>({
+        method: 'signRawTransaction',
+        params: { data, raw, version },
+      });
+
+      return this.provider.mapSignedTransaction<T>(tx, signatureEncoded);
+    } catch (error) {
+      console.log(`<== Error: ${error}`);
+    }
   }
 
   /**

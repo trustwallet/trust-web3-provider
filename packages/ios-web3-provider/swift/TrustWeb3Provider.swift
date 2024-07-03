@@ -86,7 +86,9 @@ public struct TrustWeb3Provider {
                     rpcUrl: "\(config.ethereum.rpcUrl)"
                 },
                 solana: {
-                    cluster: "\(config.solana.cluster)"
+                    cluster: "\(config.solana.cluster)",
+                    // @todo: remove this when mobile supports versioned transactions
+                    useLegacySign: true
                 },
                 aptos: {
                     network: "\(config.aptos.network)",
@@ -95,31 +97,24 @@ public struct TrustWeb3Provider {
             };
 
             const strategy = 'CALLBACK';
+
             try {
                 const core = trustwallet.core(strategy, (params) => {
+                    console.log('sending to wallet', params);
                   webkit.messageHandlers._tw_.postMessage(params);
                 });
-
 
                 // Generate instances
                 const ethereum = trustwallet.ethereum(config.ethereum);
                 const solana = trustwallet.solana(config.solana);
                 const cosmos = trustwallet.cosmos();
-                //const aptos = trustwallet.aptos(config.aptos);
+                const aptos = trustwallet.aptos(config.aptos);
 
-                core.registerProviders([ethereum, solana, cosmos].map(provider => {
+                core.registerProviders([ethereum, solana, cosmos, aptos].map(provider => {
                   provider.sendResponse = core.sendResponse.bind(core);
                   provider.sendError = core.sendError.bind(core);
                   return provider;
                 }));
-
-                ethereum.sendResponse = (...params) => {
-                    return core.sendResponse.bind(core)(...params);
-                }
-
-                cosmos.sendResponse = (...params) => {
-                    return core.sendResponse.bind(core)(...params);
-                }
 
                 // Custom methods
                 ethereum.emitChainChanged = (chainId) => {
@@ -133,6 +128,7 @@ public struct TrustWeb3Provider {
                   ethereum.setAddress(config.ethereum.address);
                   ethereum.setRPCUrl(config.ethereum.rpcUrl);
                 };
+                // End custom methods
 
                 cosmos.mode = 'extension';
                 cosmos.providerNetwork = 'cosmos';
@@ -140,7 +136,7 @@ public struct TrustWeb3Provider {
                 cosmos.version = "0.12.106";
 
                 cosmos.enable = (chainIds)  => {
-                    console.log(`==> enabled for ${chainIds}`);
+                  console.log(`==> enabled for ${chainIds}`);
                 };
 
                 // Attach to window
@@ -148,9 +144,11 @@ public struct TrustWeb3Provider {
                 trustwallet.solana = solana;
                 trustwallet.cosmos = cosmos;
                 trustwallet.TrustCosmos = trustwallet.cosmos;
+                trustwallet.aptos = aptos;
 
                 window.ethereum = trustwallet.ethereum;
                 window.keplr = trustwallet.cosmos;
+                window.aptos = trustwallet.aptos;
 
                 const getDefaultCosmosProvider = (chainId) => {
                   return trustwallet.cosmos.getOfflineSigner(chainId);

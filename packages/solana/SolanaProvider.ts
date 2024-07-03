@@ -38,6 +38,8 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
 
   isTrustWallet: boolean = true;
 
+  #useLegacySign = false;
+
   static bufferToHex(buffer: Buffer | Uint8Array | string) {
     return '0x' + Buffer.from(buffer).toString('hex');
   }
@@ -73,6 +75,10 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
         this.#disableMobileAdapter = config.disableMobileAdapter;
       }
 
+      if (typeof config.useLegacySign !== 'undefined') {
+        this.#useLegacySign = config.useLegacySign;
+      }
+
       if (typeof config.isTrust !== 'undefined') {
         this.isTrust = config.isTrust;
         this.isTrustWallet = config.isTrust;
@@ -84,7 +90,7 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
     }
 
     if (!this.#disableMobileAdapter) {
-      this.mobileAdapter = new MobileAdapter(this);
+      this.mobileAdapter = new MobileAdapter(this, this.#useLegacySign);
     }
   }
 
