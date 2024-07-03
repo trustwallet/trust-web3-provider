@@ -100,7 +100,6 @@ public struct TrustWeb3Provider {
 
             try {
                 const core = trustwallet.core(strategy, (params) => {
-                    console.log('sending to wallet', params);
                   webkit.messageHandlers._tw_.postMessage(params);
                 });
 
