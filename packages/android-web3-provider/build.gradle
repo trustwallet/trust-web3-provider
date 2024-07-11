@@ -1,0 +1,35 @@
+
+
+buildscript {
+    ext.kotlin_version = "1.8.0" // Update to a compatible Kotlin version
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.0.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven {
+            url = uri("https://maven.pkg.github.com/trustwallet/wallet-core")
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            credentials {
+                username = properties.getProperty("gpr.user")
+                password = properties.getProperty("gpr.key")
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

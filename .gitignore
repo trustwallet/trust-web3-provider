@@ -173,5 +173,8 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
-
-
+packages/android-web3-provider/build
+packages/android-web3-provider/app/build/*
+packages/android-web3-provider/lib/build/*
+packages/android-web3-provider/.gradle
+local.properties
