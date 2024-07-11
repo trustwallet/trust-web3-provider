@@ -1,0 +1,5 @@
+jdk:
+  - openjdk8
+
+build:
+  script: ./packages/android-web3-provider/gradlew build
