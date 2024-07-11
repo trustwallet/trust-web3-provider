@@ -1,5 +1,8 @@
 jdk:
   - openjdk8
 
+before_install:
+  - echo "installing"
+
 build:
   script: ./packages/android-web3-provider/gradlew build
