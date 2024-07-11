@@ -36,7 +36,7 @@ function createConfig(
       input,
       plugins,
       output: {
-        file: './lib/src/main/res/raw/trust_min.js',
+        file: '../../android/lib/src/main/res/raw/trust_min.js',
         format: 'umd',
         exports: 'named',
         name: packageName,
