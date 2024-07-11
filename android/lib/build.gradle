@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 
 group='com.trustwallet'
@@ -12,7 +13,7 @@ def getVersionName = { ->
 
 android {
     compileSdkVersion 28
-    namespace 'trust.web3jproviderV2'
+
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 28

@@ -7,7 +7,6 @@ import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
-import com.example.namespace.R
 
 class MainActivity : AppCompatActivity() {
     companion object {

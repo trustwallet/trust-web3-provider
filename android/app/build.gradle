@@ -4,7 +4,6 @@ plugins {
 }
 
 android {
-    namespace 'com.trust.web3.demo'
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -43,7 +42,7 @@ dependencies {
     implementation "com.louiscad.splitties:splitties-alertdialog-material:3.0.0"
     implementation "com.trustwallet:wallet-core:2.9.7"
 
-    implementation 'com.github.trustwallet:trust-web3-provider:4.0.1:packages/android-web3-provider/lib'
+    implementation 'com.github.trustwallet:trust-web3-provider:2.0.0-alpha'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
