@@ -173,5 +173,8 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
-
-
+android/build
+android/app/build/*
+android/lib/build/*
+android/.gradle
+local.properties

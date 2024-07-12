@@ -1,0 +1,3 @@
+include ':app'
+include ':lib'
+rootProject.name = "Web3 Provider Demo"
