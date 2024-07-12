@@ -100,6 +100,12 @@ public struct TrustWeb3Provider {
 
             try {
                 const core = trustwallet.core(strategy, (params) => {
+                     // Disabled methods
+                    if (params.name === 'wallet_requestPermissions') {
+                        core.sendResponse(params.id, null);
+                        return;
+                    }
+
                   webkit.messageHandlers._tw_.postMessage(params);
                 });
 
@@ -157,7 +163,7 @@ public struct TrustWeb3Provider {
                 window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
                 window.getOfflineSignerAuto = getDefaultCosmosProvider;
             } catch (e) {
-              alert(e)
+              console.error(e)
             }
         })();
         """
