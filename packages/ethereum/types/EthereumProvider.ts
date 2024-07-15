@@ -10,6 +10,7 @@ import {
 
 export interface IEthereumProviderConfig {
   rpc?: string;
+  rpcUrl?: string;
   chainId?: string;
   overwriteMetamask?: boolean;
   supportedMethods?: string[];
