@@ -53,7 +53,7 @@ export class MobileAdapter {
     this.provider = provider;
   }
 
-  request<T>(args: IRequestArguments): Promise<T> {
+  async request<T>(args: IRequestArguments): Promise<T> {
     if (this.#unsupportedMethods.includes(args.method)) {
       return Promise.reject(
         new RPCError(
@@ -125,11 +125,13 @@ export class MobileAdapter {
           params: (args.params as object[])[0],
         });
       default: {
-        return this.provider.getRPC().call({
+        const res = await this.provider.getRPC().call({
           method: args.method,
           jsonrpc: '2.0',
           params: args.params,
         });
+
+        return res.result;
       }
     }
   }

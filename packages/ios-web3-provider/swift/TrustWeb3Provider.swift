@@ -78,7 +78,6 @@ public struct TrustWeb3Provider {
     public var injectScript: WKUserScript {
         let source = """
         (function() {
-
             const config = {
                 ethereum: {
                     address: "\(config.ethereum.address)",
@@ -131,7 +130,9 @@ public struct TrustWeb3Provider {
                 ethereum.setConfig = (config) => {
                   ethereum.setChainId('0x' + parseInt(config.ethereum.chainId || '1').toString(16));
                   ethereum.setAddress(config.ethereum.address);
-                  ethereum.setRPCUrl(config.ethereum.rpcUrl);
+                    if (config.ethereum.rpcUrl) {
+                      ethereum.setRPCUrl(config.ethereum.rpcUrl);
+                    }
                 };
                 // End custom methods
 

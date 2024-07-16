@@ -44,8 +44,8 @@ export class EthereumProvider
         this.#chainId = config.chainId;
       }
 
-      if (config.rpc) {
-        this.#rpcUrl = config.rpc;
+      if (config.rpc || config.rpcUrl) {
+        this.#rpcUrl = config.rpc || config.rpcUrl!;
       }
 
       if (typeof config.overwriteMetamask !== 'undefined') {
@@ -292,6 +292,7 @@ export class EthereumProvider
 
   public setRPCUrl(rpcUrl: string) {
     this.#rpcUrl = rpcUrl;
+    this.#rpc = new RPCServer(this.#rpcUrl);
   }
 
   public getRPC() {

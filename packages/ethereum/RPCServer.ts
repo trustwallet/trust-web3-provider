@@ -53,7 +53,10 @@ export class RPCServer implements RPC {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        id: new Date().getTime() + Math.floor(Math.random() * 1000),
+        ...payload,
+      }),
     });
 
     const json = await response.json();
