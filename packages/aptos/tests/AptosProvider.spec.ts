@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 // Mock window
-Object.assign(globalThis.window, {
+Object.assign(globalThis.window || {}, {
   location: {
     protocol: 'https',
     hostname: 'trust',
