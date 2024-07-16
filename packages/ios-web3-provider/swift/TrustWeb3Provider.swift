@@ -163,6 +163,63 @@ public struct TrustWeb3Provider {
                 window.getOfflineSigner = getDefaultCosmosProvider;
                 window.getOfflineSignerOnlyAmino = getDefaultCosmosProvider;
                 window.getOfflineSignerAuto = getDefaultCosmosProvider;
+
+                Object.assign(window.trustwallet, {
+                  isTrust: true,
+                  isTrustWallet: true,
+                  request: ethereum.request.bind(ethereum),
+                  send: ethereum.send.bind(ethereum),
+                  on: (...params) => ethereum.on(...params),
+                  off: (...params) => ethereum.off(...params),
+                });
+
+                const provider = ethereum;
+                const proxyMethods = ['chainId', 'networkVersion', 'address', 'enable', 'send'];
+
+                // Attach properties to trustwallet object (legacy props)
+                const proxy = new Proxy(window.trustwallet, {
+                  get(target, prop, receiver) {
+                    if (proxyMethods.includes(prop)) {
+                      switch (prop) {
+                        case 'chainId':
+                          return ethereum.getChainId.bind(provider);
+                        case 'networkVersion':
+                          return ethereum.getNetworkVersion.bind(provider);
+                        case 'address':
+                          return ethereum.getAddress.bind(provider);
+                        case 'enable':
+                          return ethereum.enable.bind(provider);
+                        case 'send':
+                          return ethereum.send.bind(provider);
+                      }
+                    }
+
+                    return Reflect.get(target, prop, receiver);
+                  },
+                });
+
+                window.trustwallet = proxy;
+                window.trustWallet = proxy;
+
+                const EIP6963Icon =
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTgiIGhlaWdodD0iNjUiIHZpZXdCb3g9IjAgMCA1OCA2NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgOS4zODk0OUwyOC44OTA3IDBWNjUuMDA0MkM4LjI1NDUgNTYuMzM2OSAwIDM5LjcyNDggMCAzMC4zMzUzVjkuMzg5NDlaIiBmaWxsPSIjMDUwMEZGIi8+CjxwYXRoIGQ9Ik01Ny43ODIyIDkuMzg5NDlMMjguODkxNSAwVjY1LjAwNDJDNDkuNTI3NyA1Ni4zMzY5IDU3Ljc4MjIgMzkuNzI0OCA1Ny43ODIyIDMwLjMzNTNWOS4zODk0OVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8yMjAxXzY5NDIpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMjIwMV82OTQyIiB4MT0iNTEuMzYxNSIgeTE9Ii00LjE1MjkzIiB4Mj0iMjkuNTM4NCIgeTI9IjY0LjUxNDciIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agb2Zmc2V0PSIwLjAyMTEyIiBzdG9wLWNvbG9yPSIjMDAwMEZGIi8+CjxzdG9wIG9mZnNldD0iMC4wNzYyNDIzIiBzdG9wLWNvbG9yPSIjMDA5NEZGIi8+CjxzdG9wIG9mZnNldD0iMC4xNjMwODkiIHN0b3AtY29sb3I9IiM0OEZGOTEiLz4KPHN0b3Agb2Zmc2V0PSIwLjQyMDA0OSIgc3RvcC1jb2xvcj0iIzAwOTRGRiIvPgo8c3RvcCBvZmZzZXQ9IjAuNjgyODg2IiBzdG9wLWNvbG9yPSIjMDAzOEZGIi8+CjxzdG9wIG9mZnNldD0iMC45MDI0NjUiIHN0b3AtY29sb3I9IiMwNTAwRkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K';
+
+                const info = {
+                  uuid: crypto.randomUUID(),
+                  name: 'Trust Wallet',
+                  icon: EIP6963Icon,
+                  rdns: 'com.trustwallet.app',
+                };
+
+                const announceEvent = new CustomEvent('eip6963:announceProvider', {
+                  detail: Object.freeze({ info, provider: ethereum }),
+                });
+
+                window.dispatchEvent(announceEvent);
+
+                window.addEventListener('eip6963:requestProvider', () => {
+                   window.dispatchEvent(announceEvent);
+                });
             } catch (e) {
               console.error(e)
             }
