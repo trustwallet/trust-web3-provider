@@ -7,4 +7,5 @@ export const allowedPackages = [
   'ethereum',
   'solana',
   'aptos',
+  'ton',
 ];
