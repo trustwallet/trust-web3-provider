@@ -1,13 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync, exec } from 'child_process';
+import { allowedPackages } from './packages';
 
 const subpackagesDir = path.resolve(__dirname, '../packages');
 
 const directories = fs
   .readdirSync(subpackagesDir, { withFileTypes: true })
   .filter((dirent) => dirent.isDirectory())
-  .map((dirent) => dirent.name);
+  .map((dirent) => dirent.name)
+  .filter((name) => allowedPackages.includes(name));
 
 let command = `npm link `;
 
