@@ -11,7 +11,7 @@ import TrustWeb3Provider
 
 extension TrustWeb3Provider {
     static func createEthereum(address: String, chainId: Int, rpcUrl: String) -> TrustWeb3Provider {
-        return TrustWeb3Provider(config: .init(ethereum: .init(address: address, chainId: chainId, rpcUrl: rpcUrl)))
+        return TrustWeb3Provider(config: .init(ethereum: .init(address: address, chainId: chainId, rpcUrl: rpcUrl), solana: TrustWeb3Provider.Config.SolanaConfig(cluster: "https://holy-convincing-firefly.solana-mainnet.quiknode.pro/d3add3f9b762945392453ad879fd5fc1f692468c/")))
     }
 }
 
@@ -20,17 +20,17 @@ class DAppWebViewController: UIViewController {
     @IBOutlet weak var urlField: UITextField!
 
     var homepage: String {
-        return "https://pancakeswap.finance/"
+        return "https://metamask.github.io/test-dapp/"
     }
 
     static let wallet = HDWallet(strength: 128, passphrase: "")!
 
-    var current: TrustWeb3Provider = TrustWeb3Provider(config: .init(ethereum: ethereumConfigs[0]))
+    var current: TrustWeb3Provider = TrustWeb3Provider(config: .init(ethereum: ethereumConfigs[0], solana: TrustWeb3Provider.Config.SolanaConfig(cluster: "https://holy-convincing-firefly.solana-mainnet.quiknode.pro/d3add3f9b762945392453ad879fd5fc1f692468c/")))
 
     var providers: [Int: TrustWeb3Provider] = {
         var result = [Int: TrustWeb3Provider]()
         ethereumConfigs.forEach {
-            result[$0.chainId] = TrustWeb3Provider(config: .init(ethereum: $0))
+            result[$0.chainId] = TrustWeb3Provider(config: .init(ethereum: $0, solana: TrustWeb3Provider.Config.SolanaConfig(cluster: "https://holy-convincing-firefly.solana-mainnet.quiknode.pro/d3add3f9b762945392453ad879fd5fc1f692468c/")))
         }
         return result
     }()
@@ -65,6 +65,11 @@ class DAppWebViewController: UIViewController {
             address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
             chainId: 42161,
             rpcUrl: "https://arb1.arbitrum.io/rpc"
+        ),
+        TrustWeb3Provider.Config.EthereumConfig(
+            address: "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f",
+            chainId: 59144,
+            rpcUrl: "https://1rpc.io/linea"
         )
     ]
 
@@ -73,7 +78,8 @@ class DAppWebViewController: UIViewController {
 
     lazy var webview: WKWebView = {
         let config = WKWebViewConfiguration()
-
+        config.preferences = WKPreferences()
+        config.preferences.javaScriptEnabled = true
         let controller = WKUserContentController()
         controller.addUserScript(current.providerScript)
         controller.addUserScript(current.injectScript)
@@ -85,7 +91,11 @@ class DAppWebViewController: UIViewController {
         let webview = WKWebView(frame: .zero, configuration: config)
         webview.translatesAutoresizingMaskIntoConstraints = false
         webview.uiDelegate = self
-
+        if #available(iOS 16.4, *) {
+            webview.isInspectable = true
+        } else {
+            // Fallback on earlier versions
+        }
         return webview
     }()
 

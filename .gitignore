@@ -119,6 +119,9 @@ out
 
 .nuxt
 dist
+.build
+.swiftpm
+.gradle
 
 # Gatsby files
 

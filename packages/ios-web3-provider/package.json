@@ -21,9 +21,6 @@
   "dependencies": {
     "@trustwallet/web3-provider-core": "workspace:*",
     "@trustwallet/web3-provider-ethereum": "workspace:*",
-    "@trustwallet/web3-provider-solana": "workspace:*",
-    "@trustwallet/web3-provider-cosmos": "workspace:*",
-    "@trustwallet/web3-provider-aptos": "workspace:*",
     "rollup-plugin-polyfill-node": "0.13.0"
   },
   "devDependencies": { }

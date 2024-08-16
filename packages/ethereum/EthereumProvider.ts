@@ -10,8 +10,7 @@ import { RPCServer } from './RPCServer';
 
 export class EthereumProvider
   extends BaseProvider
-  implements IEthereumProvider
-{
+  implements IEthereumProvider {
   static NETWORK = 'ethereum';
 
   // should be hex
@@ -21,7 +20,7 @@ export class EthereumProvider
 
   #disableMobileAdapter: boolean = false;
 
-  #overwriteMetamask = false;
+  #overwriteMetamask = true;
 
   #address!: string;
 
@@ -29,11 +28,15 @@ export class EthereumProvider
 
   #rpc!: RPCServer;
 
-  isTrust: boolean = true;
+  isOnto: boolean = true
 
-  isTrustWallet: boolean = true;
+  isTrust: boolean = false;
+
+  isTrustWallet: boolean = false;
 
   providers: object[] | undefined;
+
+  signer = { uri: crypto.randomUUID() }
 
   constructor(config?: IEthereumProviderConfig) {
     super();
@@ -46,6 +49,10 @@ export class EthereumProvider
 
       if (config.rpc || config.rpcUrl) {
         this.#rpcUrl = config.rpc || config.rpcUrl!;
+      }
+
+      if (config.address) {
+        this.#address = config.address;
       }
 
       if (typeof config.overwriteMetamask !== 'undefined') {
@@ -286,6 +293,23 @@ export class EthereumProvider
     }) as number | undefined;
   }
 
+  public setConfig(config: IEthereumProviderConfig) {
+    this.setChainId('0x' + parseInt(config.chainId || '1').toString(16));
+    if (config.address) {
+      this.setAddress(config.address);
+    }
+    if (config.rpcUrl) {
+      this.setRPCUrl(config.rpcUrl);
+    }
+  }
+
+  public emitChainChanged(chainId: string) {
+    this.setChainId('0x' + parseInt(chainId || '1').toString(16));
+    this.emit('chainChanged', this.getChainId());
+    this.emit('networkChanged', parseInt(chainId || '1'));
+    this.emit('accountsChanged', [this.getAddress()]);
+  };
+
   public setChainId(chainId: string) {
     this.#chainId = chainId;
   }
@@ -301,6 +325,10 @@ export class EthereumProvider
 
   public setOverwriteMetamask(overwriteMetamask: boolean) {
     this.#overwriteMetamask = overwriteMetamask;
+  }
+
+  public selectedAddress() {
+    return this.#address;
   }
 
   public getAddress() {
