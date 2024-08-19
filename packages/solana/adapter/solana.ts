@@ -16,7 +16,12 @@ export const SOLANA_TESTNET_CHAIN = 'solana:testnet';
 export const SOLANA_LOCALNET_CHAIN = 'solana:localnet';
 
 /** Array of all Solana clusters */
-export const SOLANA_CHAINS = [SOLANA_MAINNET_CHAIN] as const;
+export const SOLANA_CHAINS = [
+    SOLANA_MAINNET_CHAIN,
+    SOLANA_DEVNET_CHAIN,
+    SOLANA_TESTNET_CHAIN,
+    SOLANA_LOCALNET_CHAIN,
+] as const;
 
 /** Type of all Solana clusters */
 export type SolanaChain = (typeof SOLANA_CHAINS)[number];
@@ -25,11 +30,11 @@ export type SolanaChain = (typeof SOLANA_CHAINS)[number];
  * Check if a chain corresponds with one of the Solana clusters.
  */
 export function isSolanaChain(chain: IdentifierString): chain is SolanaChain {
-  return SOLANA_CHAINS.includes(chain as SolanaChain);
+    return SOLANA_CHAINS.includes(chain as SolanaChain);
 }
 
 export function isVersionedTransaction(
-  transaction: Transaction | VersionedTransaction,
+  transaction: Transaction | VersionedTransaction
 ): transaction is VersionedTransaction {
-  return 'version' in transaction;
+    return 'version' in transaction;
 }

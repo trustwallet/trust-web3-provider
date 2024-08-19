@@ -3,7 +3,6 @@ import { SolanaProvider } from './SolanaProvider';
 import { isVersionedTransaction } from './adapter/solana';
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { ConnectOptions } from './types/SolanaProvider';
-import * as bs58 from 'bs58';
 
 /**
  * Adapting some requests to legacy mobile API
@@ -13,11 +12,9 @@ import * as bs58 from 'bs58';
  */
 export class MobileAdapter {
   private provider!: SolanaProvider;
-  private useLegacySign = false;
 
-  constructor(provider: SolanaProvider, useLegacySign = false) {
+  constructor(provider: SolanaProvider) {
     this.provider = provider;
-    this.useLegacySign = useLegacySign;
   }
 
   async connect(
@@ -35,65 +32,20 @@ export class MobileAdapter {
   async signTransaction<T extends Transaction | VersionedTransaction>(
     tx: T,
   ): Promise<T> {
-    if (this.useLegacySign) {
-      return (await this.legacySign<T>(tx)) as T;
-    }
 
-    const data = JSON.stringify(tx);
-
-    let version: string | number = 'legacy';
     let rawMessage: string;
-
     if (isVersionedTransaction(tx)) {
-      version = tx.version;
-      rawMessage = Buffer.from(tx.message.serialize()).toString('base64');
+      rawMessage = SolanaProvider.bufferToHex(tx.message.serialize());
     } else {
-      rawMessage = Buffer.from(tx.serializeMessage()).toString('base64');
+      rawMessage = SolanaProvider.bufferToHex(tx.serializeMessage());
     }
 
-    const raw = Buffer.from(
-      tx.serialize({ requireAllSignatures: false, verifySignatures: false }),
-    ).toString('base64');
-
-    const signatureEncoded = await this.provider.internalRequest<string>({
-      method: 'signRawTransaction',
-      params: {
-        data,
-        raw,
-        rawMessage,
-        version,
-      },
+    const response = await this.provider.internalRequest<{ signature: string }>({
+      method: 'signTransaction',
+      params: { message: rawMessage },
     });
 
-    return this.provider.mapSignedTransaction<T>(tx, signatureEncoded);
-  }
-
-  async legacySign<T extends Transaction | VersionedTransaction>(tx: T) {
-    const data = JSON.stringify(tx);
-
-    const version =
-      typeof (tx as VersionedTransaction).version !== 'number'
-        ? 'legacy'
-        : (tx as VersionedTransaction).version;
-
-    const raw = bs58.encode(
-      version === 'legacy'
-        ? (tx as Transaction).serializeMessage()
-        : version === 0
-        ? (tx as VersionedTransaction).message.serialize()
-        : tx.serialize(),
-    );
-
-    try {
-      const signatureEncoded = await this.provider.internalRequest<string>({
-        method: 'signRawTransaction',
-        params: { data, raw, version },
-      });
-
-      return this.provider.mapSignedTransaction<T>(tx, signatureEncoded);
-    } catch (error) {
-      console.log(`<== Error: ${error}`);
-    }
+    return this.provider.mapSignedTransaction<T>(tx, response.signature);
   }
 
   /**

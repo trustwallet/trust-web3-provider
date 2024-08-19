@@ -2,7 +2,6 @@ import {
   BaseProvider,
   IRequestArguments,
 } from '@trustwallet/web3-provider-core';
-import type ISolanaProvider from './types/SolanaProvider';
 import type { ISolanaProviderConfig } from './types/SolanaProvider';
 import {
   SolanaSignInInput,
@@ -15,11 +14,12 @@ import {
   SendOptions,
   Connection,
 } from '@solana/web3.js';
-import initialize from './adapter/initialize';
-import { TrustWallet } from './adapter/wallet';
+import { initialize } from './adapter/initialize';
+import { ONTOWallet } from './adapter/wallet';
 import { isVersionedTransaction } from './adapter/solana';
 import * as bs58 from 'bs58';
 import { MobileAdapter } from './MobileAdapter';
+import { ISolanaProvider } from './adapter/window';
 
 export class SolanaProvider extends BaseProvider implements ISolanaProvider {
   static NETWORK = 'solana';
@@ -30,15 +30,14 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
 
   #enableAdapter = true;
 
+  #isConnected = false
+
   connection!: Connection;
 
   publicKey!: PublicKey | null;
 
-  isTrust: boolean = true;
-
-  isTrustWallet: boolean = true;
-
-  #useLegacySign = false;
+  isONTO: boolean = true;
+  isPhantom: Boolean = true;
 
   static bufferToHex(buffer: Buffer | Uint8Array | string) {
     return '0x' + Buffer.from(buffer).toString('hex');
@@ -75,13 +74,8 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
         this.#disableMobileAdapter = config.disableMobileAdapter;
       }
 
-      if (typeof config.useLegacySign !== 'undefined') {
-        this.#useLegacySign = config.useLegacySign;
-      }
-
-      if (typeof config.isTrust !== 'undefined') {
-        this.isTrust = config.isTrust;
-        this.isTrustWallet = config.isTrust;
+      if (typeof config.isOnto !== 'undefined') {
+        this.isONTO = config.isOnto;
       }
     }
 
@@ -90,12 +84,12 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
     }
 
     if (!this.#disableMobileAdapter) {
-      this.mobileAdapter = new MobileAdapter(this, this.#useLegacySign);
+      this.mobileAdapter = new MobileAdapter(this);
     }
   }
 
-  getInstanceWithAdapter(): TrustWallet {
-    return new TrustWallet(this);
+  getInstanceWithAdapter(): ONTOWallet {
+    return new ONTOWallet(this);
   }
 
   async connect(
@@ -107,14 +101,21 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
     });
 
     this.publicKey = res.publicKey;
+    this.#isConnected = true
 
     return res;
+  }
+
+  async getAccount(): Promise<string> {
+    const res = await this.connect()
+    return res.publicKey.toBase58();
   }
 
   disconnect(): Promise<void> {
     return new Promise((resolve) => {
       this.publicKey = null;
       this.emit('disconnect');
+      this.#isConnected = false
       resolve();
     });
   }
@@ -237,4 +238,8 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
   internalRequest<T>(args: IRequestArguments): Promise<T> {
     return super.request<T>(args);
   }
+
+  isConnected(): Boolean { return this.#isConnected }
+
+  connected(): Boolean { return this.#isConnected }
 }

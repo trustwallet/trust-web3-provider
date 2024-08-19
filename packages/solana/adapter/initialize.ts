@@ -1,8 +1,7 @@
-import ISolanaProvider from '../types/SolanaProvider';
 import { registerWallet } from './register';
+import { ONTOWallet } from './wallet';
+import type { ONTO } from './window';
 
-function initialize(trust: ISolanaProvider): void {
-  registerWallet(trust.getInstanceWithAdapter());
+export function initialize(ONTO: ONTO): void {
+    registerWallet(new ONTOWallet(ONTO));
 }
-
-export default initialize;
