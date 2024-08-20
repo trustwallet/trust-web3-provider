@@ -7,14 +7,14 @@ export class TonProvider extends BaseProvider implements ITonProvider {
   static NETWORK = 'ton';
   private mobileAdapter!: MobileAdapter;
 
-  #version = 'v4R2';
+  version = 'v4R2';
 
   constructor(config?: ITonProviderConfig) {
     super();
 
     if (config) {
       if (config.version) {
-        this.#version = config.version;
+        this.version = config.version;
       }
     }
 
@@ -23,20 +23,24 @@ export class TonProvider extends BaseProvider implements ITonProvider {
     }
   }
 
+  disconnect() {
+    return this.send('tonConnect_disconnect', {});
+  }
+
   isConnected(): Promise<boolean> {
     return Promise.resolve(true);
   }
 
-  send<T>(method: string, params?: unknown[] | object): Promise<T> {
+  async send<T>(method: string, params?: unknown[] | object): Promise<T> {
     const next = () => {
       return this.internalRequest<T>(method, params) as Promise<T>;
     };
 
     if (this.mobileAdapter) {
-      return this.mobileAdapter.request<T>(method, params);
+      return await this.mobileAdapter.request<T>(method, params);
     }
 
-    return next();
+    return await next();
   }
 
   internalRequest<T>(
@@ -51,9 +55,5 @@ export class TonProvider extends BaseProvider implements ITonProvider {
 
   getNetwork(): string {
     return TonProvider.NETWORK;
-  }
-
-  get version() {
-    return this.#version;
   }
 }

@@ -113,7 +113,7 @@ export class TonBridge implements TonConnectBridge {
       return this.emit({
         event: 'connect',
         payload: {
-          items: items,
+          items,
           device: this.deviceInfo,
         },
       });
