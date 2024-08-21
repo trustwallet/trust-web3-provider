@@ -10,8 +10,10 @@ afterEach(() => {
   aptos = new AptosProvider();
 });
 
+(global as any).window = {};
+
 // Mock window
-Object.assign(globalThis.window || {}, {
+Object.assign(global.window, {
   location: {
     protocol: 'https',
     hostname: 'trust',
