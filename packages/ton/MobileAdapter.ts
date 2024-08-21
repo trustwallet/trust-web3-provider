@@ -21,12 +21,16 @@ export class MobileAdapter {
   static mapToCamelCase(transaction: ITransaction) {
     return {
       ...transaction,
-      messages: transaction?.messages
-        ? (transaction?.messages || []).map(({ state_init, ...message }) => ({
-            ...message,
-            stateInit: state_init,
-          }))
-        : undefined,
+      ...(transaction?.messages
+        ? {
+            messages: (transaction?.messages || []).map(
+              ({ state_init, ...message }) => ({
+                ...message,
+                stateInit: state_init,
+              }),
+            ),
+          }
+        : {}),
     };
   }
 
