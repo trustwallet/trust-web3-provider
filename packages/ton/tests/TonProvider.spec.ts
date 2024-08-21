@@ -68,7 +68,7 @@ test('Ton Connect → ton_sendTransaction', async () => {
     handler,
   }).registerProvider(Ton);
 
-  await Ton.send('ton_sendTransaction', { data: '123' });
+  await Ton.send('ton_sendTransaction', [{ data: '123' }]);
 
   expect(handler).toHaveBeenCalledWith(
     expect.objectContaining({

@@ -21,16 +21,16 @@ export class MobileAdapter {
   static mapToCamelCase(transaction: ITransaction) {
     return {
       ...transaction,
-      messages: transaction.messages.map(({ state_init, ...message }) => ({
-        ...message,
-        stateInit: state_init,
-      })),
+      messages: transaction?.messages
+        ? (transaction?.messages || []).map(({ state_init, ...message }) => ({
+            ...message,
+            stateInit: state_init,
+          }))
+        : undefined,
     };
   }
 
   async request<T>(method: string, params?: unknown[] | object): Promise<T> {
-    console.debug(`Sending to wallet: `, method, params);
-
     switch (method) {
       case 'tonConnect_connect': {
         const res = await this.provider.internalRequest<string>(
