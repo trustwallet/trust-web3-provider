@@ -1,8 +1,9 @@
 import { TonProvider } from './TonProvider';
+import { Address, WalletContractV4 } from 'ton';
 
 interface ITransaction {
   valid_until: number;
-  messages: { state_init: string }[];
+  messages: { state_init: string; address: string }[];
 }
 
 /**
@@ -26,6 +27,9 @@ export class MobileAdapter {
             messages: (transaction?.messages || []).map(
               ({ state_init, ...message }) => ({
                 ...message,
+                address: Address.parse(message.address).toString({
+                  bounceable: false,
+                }),
                 stateInit: state_init,
               }),
             ),

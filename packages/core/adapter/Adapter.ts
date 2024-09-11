@@ -26,12 +26,12 @@ export abstract class Adapter {
   /**
    * Strategy to wait for wallet's response
    */
-  #strategy!: AdapterStrategyType;
+  private strategy!: AdapterStrategyType;
 
   /**
    * Function that will handle requests on wallet side
    */
-  #handler!: IHandler;
+  private handler!: IHandler;
 
   static isCallbackAdapterRequest(
     params: IAdapterRequestParams | ICallbackAdapterRequestParams,
@@ -44,7 +44,7 @@ export abstract class Adapter {
   }
 
   setHandler(remoteHandler: IHandler) {
-    this.#handler = remoteHandler;
+    this.handler = remoteHandler;
     return this;
   }
 
@@ -52,12 +52,12 @@ export abstract class Adapter {
     params: IAdapterRequestParams | ICallbackAdapterRequestParams,
     network: string,
   ): Promise<any> | void {
-    if (!this.#handler) {
+    if (!this.handler) {
       throw new Error('No handler defined for Adapter');
     }
 
     if (Adapter.isCallbackAdapterRequest(params)) {
-      return this.#handler({
+      return this.handler({
         network,
         id: params.id,
         name: params.method,
@@ -66,7 +66,7 @@ export abstract class Adapter {
       });
     }
 
-    return this.#handler({
+    return this.handler({
       name: params.method,
       network,
       params: params.params,
@@ -75,11 +75,11 @@ export abstract class Adapter {
   }
 
   setStrategy(strategy: AdapterStrategyType) {
-    this.#strategy = strategy;
+    this.strategy = strategy;
     return this;
   }
 
   getStrategy() {
-    return this.#strategy;
+    return this.strategy;
   }
 }

@@ -14,7 +14,7 @@ import { PromiseAdapter } from './adapter/PromiseAdapter';
  *
  */
 export class Web3Provider {
-  #adapter!: Adapter;
+  private adapter!: Adapter;
 
   constructor(params: { strategy: AdapterStrategyType; handler?: IHandler }) {
     const adapter =
@@ -30,16 +30,16 @@ export class Web3Provider {
   }
 
   setHandler(handler: IHandler) {
-    this.#adapter.setHandler(handler);
+    this.adapter.setHandler(handler);
   }
 
   private setAdapter(adapter: Adapter) {
-    this.#adapter = adapter;
+    this.adapter = adapter;
     return this;
   }
 
   registerProvider(provider: BaseProvider) {
-    provider.setAdapter(this.#adapter);
+    provider.setAdapter(this.adapter);
     return this;
   }
 
@@ -49,14 +49,14 @@ export class Web3Provider {
   }
 
   sendResponse(requestId: number, response: any) {
-    if (this.#adapter.getStrategy() === 'CALLBACK') {
-      (this.#adapter as CallbackAdapter).sendResponse(requestId, response);
+    if (this.adapter.getStrategy() === 'CALLBACK') {
+      (this.adapter as CallbackAdapter).sendResponse(requestId, response);
     }
   }
 
   sendError(requestId: number, error: any) {
-    if (this.#adapter.getStrategy() === 'CALLBACK') {
-      (this.#adapter as CallbackAdapter).sendError(requestId, error);
+    if (this.adapter.getStrategy() === 'CALLBACK') {
+      (this.adapter as CallbackAdapter).sendError(requestId, error);
     }
   }
 }
