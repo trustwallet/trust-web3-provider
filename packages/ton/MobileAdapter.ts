@@ -1,5 +1,5 @@
 import { TonProvider } from './TonProvider';
-import { Address, WalletContractV4 } from 'ton';
+import { Address } from 'ton';
 
 interface ITransaction {
   valid_until: number;

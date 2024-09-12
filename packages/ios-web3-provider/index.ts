@@ -11,8 +11,8 @@ import { ICosmosProviderConfig } from '@trustwallet/web3-provider-cosmos/types/C
 import { IEthereumProviderConfig } from '@trustwallet/web3-provider-ethereum/types/EthereumProvider';
 import { AptosProvider } from '@trustwallet/web3-provider-aptos';
 import { IAptosProviderConfig } from '@trustwallet/web3-provider-aptos/types/AptosProvider';
-import { ITonProviderConfig } from '@trustwallet/web3-provider-ton/dist/types/types/TonProvider';
-import { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/dist/types/types/TonBridge';
+import { ITonProviderConfig } from '@trustwallet/web3-provider-ton/types/TonProvider';
+import { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/types/TonBridge';
 import { TonBridge, TonProvider } from '@trustwallet/web3-provider-ton';
 
 const core = (strategy: AdapterStrategyType, handler?: IHandler) =>
