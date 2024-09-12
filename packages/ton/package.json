@@ -18,7 +18,7 @@
     "build:source": "bun build:clean; rollup --config ./rollup.config.js; bun run build:types",
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
-  "dependencies": {
+  "peerDependencies": {
     "ton": "^13.9.0"
   },
   "devDependencies": {
