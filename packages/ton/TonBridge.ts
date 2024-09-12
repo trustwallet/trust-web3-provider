@@ -7,6 +7,7 @@ import {
   ConnectItemReply,
   ConnectRequest,
   DeviceInfo,
+  ITonBridgeConfig,
   TonConnectBridge,
   TonConnectCallback,
   WalletEvent,
@@ -39,14 +40,7 @@ export class TonBridge implements TonConnectBridge {
   private provider!: TonProvider;
   private callbacks: TonConnectCallback[] = [];
 
-  constructor(
-    config: {
-      isWalletBrowser: boolean;
-      walletInfo: WalletInfo;
-      deviceInfo: DeviceInfo;
-    },
-    provider: TonProvider,
-  ) {
+  constructor(config: ITonBridgeConfig, provider: TonProvider) {
     if (config) {
       if (typeof config.isWalletBrowser !== 'undefined') {
         this.isWalletBrowser = config.isWalletBrowser;

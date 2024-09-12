@@ -9,4 +9,5 @@ public enum ProviderNetwork: String, Decodable {
     case solana
     case cosmos
     case aptos
+    case ton
 }

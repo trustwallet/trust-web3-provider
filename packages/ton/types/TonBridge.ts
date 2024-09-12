@@ -122,6 +122,12 @@ export interface AppRequest {
 
 export type TonConnectCallback = (event: WalletEvent) => void;
 
+export interface ITonBridgeConfig {
+  isWalletBrowser: boolean;
+  walletInfo: WalletInfo;
+  deviceInfo: DeviceInfo;
+}
+
 export interface TonConnectBridge {
   deviceInfo: DeviceInfo;
   walletInfo?: WalletInfo;
