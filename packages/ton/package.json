@@ -21,7 +21,7 @@
   "peerDependencies": {
     "ton": "^13.9.0"
   },
-  "devDependencies": {
+  "dependencies": {
     "@trustwallet/web3-provider-core": "workspace:*"
   }
 }
