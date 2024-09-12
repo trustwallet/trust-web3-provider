@@ -1,9 +1,11 @@
 import esbuild from 'rollup-plugin-esbuild';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 
 const input = './index.ts';
 const plugins = [
+  json(),
   nodeResolve({ preferBuiltins: false, browser: true }),
   commonjs(),
   esbuild({
