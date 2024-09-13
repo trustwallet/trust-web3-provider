@@ -142,6 +142,7 @@ test('Ethereum Provider → Mobile Adapter → eth_sign → signPersonalMessage 
       params: {
         data: `0x${Buffer.from('hello world').toString('hex')}`,
         address: '0x0',
+        isEthSign: true,
       },
     }),
   );
@@ -185,6 +186,7 @@ test('Ethereum Provider → Mobile Adapter → eth_sign → signMessage payload 
       params: {
         data: `0x${payload}`,
         address: '0x0',
+        isEthSign: true,
       },
     }),
   );
