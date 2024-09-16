@@ -1,80 +1,23 @@
-# TrustWeb3Provider
+#vacancy #Moscow #fulltime #tester
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/trustwallet/trust-web3-provider)
-[![License](https://img.shields.io/cocoapods/l/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
-[![Platform](https://img.shields.io/cocoapods/p/TrustWeb3Provider.svg?style=flat)](http://cocoapods.org/pods/TrustWeb3Provider)
-[![Platform](https://img.shields.io/badge/platform-android-lightgrey.svg)](https://jitpack.io/#TrustWallet/trust-web3-provider/0.2.1)
+NPP "Digital Solutions" - a developer, manufacturer and supplier (b2b) of telecommunications equipment, strengthens the testing team and is looking for a tester with a desire to develop in the direction of equipment testing.
 
-TrustWeb3Provider is multi-network web3 provider used by TrustWallet. Currently it supports:
+Tasks:Test telecommunications equipment; Apply test design practices when testing the functions of telecommunications equipment;
+Participate in the development and updating of the network equipment testing plan; Develop functional tests of network equipment and test scenarios for its application; 
 
-- Ethereum
-- Solana
+Carry out load and functional testing of network equipment using Sprint and Xinertel test suites;Test graphical (WEB) and text (CLI) interface of network equipment; Our expectations for the candidate:Knowledge in telecommunications and networks (TCP/IP stack, switching, routing)Knowledge of testing theory;
 
-## How to Identify Trust Provider
+High learning ability and susceptibility to new things;English at the level of reading technical documentation; Higher technical education, possibly final year students.
 
-If trust provider injected properly `isTrust` will be `true`
+We offer:Work in the office 5/2 (m.Avis motorways), the beginning of the working day is flexible (from 08:00 to 11:00 you can start working);
+The level of income based on the results of the interview and based on the wishes of the candidate;
+Bonuses for closing the stages of projects and the projects themselves;
+Registration in accordance with the Labor Code of the Russian Federation;
+Accreditation of an IT company with a deferment from military service;
+VHI, corporate discounts for a subscription to a fitness club.
 
-```javascript
-window.ethereum.isTrust
-// or
-window.trustwallet.solana.isTrust
-```
-
-## Installation
-
-### iOS
-
-TrustWeb3Provider is available through CocoaPods and SPM (locally due to Xcode git lfs issue).
-
-CocoaPods
-
-Add this line to your `Podfile`:
-```ruby
-pod 'TrustWeb3Provider', :git => 'https://github.com/trustwallet/trust-web3-provider', :branch => 'master'
-```
-
-Swift Package Manager
-
-Add this repo as a `git submodule`, then add it this to your `Package.swift`:
-
-```swift
-.package(name: "TrustWeb3Provider", path: "<local path>"),
-```
-
-Here is an example project located at `ios/TrustWeb3Provider.xcodeproj` to demonstrate how to use this provider.
-
-### Android
-
-TrustWeb3Provider is available through [Jitpack](https://jitpack.io)
-#### Jitpack
-
-To install it:
-
-Step 1. Add jitpack to `repositories` in your root `build.gradle` file:
-
-```groovy
-allprojects {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-}
-```
-
-Step 2. Add the dependency
-
-```groovy
-dependencies {
-    implementation 'com.github.trustwallet:trust-web3-provider:TAG'
-}
-```
-
-## Authors
-
-[vikmeup](https://github.com/vikmeup)  
-[hewigovens](https://github.com/hewigovens)  
-[madcake](https://github.com/madcake)  
-[rsrbk](https://github.com/rsrbk)
-
-## License
-
-TrustWeb3Provider is available under the MIT license. See the LICENSE file for more info.
+Contacts can be contacted:
+Fomina Ekaterina
++7 (915) 7424771
+TG: @kate_4mina
+Email: fomina@dsol.ru
