@@ -12,15 +12,20 @@ public struct TrustWeb3Provider {
         public let ethereum: EthereumConfig
         public let solana: SolanaConfig
         public let aptos: AptosConfig
+        public let ton: TonConfig
+        public let appVersion: String
 
         public init(
             ethereum: EthereumConfig,
             solana: SolanaConfig,
-            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1")
+            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1"),
+            appVersion: String
         ) {
             self.ethereum = ethereum
             self.solana = solana
             self.aptos = aptos
+            self.ton = ton
+            self.appVersion: String
         }
 
         public struct EthereumConfig: Equatable {
@@ -40,6 +45,11 @@ public struct TrustWeb3Provider {
 
             public init(cluster: String) {
                 self.cluster = cluster
+            }
+        }
+
+        public struct TonConfig: Equatable {
+            public init() {
             }
         }
 
@@ -113,12 +123,42 @@ public struct TrustWeb3Provider {
                 const solana = trustwallet.solana(config.solana);
                 const cosmos = trustwallet.cosmos();
                 const aptos = trustwallet.aptos(config.aptos);
+                const ton = trustwallet.ton();
 
-                core.registerProviders([ethereum, solana, cosmos, aptos].map(provider => {
+                const walletInfo = {
+                  deviceInfo: {
+                    platform: 'iphone',
+
+                    // TODO: Change to trust
+                    appName: 'OpenMask',
+                    appVersion: "\(config.appVersion)",
+                    maxProtocolVersion: 2,
+                    features: [
+                      'SendTransaction',
+                      {
+                        name: 'SendTransaction',
+                        maxMessages: 4,
+                      },
+                    ],
+                  },
+                  walletInfo: {
+                    // TODO: Change to trust
+                    name: 'OpenMask',
+                    image: 'https://assets-cdn.trustwallet.com/dapps/trust.logo.png',
+                    about_url: 'https://trustwallet.com/about-us',
+                  },
+                  isWalletBrowser: true,
+                };
+
+                const tonBridge = trustwallet.tonBridge(walletInfo, ton);
+
+                core.registerProviders([ethereum, solana, cosmos, aptos, ton].map(provider => {
                   provider.sendResponse = core.sendResponse.bind(core);
                   provider.sendError = core.sendError.bind(core);
                   return provider;
                 }));
+
+                window.openmask = { tonconnect: tonBridge, provider: ton };
 
                 // Custom methods
                 ethereum.emitChainChanged = (chainId) => {
