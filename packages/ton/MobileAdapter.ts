@@ -1,5 +1,4 @@
 import { TonProvider } from './TonProvider';
-import { Address } from 'ton';
 
 interface ITransaction {
   valid_until: number;
@@ -27,9 +26,6 @@ export class MobileAdapter {
             messages: (transaction?.messages || []).map(
               ({ state_init, ...message }) => ({
                 ...message,
-                address: Address.parse(message.address).toString({
-                  bounceable: false,
-                }),
                 stateInit: state_init,
               }),
             ),

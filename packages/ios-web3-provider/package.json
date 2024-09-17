@@ -19,7 +19,6 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "ton": "^13.9.0",
     "@trustwallet/web3-provider-core": "workspace:*",
     "@trustwallet/web3-provider-ethereum": "workspace:*",
     "@trustwallet/web3-provider-solana": "workspace:*",

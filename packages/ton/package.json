@@ -18,9 +18,7 @@
     "build:source": "bun build:clean; rollup --config ./rollup.config.js; bun run build:types",
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
-  "peerDependencies": {
-    "ton": "^13.9.0"
-  },
+  "peerDependencies": {},
   "dependencies": {
     "@trustwallet/web3-provider-core": "workspace:*"
   }
