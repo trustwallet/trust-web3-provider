@@ -19,13 +19,14 @@ public struct TrustWeb3Provider {
             ethereum: EthereumConfig,
             solana: SolanaConfig,
             aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1"),
+            ton: TonConfig,
             appVersion: String
         ) {
             self.ethereum = ethereum
             self.solana = solana
             self.aptos = aptos
             self.ton = ton
-            self.appVersion: String
+            self.appVersion = appVersion
         }
 
         public struct EthereumConfig: Equatable {
@@ -158,6 +159,7 @@ public struct TrustWeb3Provider {
                   return provider;
                 }));
 
+                // TODO: remove after updating to trust
                 window.openmask = { tonconnect: tonBridge, provider: ton };
 
                 // Custom methods
@@ -191,6 +193,7 @@ public struct TrustWeb3Provider {
                 trustwallet.cosmos = cosmos;
                 trustwallet.TrustCosmos = trustwallet.cosmos;
                 trustwallet.aptos = aptos;
+                trustwallet.ton = ton;
 
                 window.ethereum = trustwallet.ethereum;
                 window.keplr = trustwallet.cosmos;
