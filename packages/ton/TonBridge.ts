@@ -96,6 +96,15 @@ export class TonBridge implements TonConnectBridge {
     });
   }
 
+  async disconnect() {
+    await this.provider.send('tonConnect_disconnect', {});
+
+    return this.emit({
+      event: 'disconnect',
+      payload: {},
+    });
+  }
+
   /**
    * Return and call callbacks
    * @param event
