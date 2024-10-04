@@ -62,7 +62,9 @@ export class MobileAdapter {
           MobileAdapter.mapToCamelCase((params as object[])[0] as ITransaction),
         );
 
-        return parseInt(res, 10) as T;
+        const { nonce, hash } = JSON.parse(res);
+
+        return method === 'ton_sendTransaction' ? nonce : hash;
 
       case 'ton_requestAccounts': {
         const res = await this.provider.internalRequest<string>(
