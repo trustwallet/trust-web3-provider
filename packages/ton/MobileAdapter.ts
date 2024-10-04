@@ -56,7 +56,7 @@ export class MobileAdapter {
         return this.provider.internalRequest<T>('signMessage', params);
 
       case 'ton_sendTransaction':
-      case 'tonConnect_sendTransaction':
+      case 'tonConnect_sendTransaction': {
         const res = await this.provider.internalRequest<string>(
           'signTransaction',
           MobileAdapter.mapToCamelCase((params as object[])[0] as ITransaction),
@@ -64,7 +64,8 @@ export class MobileAdapter {
 
         const { nonce, hash } = JSON.parse(res);
 
-        return method === 'ton_sendTransaction' ? nonce : hash;
+        return method === 'ton_sendTransaction' ? nonce : { boc: hash };
+      }
 
       case 'ton_requestAccounts': {
         const res = await this.provider.internalRequest<string>(
