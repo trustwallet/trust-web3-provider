@@ -57,10 +57,12 @@ export class MobileAdapter {
 
       case 'ton_sendTransaction':
       case 'tonConnect_sendTransaction':
-        return this.provider.internalRequest<T>(
+        const res = await this.provider.internalRequest<string>(
           'signTransaction',
           MobileAdapter.mapToCamelCase((params as object[])[0] as ITransaction),
         );
+
+        return parseInt(res, 10) as T;
 
       case 'ton_requestAccounts': {
         const res = await this.provider.internalRequest<string>(
