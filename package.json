@@ -26,7 +26,7 @@
     "esbuild": "0.17.19",
     "eslint": "9.x",
     "globals": "^15.3.0",
-    "rollup": "2.78.0",
+    "rollup": "2.79.2",
     "rollup-plugin-esbuild": "4.9.3",
     "simple-scaffold": "2.2.1",
     "typescript": "^5.0.0",
