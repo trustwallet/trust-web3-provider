@@ -12,15 +12,24 @@ public struct TrustWeb3Provider {
         public let ethereum: EthereumConfig
         public let solana: SolanaConfig
         public let aptos: AptosConfig
+        public let ton: TonConfig
+        public let appVersion: String
+        public let autoConnect: Bool
 
         public init(
             ethereum: EthereumConfig,
             solana: SolanaConfig,
-            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1")
+            aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1"),
+            ton: TonConfig,
+            appVersion: String,
+            autoConnect: Bool
         ) {
             self.ethereum = ethereum
             self.solana = solana
             self.aptos = aptos
+            self.ton = ton
+            self.appVersion = appVersion
+            self.autoConnect = autoConnect
         }
 
         public struct EthereumConfig: Equatable {
@@ -40,6 +49,11 @@ public struct TrustWeb3Provider {
 
             public init(cluster: String) {
                 self.cluster = cluster
+            }
+        }
+
+        public struct TonConfig: Equatable {
+            public init() {
             }
         }
 
@@ -113,12 +127,43 @@ public struct TrustWeb3Provider {
                 const solana = trustwallet.solana(config.solana);
                 const cosmos = trustwallet.cosmos();
                 const aptos = trustwallet.aptos(config.aptos);
+                const ton = trustwallet.ton();
 
-                core.registerProviders([ethereum, solana, cosmos, aptos].map(provider => {
+                const walletInfo = {
+                  deviceInfo: {
+                    platform: 'iphone',
+
+                    // TODO: Change to trust
+                    appName: 'OpenMask',
+                    appVersion: "\(config.appVersion)",
+                    maxProtocolVersion: 2,
+                    features: [
+                      'SendTransaction',
+                      {
+                        name: 'SendTransaction',
+                        maxMessages: 4,
+                      },
+                    ],
+                  },
+                  walletInfo: {
+                    // TODO: Change to trust
+                    name: 'OpenMask',
+                    image: 'https://assets-cdn.trustwallet.com/dapps/trust.logo.png',
+                    about_url: 'https://trustwallet.com/about-us',
+                  },
+                  isWalletBrowser: \(config.autoConnect),
+                };
+
+                const tonBridge = trustwallet.tonBridge(walletInfo, ton);
+
+                core.registerProviders([ethereum, solana, cosmos, aptos, ton].map(provider => {
                   provider.sendResponse = core.sendResponse.bind(core);
                   provider.sendError = core.sendError.bind(core);
                   return provider;
                 }));
+
+                // TODO: remove after updating to trust
+                window.openmask = { tonconnect: tonBridge, provider: ton };
 
                 // Custom methods
                 ethereum.emitChainChanged = (chainId) => {
@@ -151,10 +196,12 @@ public struct TrustWeb3Provider {
                 trustwallet.cosmos = cosmos;
                 trustwallet.TrustCosmos = trustwallet.cosmos;
                 trustwallet.aptos = aptos;
+                trustwallet.ton = ton;
 
                 window.ethereum = trustwallet.ethereum;
                 window.keplr = trustwallet.cosmos;
                 window.aptos = trustwallet.aptos;
+                window.ton = trustwallet.ton;
 
                 const getDefaultCosmosProvider = (chainId) => {
                   return trustwallet.cosmos.getOfflineSigner(chainId);

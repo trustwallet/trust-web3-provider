@@ -1,5 +1,4 @@
 import { TonProvider } from './TonProvider';
-import { Address } from 'ton';
 
 interface ITransaction {
   valid_until: number;
@@ -27,9 +26,6 @@ export class MobileAdapter {
             messages: (transaction?.messages || []).map(
               ({ state_init, ...message }) => ({
                 ...message,
-                address: Address.parse(message.address).toString({
-                  bounceable: false,
-                }),
                 stateInit: state_init,
               }),
             ),
@@ -60,11 +56,16 @@ export class MobileAdapter {
         return this.provider.internalRequest<T>('signMessage', params);
 
       case 'ton_sendTransaction':
-      case 'tonConnect_sendTransaction':
-        return this.provider.internalRequest<T>(
+      case 'tonConnect_sendTransaction': {
+        const res = await this.provider.internalRequest<string>(
           'signTransaction',
           MobileAdapter.mapToCamelCase((params as object[])[0] as ITransaction),
         );
+
+        const { nonce, hash } = JSON.parse(res);
+
+        return method === 'ton_sendTransaction' ? nonce : { boc: hash };
+      }
 
       case 'ton_requestAccounts': {
         const res = await this.provider.internalRequest<string>(

@@ -11,6 +11,9 @@ import { ICosmosProviderConfig } from '@trustwallet/web3-provider-cosmos/types/C
 import { IEthereumProviderConfig } from '@trustwallet/web3-provider-ethereum/types/EthereumProvider';
 import { AptosProvider } from '@trustwallet/web3-provider-aptos';
 import { IAptosProviderConfig } from '@trustwallet/web3-provider-aptos/types/AptosProvider';
+import { TonBridge, TonProvider } from '@trustwallet/web3-provider-ton';
+import { ITonProviderConfig } from '@trustwallet/web3-provider-ton/types/TonProvider';
+import { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/types/TonBridge';
 
 const core = (strategy: AdapterStrategyType, handler?: IHandler) =>
   new Web3Provider({ strategy, handler });
@@ -24,10 +27,17 @@ const ethereum = (config: IEthereumProviderConfig) =>
 
 const aptos = (config: IAptosProviderConfig) => new AptosProvider(config);
 
+const ton = (config: ITonProviderConfig) => new TonProvider(config);
+
+const tonBridge = (config: ITonBridgeConfig, provider: TonProvider) =>
+  new TonBridge(config, provider);
+
 window.trustwallet = {
   core,
   solana,
   cosmos,
   ethereum,
   aptos,
+  ton,
+  tonBridge,
 };
