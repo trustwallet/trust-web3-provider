@@ -64,6 +64,9 @@ export class MobileAdapter {
 
         const { nonce, hash } = JSON.parse(res);
 
+        console.log(nonce, 'nonce received');
+        console.log(hash, 'hash received');
+
         return method === 'ton_sendTransaction' ? nonce : hash;
       }
 
