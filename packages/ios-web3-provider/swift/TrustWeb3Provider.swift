@@ -134,7 +134,7 @@ public struct TrustWeb3Provider {
                     platform: 'iphone',
 
                     // TODO: Change to trust
-                    appName: 'OpenMask',
+                    appName: 'tonkeeper',
                     appVersion: "\(config.appVersion)",
                     maxProtocolVersion: 2,
                     features: [
@@ -147,7 +147,7 @@ public struct TrustWeb3Provider {
                   },
                   walletInfo: {
                     // TODO: Change to trust
-                    name: 'OpenMask',
+                    name: 'tonkeeper',
                     image: 'https://assets-cdn.trustwallet.com/dapps/trust.logo.png',
                     about_url: 'https://trustwallet.com/about-us',
                   },
@@ -163,7 +163,7 @@ public struct TrustWeb3Provider {
                 }));
 
                 // TODO: remove after updating to trust
-                window.openmask = { tonconnect: tonBridge, provider: ton };
+                window.tonkeeper = { tonconnect: tonBridge, provider: ton };
 
                 // Custom methods
                 ethereum.emitChainChanged = (chainId) => {

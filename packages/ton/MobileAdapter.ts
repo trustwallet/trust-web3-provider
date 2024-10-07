@@ -64,7 +64,7 @@ export class MobileAdapter {
 
         const { nonce, hash } = JSON.parse(res);
 
-        return method === 'ton_sendTransaction' ? nonce : { boc: hash };
+        return method === 'ton_sendTransaction' ? nonce : hash;
       }
 
       case 'ton_requestAccounts': {
