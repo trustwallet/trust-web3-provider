@@ -76,11 +76,15 @@ export class TonBridge implements TonConnectBridge {
       'tonConnect_connect',
       message,
     );
-
-    return this.emit({
-      event: 'connect',
-      payload: { items, device: this.deviceInfo },
-    });
+    
+    if(items?.event === "connect_error") {
+      return this.emit(items);
+    } else {
+      return this.emit({
+        event: 'connect',
+        payload: { items, device: this.deviceInfo },
+      });
+    }
   }
 
   async disconnect() {
