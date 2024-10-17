@@ -76,9 +76,9 @@ export class TonBridge implements TonConnectBridge {
       'tonConnect_connect',
       message,
     );
-    
-    if (items?.event === "connect_error") {
-      return this.emit(items);
+
+    if ((items as any)?.event === 'connect_error') {
+      return this.emit(items as any);
     } else {
       return this.emit({
         event: 'connect',
