@@ -40,4 +40,5 @@ window.trustwallet = {
   aptos,
   ton,
   tonBridge,
+  randomUUID: () => crypto.randomUUID(),
 };
