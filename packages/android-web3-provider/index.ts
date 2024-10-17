@@ -14,6 +14,7 @@ import { IAptosProviderConfig } from '@trustwallet/web3-provider-aptos/types/Apt
 import { TonBridge, TonProvider } from '@trustwallet/web3-provider-ton';
 import { ITonProviderConfig } from '@trustwallet/web3-provider-ton/types/TonProvider';
 import { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/types/TonBridge';
+import crypto from 'crypto';
 
 const core = (strategy: AdapterStrategyType, handler?: IHandler) =>
   new Web3Provider({ strategy, handler });
