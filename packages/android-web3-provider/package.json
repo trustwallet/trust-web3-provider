@@ -19,13 +19,21 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
+    "@trustwallet/web3-provider-aptos": "workspace:*",
     "@trustwallet/web3-provider-core": "workspace:*",
+    "@trustwallet/web3-provider-cosmos": "workspace:*",
     "@trustwallet/web3-provider-ethereum": "workspace:*",
     "@trustwallet/web3-provider-solana": "workspace:*",
-    "@trustwallet/web3-provider-cosmos": "workspace:*",
-    "@trustwallet/web3-provider-aptos": "workspace:*",
     "@trustwallet/web3-provider-ton": "workspace:*",
-    "rollup-plugin-polyfill-node": "0.13.0"
+    "core-js": "^3.38.1",
+    "rollup-plugin-polyfill-node": "0.13.0",
+    "uuid": "9.0.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@babel/preset-env": "^7.25.8",
+    "@babel/preset-typescript": "^7.25.7",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/uuid": "^9.0.8"
+  }
 }

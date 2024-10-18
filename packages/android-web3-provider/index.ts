@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 import { SolanaProvider } from '@trustwallet/web3-provider-solana';
 import { EthereumProvider } from '@trustwallet/web3-provider-ethereum';
 import { CosmosProvider } from '@trustwallet/web3-provider-cosmos';
@@ -40,4 +42,5 @@ window.trustwallet = {
   aptos,
   ton,
   tonBridge,
+  randomUUID: () => uuidv4(),
 };
