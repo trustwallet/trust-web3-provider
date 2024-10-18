@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { IRequestArguments } from '../Provider';
 
 import { Adapter, AdapterStrategy, IAdapterRequestParams } from './Adapter';

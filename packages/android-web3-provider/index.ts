@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 import { SolanaProvider } from '@trustwallet/web3-provider-solana';
 import { EthereumProvider } from '@trustwallet/web3-provider-ethereum';
 import { CosmosProvider } from '@trustwallet/web3-provider-cosmos';
@@ -14,7 +16,6 @@ import { IAptosProviderConfig } from '@trustwallet/web3-provider-aptos/types/Apt
 import { TonBridge, TonProvider } from '@trustwallet/web3-provider-ton';
 import { ITonProviderConfig } from '@trustwallet/web3-provider-ton/types/TonProvider';
 import { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/types/TonBridge';
-import crypto from 'crypto';
 
 const core = (strategy: AdapterStrategyType, handler?: IHandler) =>
   new Web3Provider({ strategy, handler });
@@ -41,5 +42,5 @@ window.trustwallet = {
   aptos,
   ton,
   tonBridge,
-  randomUUID: () => crypto.randomUUID(),
+  randomUUID: () => uuidv4(),
 };
