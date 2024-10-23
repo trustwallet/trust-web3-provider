@@ -131,7 +131,7 @@ export class MobileAdapter {
           params: args.params,
         });
 
-        return res.result;
+        return res;
       }
     }
   }
