@@ -65,6 +65,6 @@ export class RPCServer implements RPC {
       throw new Error(json.error.message || 'rpc error');
     }
 
-    return json;
+    return json.result;
   }
 }
