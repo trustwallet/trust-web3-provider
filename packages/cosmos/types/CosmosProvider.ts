@@ -51,7 +51,7 @@ export interface ICosmosProvider {
     chainId: string,
     tx: Uint8Array,
     mode: BroadcastMode,
-  ): Promise<Uint8Array>;
+  ): Promise<Uint8Array | Buffer>;
 }
 
 export interface ICosmosProviderConfig {

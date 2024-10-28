@@ -229,7 +229,7 @@ export class TrustWallet implements Wallet {
         },
       );
 
-      outputs.push({ signature: bs58.decode(signature) });
+      outputs.push({ signature: bs58.decode(signature) as any });
     } else if (inputs.length > 1) {
       for (const input of inputs) {
         outputs.push(...(await this.#signAndSendTransaction(input)));
