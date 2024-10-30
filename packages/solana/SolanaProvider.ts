@@ -192,7 +192,9 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
     });
 
     return {
-      signature: Buffer.from(SolanaProvider.messageToBuffer(res).buffer) as any,
+      signature: new Uint8Array(
+        Buffer.from(SolanaProvider.messageToBuffer(res).buffer),
+      ),
       publicKey: this.publicKey?.toBase58(),
     };
   }
@@ -211,7 +213,7 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
   ) {
     transaction.addSignature(
       this.publicKey!,
-      bs58.decode(signatureEncoded) as any,
+      bs58.decode(signatureEncoded) as Buffer & Uint8Array,
     );
     return transaction;
   }

@@ -41,7 +41,7 @@ type TonProofItem = {
 
 // Untrusted data returned by the wallet.
 // If you need a guarantee that the user owns this address and public key, you need to additionally request a ton_proof.
-type TonAddressItemReply = {
+export type TonAddressItemReply = {
   name: 'ton_addr';
   address: string; // TON address raw (`0:<hex>`)
   network: NETWORK; // network global_id
