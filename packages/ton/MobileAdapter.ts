@@ -1,4 +1,5 @@
 import { TonProvider } from './TonProvider';
+import { ConnectItemReply, TonAddressItemReply } from './types/TonBridge';
 
 interface ITransaction {
   valid_until: number;
@@ -41,7 +42,19 @@ export class MobileAdapter {
           'requestAccounts',
           params,
         );
-        return JSON.parse(res);
+
+        // Internally we use nonBounceable value, here we remove it from the response
+        return JSON.parse(res).map((item: ConnectItemReply) => {
+          if (item.name === 'ton_addr') {
+            const { nonBounceable, ...rest } = item as TonAddressItemReply & {
+              nonBounceable: string;
+            };
+
+            return rest;
+          }
+
+          return item;
+        });
       }
 
       case 'tonConnect_reconnect': {

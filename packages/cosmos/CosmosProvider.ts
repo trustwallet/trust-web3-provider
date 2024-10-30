@@ -123,7 +123,7 @@ export class CosmosProvider extends BaseProvider implements ICosmosProvider {
       },
     });
 
-    return Buffer.from(hash, 'hex');
+    return new Uint8Array(Buffer.from(hash, 'hex'));
   }
 
   async signArbitrary(
