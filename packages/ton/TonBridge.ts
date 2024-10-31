@@ -151,6 +151,38 @@ export class TonBridge implements TonConnectBridge {
 
       return { result, id: message.id.toString() };
     } catch (e) {
+      // Parse general RPC rejection errors to ton
+      if ((e as any)?.code === 4001) {
+        return {
+          error: {
+            message: 'User Rejected the transaction',
+            code: 300,
+          },
+          id: String(message.id),
+        };
+      }
+
+      // If there are too many requests
+      if ((e as any)?.code === -32002) {
+        return {
+          error: {
+            message: 'Bad request, a transaction is already pending',
+            code: 1,
+          },
+          id: String(message.id),
+        };
+      }
+
+      // Set default error code if needed
+      if (
+        (e as WalletResponseError['error']) &&
+        ![0, 1, 100, 300, 400].includes(
+          (e as WalletResponseError['error']).code,
+        )
+      ) {
+        (e as WalletResponseError['error']).code = 0;
+      }
+
       return {
         error: e as WalletResponseError['error'],
         id: String(message.id),
