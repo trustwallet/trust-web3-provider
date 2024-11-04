@@ -136,8 +136,8 @@ export interface TonConnectBridge {
   connect(
     protocolVersion: number,
     message: ConnectRequest,
-  ): Promise<ConnectEvent>;
-  restoreConnection(): Promise<ConnectEvent>;
+  ): Promise<ConnectEvent | WalletResponseError>;
+  restoreConnection(): Promise<ConnectEvent | WalletResponseError>;
   send(message: AppRequest): Promise<WalletResponse>;
   listen(callback: (event: WalletEvent) => void): () => void;
 }

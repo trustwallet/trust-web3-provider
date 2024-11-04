@@ -67,23 +67,27 @@ export class TonBridge implements TonConnectBridge {
   async connect(
     protocolVersion: number,
     message: ConnectRequest,
-  ): Promise<ConnectEvent> {
-    if (protocolVersion > this.protocolVersion) {
-      new TonConnectError('Unsupported protocol version', 1);
-    }
+  ): Promise<ConnectEvent | WalletResponseError> {
+    try {
+      if (protocolVersion > this.protocolVersion) {
+        new TonConnectError('Unsupported protocol version', 1);
+      }
 
-    const items = await this.provider.send<ConnectItemReply[]>(
-      'tonConnect_connect',
-      message,
-    );
+      const items = await this.provider.send<ConnectItemReply[]>(
+        'tonConnect_connect',
+        message,
+      );
 
-    if ((items as any)?.event === 'connect_error') {
-      return this.emit(items as any);
-    } else {
-      return this.emit({
-        event: 'connect',
-        payload: { items, device: this.deviceInfo },
-      });
+      if ((items as any)?.event === 'connect_error') {
+        return this.emit(items as any);
+      } else {
+        return this.emit({
+          event: 'connect',
+          payload: { items, device: this.deviceInfo },
+        });
+      }
+    } catch (e) {
+      return this.parseError(e, { id: 0 });
     }
   }
 
@@ -142,7 +146,9 @@ export class TonBridge implements TonConnectBridge {
    * @param message
    * @returns
    */
-  async send(message: AppRequest): Promise<WalletResponse> {
+  async send(
+    message: AppRequest,
+  ): Promise<WalletResponse | WalletResponseError> {
     try {
       const result = await this.provider.send<string>(
         `tonConnect_${message.method}`,
@@ -151,42 +157,7 @@ export class TonBridge implements TonConnectBridge {
 
       return { result, id: message.id.toString() };
     } catch (e) {
-      // Parse general RPC rejection errors to ton
-      if ((e as any)?.code === 4001) {
-        return {
-          error: {
-            message: 'User Rejected the transaction',
-            code: 300,
-          },
-          id: String(message.id),
-        };
-      }
-
-      // If there are too many requests
-      if ((e as any)?.code === -32002) {
-        return {
-          error: {
-            message: 'Bad request, a transaction is already pending',
-            code: 1,
-          },
-          id: String(message.id),
-        };
-      }
-
-      // Set default error code if needed
-      if (
-        (e as WalletResponseError['error']) &&
-        ![0, 1, 100, 300, 400].includes(
-          (e as WalletResponseError['error']).code,
-        )
-      ) {
-        (e as WalletResponseError['error']).code = 0;
-      }
-
-      return {
-        error: e as WalletResponseError['error'],
-        id: String(message.id),
-      };
+      return this.parseError(e, { id: message.id });
     }
   }
 
@@ -202,4 +173,40 @@ export class TonBridge implements TonConnectBridge {
       this.callbacks = this.callbacks.filter((item) => item != callback);
     };
   };
+
+  private parseError(e: any, message: { id?: number | string }) {
+    if ((e as any)?.code === 4001) {
+      return {
+        error: {
+          message: 'User Rejected the transaction',
+          code: 300,
+        },
+        id: String(message.id) ?? 0,
+      };
+    }
+
+    // If there are too many requests
+    if ((e as any)?.code === -32002) {
+      return {
+        error: {
+          message: 'Bad request, a transaction is already pending',
+          code: 1,
+        },
+        id: String(message.id) ?? 0,
+      };
+    }
+
+    // Set default error code if needed
+    if (
+      (e as WalletResponseError['error']) &&
+      ![0, 1, 100, 300, 400].includes((e as WalletResponseError['error']).code)
+    ) {
+      (e as WalletResponseError['error']).code = 0;
+    }
+
+    return {
+      error: e as WalletResponseError['error'],
+      id: String(message.id) ?? 0,
+    };
+  }
 }
