@@ -42,7 +42,7 @@ jobs:
           bun run publish
           git add .
           git commit -m "feat: Adding release files"
-          git push origin release-v${RELEASE_VERSION}
+          git push origin release-v${{ github.event.inputs.version || steps.vars.outputs.tag  }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
