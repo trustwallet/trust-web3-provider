@@ -16,10 +16,6 @@ jobs:
     name: Github Release
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       - uses: actions/checkout@v4
         with:
           ref: main
@@ -34,15 +30,11 @@ jobs:
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: build packages
         run: |
-          git checkout -b release-v${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun install
           bun run build:packages
           bun run test
           bun run rename ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
           bun run publish
-          git add .
-          git commit -m "feat: Adding release files"
-          git push origin release-v${{ github.event.inputs.version || steps.vars.outputs.tag  }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
