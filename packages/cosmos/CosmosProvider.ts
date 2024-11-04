@@ -111,7 +111,7 @@ export class CosmosProvider extends BaseProvider implements ICosmosProvider {
     chainId: string,
     tx: Uint8Array,
     mode: BroadcastMode,
-  ): Promise<Uint8Array> {
+  ): Promise<Uint8Array | Buffer> {
     const raw = Buffer.from(tx).toString('base64');
 
     const hash = await this.request<string>({
