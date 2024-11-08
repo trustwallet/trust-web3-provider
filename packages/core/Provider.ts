@@ -88,12 +88,6 @@ export abstract class BaseProvider
       throw new Error('Trying to send callback request on promisified adapter');
     }
 
-    let error = response;
-
-    if (typeof response === 'string') {
-      error = new RPCError(parseInt(response, 10), response);
-    }
-
-    (this.adapter as CallbackAdapter).sendError(requestId, error);
+    (this.adapter as CallbackAdapter).sendError(requestId, response);
   }
 }
