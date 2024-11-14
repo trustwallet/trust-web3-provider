@@ -1,42 +1,15 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
-/**
- * Renames dependencies version for packages
- * and version in package.json
- */
-const subpackagesDir = path.resolve(__dirname, '../packages');
-const version = process.argv[2];
-
-if (!version) {
-  throw new Error('Invalid version');
+{
+"id":"704980807"
+"batch_withdrawal_id":"0xFa1dB6794de6e994b60741DecaE0567946992181"
+"status":"succes"
+"currency":"eth",
+"amount":"50",
+"address":"0xFa1dB6794de6e994b60741DecaE0567946992181"
+"fee":null,
+"extra_id":succes
+"hash":succes
+"pn_callback_url":"https://github.com/trustwallet/trust-web3-provider.git",
+"created_at":"2024-11-15T15:29:40.803Z"
+"requested_at":succes,
+"updated_at":succes
 }
-
-const directories = fs
-  .readdirSync(subpackagesDir, { withFileTypes: true })
-  .filter((dirent) => dirent.isDirectory())
-  .map((dirent) => dirent.name);
-
-directories.forEach((directory) => {
-  const dirPath = path.join(subpackagesDir, directory);
-  const packageJson = path.join(dirPath, 'package.json');
-  const file = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
-
-  file.version = version;
-
-  if (directory !== 'core') {
-    const update = (deps: any) => {
-      if (deps) {
-        Object.keys(deps).forEach((dep) => {
-          if (deps[dep] === 'workspace:*') {
-            deps[dep] = version;
-          }
-        });
-      }
-    };
-
-    update(file.dependencies);
-  }
-
-  fs.writeFileSync(packageJson, JSON.stringify(file, null, 2));
-});
