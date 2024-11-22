@@ -1,3 +1,4 @@
+import { RPCError } from '../exceptions/RPCError';
 import { IRequestArguments } from '../Provider';
 
 import { Adapter, AdapterStrategy, IAdapterRequestParams } from './Adapter';
@@ -56,7 +57,18 @@ export class CallbackAdapter extends Adapter {
     if (this.callback.has(requestId.toString())) {
       const callback = this.callback.get(requestId.toString());
       this.callback.delete(requestId.toString());
-      callback?.reject(error);
+
+      let errorParsed = error;
+
+      // Parse error strings from mobile
+      if (
+        typeof errorParsed === 'string' &&
+        !isNaN(parseInt(errorParsed, 10))
+      ) {
+        errorParsed = new RPCError(parseInt(errorParsed, 10), errorParsed);
+      }
+
+      callback?.reject(errorParsed);
     } else {
       console.error(`Unable to find callback for requestId: ${requestId}`);
     }

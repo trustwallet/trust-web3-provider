@@ -1,3 +1,4 @@
+import { RPCError } from './exceptions/RPCError';
 import { TonConnectError } from './exceptions/TonConnectError';
 import { TonProvider } from './TonProvider';
 import {
@@ -201,7 +202,10 @@ export class TonBridge implements TonConnectBridge {
       (e as WalletResponseError['error']) &&
       ![0, 1, 100, 300, 400].includes((e as WalletResponseError['error']).code)
     ) {
-      (e as WalletResponseError['error']).code = 0;
+      return {
+        error: new RPCError(0, 'Bad request'),
+        id: String(message.id) ?? 0,
+      };
     }
 
     return {
