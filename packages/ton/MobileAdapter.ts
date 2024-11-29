@@ -1,5 +1,10 @@
 import { TonProvider } from './TonProvider';
-import { ConnectItemReply, TonAddressItemReply } from './types/TonBridge';
+import {
+  ConnectItemReply,
+  TonAddressItemReply,
+  TonProofItemReply,
+  TonProofItemReplySuccess,
+} from './types/TonBridge';
 
 interface ITransaction {
   valid_until: number;
@@ -59,7 +64,16 @@ export class MobileAdapter {
             return rest;
           }
 
-          return item;
+          if (item.name === 'ton_proof') {
+            const response = item as TonProofItemReplySuccess;
+            return {
+              ...response,
+              proof: {
+                ...response.proof,
+                timestamp: parseInt(response.proof.timestamp),
+              },
+            };
+          }
         });
       }
 

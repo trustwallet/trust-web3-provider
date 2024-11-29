@@ -80,11 +80,11 @@ export class TonBridge implements TonConnectBridge {
         message,
       );
 
-      if ((items as any)?.event === 'connect_error') {
-        return this.emit(items as any);
-      } else {
-        this.connectionAttempts += 1;
+      this.connectionAttempts += 1;
 
+      if ((items as any)?.event === 'connect_error') {
+        return this.emit({ ...(items as any), id: this.connectionAttempts });
+      } else {
         return this.emit({
           id: this.connectionAttempts,
           event: 'connect',
@@ -92,7 +92,7 @@ export class TonBridge implements TonConnectBridge {
         });
       }
     } catch (e) {
-      return this.parseError(e, { id: 0 });
+      return this.parseError(e, { id: this.connectionAttempts });
     }
   }
 
@@ -125,6 +125,12 @@ export class TonBridge implements TonConnectBridge {
         'tonConnect_reconnect',
         [{ name: 'ton_addr' }],
       );
+
+      this.connectionAttempts += 1;
+
+      if ((items as any)?.event === 'connect_error') {
+        return this.emit({ ...(items as any), id: this.connectionAttempts });
+      }
 
       return this.emit({
         id: this.connectionAttempts,
