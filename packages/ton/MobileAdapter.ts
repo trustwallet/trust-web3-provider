@@ -46,9 +46,15 @@ export class MobileAdapter {
         // Internally we use nonBounceable value, here we remove it from the response
         return JSON.parse(res).map((item: ConnectItemReply) => {
           if (item.name === 'ton_addr') {
-            const { nonBounceable, ...rest } = item as TonAddressItemReply & {
-              nonBounceable: string;
-            };
+            const { nonBounceable, type, ...rest } =
+              item as TonAddressItemReply & {
+                nonBounceable: string;
+                type?: string;
+              };
+
+            if (type) {
+              console.warn('type parameter removed from request');
+            }
 
             return rest;
           }

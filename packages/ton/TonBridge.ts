@@ -40,6 +40,7 @@ export class TonBridge implements TonConnectBridge {
 
   private provider!: TonProvider;
   private callbacks: TonConnectCallback[] = [];
+  private connectionAttempts = 0;
 
   constructor(config: ITonBridgeConfig, provider: TonProvider) {
     if (config) {
@@ -82,7 +83,10 @@ export class TonBridge implements TonConnectBridge {
       if ((items as any)?.event === 'connect_error') {
         return this.emit(items as any);
       } else {
+        this.connectionAttempts += 1;
+
         return this.emit({
+          id: this.connectionAttempts,
           event: 'connect',
           payload: { items, device: this.deviceInfo },
         });
@@ -123,6 +127,7 @@ export class TonBridge implements TonConnectBridge {
       );
 
       return this.emit({
+        id: this.connectionAttempts,
         event: 'connect',
         payload: {
           items,
