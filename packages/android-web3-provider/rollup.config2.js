@@ -1,35 +1,26 @@
-import commonjs from '@rollup/plugin-commonjs';
 import { name, dependencies } from './package.json';
-import nodePolyfills from 'rollup-plugin-polyfill-node';
-import inject from '@rollup/plugin-inject';
 import babel from '@rollup/plugin-babel';
-import resolve from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
 
-const input = './src/index.ts';
+const input = './dist/index.js';
+
 const plugins = [
-  nodePolyfills(),
-  resolve({ browser: true, preferBuiltins: false }),
-  commonjs(),
   babel({
     babelHelpers: 'bundled',
-    extensions: ['.js', '.ts'],
-    exclude: 'node_modules/**',
+    extensions: ['.js'],
     presets: [
       [
         '@babel/preset-env',
         {
           targets: 'chrome 67',
+          useBuiltIns: false,
           corejs: '3.21.1',
         },
       ],
-      '@babel/preset-typescript',
     ],
   }),
-  inject({
-    modules: {
-      Buffer: ['buffer', 'Buffer'],
-    },
-  }),
+
+  terser(),
 ];
 
 function createConfig(packageName) {
@@ -38,10 +29,11 @@ function createConfig(packageName) {
       input,
       plugins,
       output: {
-        file: './dist/index.js',
+        file: '../../android/lib/src/main/res/raw/trust_min.js',
         format: 'umd',
         name: packageName,
         sourcemap: false,
+        extend: true,
       },
     },
   ];
