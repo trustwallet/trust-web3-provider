@@ -214,7 +214,10 @@ export class TonBridge implements TonConnectBridge {
       ![0, 1, 100, 300, 400].includes((e as WalletResponseError['error']).code)
     ) {
       return {
-        error: new RPCError(0, 'Bad request'),
+        error: {
+          message: 'User Rejected the transaction',
+          code: 300,
+        },
         id: String(message.id) ?? 0,
       };
     }
