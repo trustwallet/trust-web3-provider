@@ -51,7 +51,7 @@ export type TonAddressItemReply = {
 
 type TonProofItemReply = TonProofItemReplySuccess | TonProofItemReplyError;
 
-type TonProofItemReplySuccess = {
+export type TonProofItemReplySuccess = {
   name: 'ton_proof';
   proof: {
     timestamp: string; // 64-bit unix epoch time of the signing operation (seconds)
