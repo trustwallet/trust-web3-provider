@@ -126,6 +126,10 @@ export class TonBridge implements TonConnectBridge {
         [{ name: 'ton_addr' }],
       );
 
+      if ((items as any)?.event === 'connect_error') {
+        return this.emit(items as any);
+      }
+
       return this.emit({
         id: this.connectionAttempts,
         event: 'connect',
