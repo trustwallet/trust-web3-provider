@@ -73,6 +73,8 @@ export class MobileAdapter {
               },
             };
           }
+
+          return item;
         });
       }
 
