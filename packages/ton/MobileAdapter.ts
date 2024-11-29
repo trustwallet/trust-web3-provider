@@ -2,7 +2,6 @@ import { TonProvider } from './TonProvider';
 import {
   ConnectItemReply,
   TonAddressItemReply,
-  TonProofItemReply,
   TonProofItemReplySuccess,
 } from './types/TonBridge';
 
