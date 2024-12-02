@@ -2,11 +2,6 @@ name: Build Packages
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        default: '4.0.0'
-        description: New version number >= 4.0.0
-        required: true
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,6 +20,11 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@trustwallet'
+      - name: Generate version
+        id: get-next-version
+        run: npm run build:version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
@@ -33,7 +33,7 @@ jobs:
           bun install
           bun run build:packages
           bun run test
-          bun run rename ${{ github.event.inputs.version || steps.vars.outputs.tag  }}
+          bun run rename ${{ steps.get-next-version.outputs.new-release-version }}
           bun run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,10 +41,11 @@ jobs:
         id: create_release
         uses: actions/create-release@latest
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: Release ${{ github.event.inputs.version }}
+          tag_name: ${{ steps.get-next-version.outputs.new-release-version }}
+          release_name:
+            Release ${{ steps.get-next-version.outputs.new-release-version }}
           body: |
             New Release 🚀
           draft: false

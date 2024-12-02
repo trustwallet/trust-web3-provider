@@ -13,7 +13,8 @@
     "build:packages": "bun run ./scripts/build.ts",
     "generate": "bun run ./scripts/generate.ts",
     "rename": "bun run ./scripts/rename.ts",
-    "publish": "bun run ./scripts/publish.ts"
+    "publish": "bun run ./scripts/publish.ts",
+    "build:version": "NODE_ENV=production semantic-release --dry-run"
   },
   "workspaces": [
     "packages/*"
@@ -30,7 +31,9 @@
     "rollup-plugin-esbuild": "4.9.3",
     "simple-scaffold": "2.2.1",
     "typescript": "^5.0.0",
-    "typescript-eslint": "^7.10.0"
+    "typescript-eslint": "^7.10.0",
+    "semantic-release": "~19.0.5",
+    "semantic-release-export-data": "~1.0.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
