@@ -22,7 +22,9 @@ jobs:
           scope: '@trustwallet'
       - name: Generate version
         id: get-next-version
-        run: npm run build:version
+        run: |
+          bun install --frozen-lockfile
+          bun run build:version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Set output
