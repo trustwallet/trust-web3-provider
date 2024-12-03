@@ -14,7 +14,7 @@
     "generate": "bun run ./scripts/generate.ts",
     "rename": "bun run ./scripts/rename.ts",
     "publish": "bun run ./scripts/publish.ts",
-    "build:version": "NODE_ENV=production semantic-release --dry-run"
+    "build:version": "NODE_ENV=production npx semantic-release --dry-run"
   },
   "workspaces": [
     "packages/*"
