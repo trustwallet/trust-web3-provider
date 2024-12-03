@@ -45,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get-next-version.outputs.new-release-version }}
+          tag_name: v${{ steps.get-next-version.outputs.new-release-version }}
           release_name:
             Release ${{ steps.get-next-version.outputs.new-release-version }}
           body: |
