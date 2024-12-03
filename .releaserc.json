@@ -1,18 +1,8 @@
 {
-  "branches": ["main", "hotfix/*", { "name": "release-v\\d+\\.\\d+\\.\\d+", "prerelease": true }],
-  "plugins": [
-    "semantic-release-export-data",
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    [
-      "@semantic-release/github",
-      {
-        "assets": [
-          {
-            "path": "./*.zip"
-          }
-        ]
-      }
-    ]
-  ]
+  "branches": [
+    "main",
+    "hotfix/*",
+    { "name": "release-v\\d+\\.\\d+\\.\\d+", "prerelease": true }
+  ],
+  "plugins": []
 }

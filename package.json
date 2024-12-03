@@ -32,8 +32,7 @@
     "simple-scaffold": "2.2.1",
     "typescript": "^5.0.0",
     "typescript-eslint": "^7.10.0",
-    "semantic-release": "^24.2.0",
-    "semantic-release-export-data": "~1.0.1"
+    "semantic-release": "^24.2.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
