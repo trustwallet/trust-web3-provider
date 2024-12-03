@@ -4,5 +4,5 @@
     "hotfix/*",
     { "name": "release-v\\d+\\.\\d+\\.\\d+", "prerelease": true }
   ],
-  "plugins": []
+  "plugins": ["semantic-release-export-data"]
 }
