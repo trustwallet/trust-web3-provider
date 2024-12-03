@@ -19,11 +19,11 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "@solana/wallet-standard-features": "^1.1.0",
-    "@solana/web3.js": "^1.58.0",
-    "@wallet-standard/base": "^1.0.1",
-    "@wallet-standard/features": "^1.0.3",
-    "bs58": "^4.0.1",
+    "@solana/wallet-standard-features": "1.2.0",
+    "@solana/web3.js": "1.91.8",
+    "@wallet-standard/base": "1.1.0",
+    "@wallet-standard/features": "1.0.3",
+    "bs58": "4.0.1",
     "@trustwallet/web3-provider-core": "workspace:*"
   },
   "devDependencies": {
