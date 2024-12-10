@@ -190,7 +190,7 @@ export class TonBridge implements TonConnectBridge {
     if ((e as any)?.code === 4001) {
       return {
         error: {
-          message: 'User Rejected the transaction',
+          message: 'User declined the transaction',
           code: 300,
         },
         id: String(message.id) ?? 0,
@@ -215,7 +215,7 @@ export class TonBridge implements TonConnectBridge {
     ) {
       return {
         error: {
-          message: 'User Rejected the transaction',
+          message: 'User declined the transaction',
           code: 300,
         },
         id: String(message.id) ?? 0,
