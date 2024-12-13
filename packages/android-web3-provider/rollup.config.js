@@ -4,9 +4,11 @@ import nodePolyfills from 'rollup-plugin-polyfill-node';
 import inject from '@rollup/plugin-inject';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
 
 const input = './src/index.ts';
 const plugins = [
+  json(),
   nodePolyfills(),
   resolve({ browser: true, preferBuiltins: false }),
   commonjs(),
