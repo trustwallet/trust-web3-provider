@@ -24,8 +24,7 @@
     "@wallet-standard/base": "1.1.0",
     "@wallet-standard/features": "1.0.3",
     "bs58": "4.0.1",
-    "@trustwallet/web3-provider-core": "workspace:*",
-    "rpc-websockets": "7.11.0"
+    "@trustwallet/web3-provider-core": "workspace:*"
   },
   "devDependencies": {
     "@types/bs58": "^4.0.1"

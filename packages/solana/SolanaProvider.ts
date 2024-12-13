@@ -1,5 +1,3 @@
-import 'rpc-websockets/dist/lib/client';
-
 import {
   BaseProvider,
   IRequestArguments,

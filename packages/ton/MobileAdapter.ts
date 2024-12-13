@@ -1,5 +1,3 @@
-import { Address, WalletContractV4 } from '@ton/ton';
-import { TonConnectError } from './exceptions/TonConnectError';
 import { TonProvider } from './TonProvider';
 import {
   ConnectItemReply,
@@ -9,21 +7,7 @@ import {
 
 interface ITransaction {
   valid_until: number;
-  messages: {
-    stateInit: string;
-    state_init: string;
-    address: string;
-    amount: string;
-  }[];
-  network: string;
-  from: string;
-}
-
-interface TransformedTransaction {
-  messages: ITransaction['messages'];
-  valid_until: number;
-  network: string;
-  from: string;
+  messages: { state_init: string; address: string }[];
 }
 
 /**
@@ -35,23 +19,21 @@ interface TransformedTransaction {
 export class MobileAdapter {
   provider: TonProvider;
 
-  private rawAddress: string | null = null;
-
   constructor(provider: TonProvider) {
     this.provider = provider;
   }
 
-  static mapToCamelCase(transaction: ITransaction): TransformedTransaction {
+  static mapToCamelCase(transaction: ITransaction) {
     return {
       ...transaction,
       ...(transaction?.messages
         ? {
-            messages: (transaction?.messages || []).map((message) => ({
-              ...message,
-              ...('state_init' in message || 'stateInit' in message
-                ? { stateInit: message.state_init || message.stateInit }
-                : {}),
-            })),
+            messages: (transaction?.messages || []).map(
+              ({ state_init, ...message }) => ({
+                ...message,
+                stateInit: state_init,
+              }),
+            ),
           }
         : {}),
     };
@@ -78,16 +60,11 @@ export class MobileAdapter {
               console.warn('type parameter removed from request');
             }
 
-            this.rawAddress = rest.address;
-
             return rest;
           }
 
           if (item.name === 'ton_proof') {
-            const { type, ...response } = item as TonProofItemReplySuccess & {
-              type?: string;
-            };
-
+            const response = item as TonProofItemReplySuccess;
             return {
               ...response,
               proof: {
@@ -106,18 +83,7 @@ export class MobileAdapter {
           'tonConnect_reconnect',
           params,
         );
-
-        const parsedResponse = JSON.parse(res);
-
-        const { nonBounceable, type, ...rest } =
-          parsedResponse[0] as TonAddressItemReply & {
-            nonBounceable: string;
-            type?: string;
-          };
-
-        this.rawAddress = rest.address;
-
-        return [rest] as T;
+        return JSON.parse(res);
       }
 
       case 'ton_rawSign':
@@ -125,16 +91,9 @@ export class MobileAdapter {
 
       case 'ton_sendTransaction':
       case 'tonConnect_sendTransaction': {
-        const tx = (params as object[])[0] as ITransaction;
-
-        this.validateNetwork(tx);
-        this.validateMessagesAddresses(tx);
-        this.validateFromAddress(tx);
-        this.validateTransaction(MobileAdapter.mapToCamelCase(tx));
-
         const res = await this.provider.internalRequest<string>(
           'signTransaction',
-          MobileAdapter.mapToCamelCase(tx),
+          MobileAdapter.mapToCamelCase((params as object[])[0] as ITransaction),
         );
 
         const { nonce, hash } = JSON.parse(res);
@@ -171,75 +130,6 @@ export class MobileAdapter {
 
       default:
         return this.provider.internalRequest(method, params);
-    }
-  }
-
-  validateTransaction(tx: TransformedTransaction) {
-    // throw error if there is a message with empty state init
-    if (
-      tx.messages.some(
-        (message) => 'stateInit' in message && message.stateInit.length === 0,
-      )
-    ) {
-      console.error('Empty state init in message');
-      throw new TonConnectError('Bad request', 1);
-    }
-
-    // throw error if there is a message with amount not being a string
-    if (tx.messages.some((message) => typeof message.amount !== 'string')) {
-      console.error('Invalid amount type');
-      throw new TonConnectError('Bad request', 1);
-    }
-
-    // throw error if valid until is not a number
-    if (typeof tx.valid_until !== 'number') {
-      console.error('Invalid valid_until type');
-      throw new TonConnectError('Bad request', 1);
-    }
-  }
-
-  validateFromAddress(tx: ITransaction) {
-    if (!this.rawAddress) {
-      console.error('Trying to execute transaction with invalid address');
-      throw new TonConnectError('Bad request', 1);
-    }
-
-    const address = Address.parseRaw(this.rawAddress);
-
-    const collection = [
-      address.toRawString(),
-      address.toString({ bounceable: true }),
-      address.toString({ bounceable: false }),
-    ];
-
-    console.log('collection', collection);
-
-    if (!collection.includes(tx.from)) {
-      console.error('from field does not match any user address');
-      throw new TonConnectError('Bad request', 1);
-    }
-  }
-
-  /**
-   * Validation on messages
-   * @param tx
-   */
-  validateMessagesAddresses(tx: ITransaction) {
-    // Message addresses can not be raw
-    if (tx.messages.some((e) => e.address.includes(':'))) {
-      console.error('Bad request, message address is invalid');
-      throw new TonConnectError('Bad request', 1);
-    }
-  }
-
-  /**
-   * Enforce mainnet
-   * @param tx
-   */
-  validateNetwork(tx: ITransaction) {
-    if (tx.network !== '-239') {
-      console.error('Bad request, network id is invalid');
-      throw new TonConnectError('Bad request', 1);
     }
   }
 }
