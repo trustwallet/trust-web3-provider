@@ -4,9 +4,11 @@ import commonjs from '@rollup/plugin-commonjs';
 import { name, dependencies } from './package.json';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import inject from '@rollup/plugin-inject';
+import json from '@rollup/plugin-json';
 
 const input = './index.ts';
 const plugins = [
+  json(),
   nodeResolve({ preferBuiltins: false, browser: true }),
   commonjs(),
   inject({
