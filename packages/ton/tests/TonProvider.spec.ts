@@ -5,7 +5,8 @@ import { AdapterStrategy } from '@trustwallet/web3-provider-core/adapter/Adapter
 import { IHandlerParams } from '@trustwallet/web3-provider-core/adapter/CallbackAdapter';
 
 let Ton = new TonProvider();
-const account = '0:123';
+const account =
+  '0:d4d9dc4b9024a4be47b8b35b02d24c679faf2d3d139c16462f9a6c34b8694cc0';
 
 afterEach(() => {
   Ton = new TonProvider();
@@ -60,7 +61,7 @@ test('Ton Connect → ton_rawSign', async () => {
 
 test('Ton Connect → ton_sendTransaction', async () => {
   const handler = jest.fn((_params: IHandlerParams) =>
-    Promise.resolve(JSON.stringify([{ address: account }])),
+    Promise.resolve(JSON.stringify([{ name: 'ton_addr', address: account }])),
   );
 
   new Web3Provider({
@@ -68,19 +69,27 @@ test('Ton Connect → ton_sendTransaction', async () => {
     handler,
   }).registerProvider(Ton);
 
-  await Ton.send('ton_sendTransaction', [{ data: '123' }]);
+  await Ton.send('tonConnect_connect');
+  await Ton.send('ton_sendTransaction', [
+    { network: '-239', messages: [], from: account, valid_until: 124 },
+  ]);
 
   expect(handler).toHaveBeenCalledWith(
     expect.objectContaining({
       name: 'signTransaction',
-      object: { data: '123' },
+      object: {
+        network: '-239',
+        messages: [],
+        from: account,
+        valid_until: 124,
+      },
     }),
   );
 });
 
 test('Ton Connect → tonConnect_sendTransaction', async () => {
   const handler = jest.fn((_params: IHandlerParams) =>
-    Promise.resolve(JSON.stringify([{ address: account }])),
+    Promise.resolve(JSON.stringify([{ name: 'ton_addr', address: account }])),
   );
 
   new Web3Provider({
@@ -88,12 +97,20 @@ test('Ton Connect → tonConnect_sendTransaction', async () => {
     handler,
   }).registerProvider(Ton);
 
-  await Ton.send('tonConnect_sendTransaction', [{ data: '123' }]);
+  await Ton.send('tonConnect_connect');
+  await Ton.send('tonConnect_sendTransaction', [
+    { network: '-239', messages: [], from: account, valid_until: 124 },
+  ]);
 
   expect(handler).toHaveBeenCalledWith(
     expect.objectContaining({
       name: 'signTransaction',
-      object: { data: '123' },
+      object: {
+        network: '-239',
+        messages: [],
+        from: account,
+        valid_until: 124,
+      },
     }),
   );
 });

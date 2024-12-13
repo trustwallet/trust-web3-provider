@@ -212,8 +212,6 @@ export class MobileAdapter {
       address.toString({ bounceable: false }),
     ];
 
-    console.log('collection', collection);
-
     if (!collection.includes(tx.from)) {
       console.error('from field does not match any user address');
       throw new TonConnectError('Bad request', 1);
