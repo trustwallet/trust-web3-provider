@@ -20,8 +20,6 @@
   },
   "peerDependencies": {},
   "dependencies": {
-    "@ton/crypto": "3.3.0",
-    "@ton/ton": "15.1.0",
     "@trustwallet/web3-provider-core": "workspace:*"
   }
 }

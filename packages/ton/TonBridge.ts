@@ -83,21 +83,16 @@ export class TonBridge implements TonConnectBridge {
       this.connectionAttempts += 1;
 
       if ((items as any)?.event === 'connect_error') {
-        return this.emit({
-          ...(items as any),
-          id: this.connectionAttempts.toString(),
-        });
+        return this.emit({ ...(items as any), id: this.connectionAttempts });
       } else {
         return this.emit({
-          id: this.connectionAttempts.toString(),
+          id: this.connectionAttempts,
           event: 'connect',
           payload: { items, device: this.deviceInfo },
         });
       }
     } catch (e) {
-      return this.parseError(e, {
-        id: this.connectionAttempts.toString(),
-      }) as WalletResponseError;
+      return this.parseError(e, { id: this.connectionAttempts });
     }
   }
 
@@ -134,14 +129,11 @@ export class TonBridge implements TonConnectBridge {
       this.connectionAttempts += 1;
 
       if ((items as any)?.event === 'connect_error') {
-        return this.emit({
-          ...(items as any),
-          id: this.connectionAttempts.toString(),
-        });
+        return this.emit({ ...(items as any), id: this.connectionAttempts });
       }
 
       return this.emit({
-        id: this.connectionAttempts.toString(),
+        id: this.connectionAttempts,
         event: 'connect',
         payload: {
           items,
@@ -177,9 +169,7 @@ export class TonBridge implements TonConnectBridge {
 
       return { result, id: message.id.toString() };
     } catch (e) {
-      return this.parseError(e, {
-        id: message.id.toString(),
-      }) as WalletResponseError;
+      return this.parseError(e, { id: message.id });
     }
   }
 
@@ -203,7 +193,7 @@ export class TonBridge implements TonConnectBridge {
           message: 'User declined the transaction',
           code: 300,
         },
-        id: String(message.id) ?? '0',
+        id: String(message.id) ?? 0,
       };
     }
 
@@ -214,7 +204,7 @@ export class TonBridge implements TonConnectBridge {
           message: 'Bad request, a transaction is already pending',
           code: 1,
         },
-        id: String(message.id) ?? '0',
+        id: String(message.id) ?? 0,
       };
     }
 
@@ -228,13 +218,13 @@ export class TonBridge implements TonConnectBridge {
           message: 'User declined the transaction',
           code: 300,
         },
-        id: String(message.id) ?? '0',
+        id: String(message.id) ?? 0,
       };
     }
 
     return {
-      error: formatConnectEventError(e as TonConnectError),
-      id: String(message.id) ?? '0',
+      error: e as WalletResponseError['error'],
+      id: String(message.id) ?? 0,
     };
   }
 }
