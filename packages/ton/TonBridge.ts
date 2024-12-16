@@ -17,8 +17,12 @@ import {
   WalletResponseError,
 } from './types/TonBridge';
 
-const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
+const formatConnectEventError = (
+  error: TonConnectError,
+  id: number,
+): ConnectEventError => {
   return {
+    id: id ?? 0,
     event: 'connect_error',
     payload: {
       code: error.code ?? 0,
@@ -84,20 +88,24 @@ export class TonBridge implements TonConnectBridge {
 
       if ((items as any)?.event === 'connect_error') {
         return this.emit({
-          ...(items as any),
-          id: this.connectionAttempts.toString(),
+          event: 'connect_error',
+          payload: {
+            code: 300,
+            message: 'User declined the transaction',
+          },
+          id: this.connectionAttempts,
         });
       } else {
         return this.emit({
-          id: this.connectionAttempts.toString(),
+          id: this.connectionAttempts,
           event: 'connect',
           payload: { items, device: this.deviceInfo },
         });
       }
     } catch (e) {
-      return this.parseError(e, {
-        id: this.connectionAttempts.toString(),
-      }) as WalletResponseError;
+      return this.emit(
+        formatConnectEventError(e as TonConnectError, this.connectionAttempts),
+      );
     }
   }
 
@@ -116,7 +124,7 @@ export class TonBridge implements TonConnectBridge {
    * @returns
    */
   private emit<E extends ConnectEvent | WalletEvent>(event: E): E {
-    this.callbacks.forEach((item) => item(event));
+    this.callbacks.forEach((item) => item(event as any));
     return event;
   }
 
@@ -141,7 +149,7 @@ export class TonBridge implements TonConnectBridge {
       }
 
       return this.emit({
-        id: this.connectionAttempts.toString(),
+        id: this.connectionAttempts,
         event: 'connect',
         payload: {
           items,
@@ -150,11 +158,12 @@ export class TonBridge implements TonConnectBridge {
       });
     } catch (e) {
       if (e instanceof TonConnectError) {
-        return this.emit(formatConnectEventError(e));
+        return this.emit(formatConnectEventError(e, this.connectionAttempts));
       } else {
         return this.emit(
           formatConnectEventError(
             new TonConnectError((e as Error).message ?? 'Unknown error'),
+            this.connectionAttempts,
           ),
         );
       }
@@ -208,10 +217,10 @@ export class TonBridge implements TonConnectBridge {
     }
 
     // If there are too many requests
-    if ((e as any)?.code === -32002) {
+    if ((e as any)?.code === -32002 || (e as any)?.code === '-32002') {
       return {
         error: {
-          message: 'Bad request, a transaction is already pending',
+          message: 'Bad request',
           code: 1,
         },
         id: String(message.id) ?? '0',
@@ -225,15 +234,15 @@ export class TonBridge implements TonConnectBridge {
     ) {
       return {
         error: {
-          message: 'User declined the transaction',
-          code: 300,
+          message: 'Bad request',
+          code: 1,
         },
         id: String(message.id) ?? '0',
       };
     }
 
     return {
-      error: formatConnectEventError(e as TonConnectError),
+      error: formatConnectEventError(e as TonConnectError, 0),
       id: String(message.id) ?? '0',
     };
   }

@@ -76,7 +76,7 @@ export type ConnectItemReply = TonAddressItemReply | TonProofItemReply;
 
 type ConnectEventSuccess = {
   event: 'connect';
-  id?: string;
+  id: number;
   payload: {
     items: ConnectItemReply[];
     device: DeviceInfo;
@@ -85,7 +85,7 @@ type ConnectEventSuccess = {
 
 export type ConnectEventError = {
   event: 'connect_error';
-  id?: string;
+  id: number;
   payload: {
     code: number;
     message: string;
