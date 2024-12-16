@@ -192,7 +192,7 @@ export class MobileAdapter {
     }
 
     // throw error if valid until is not a number
-    if (typeof tx.valid_until !== 'number') {
+    if (tx.valid_until && typeof tx.valid_until !== 'number') {
       console.error('Invalid valid_until type');
       throw new TonConnectError('Bad request', 1);
     }
