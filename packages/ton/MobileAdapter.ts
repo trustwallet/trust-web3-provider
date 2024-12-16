@@ -214,7 +214,7 @@ export class MobileAdapter {
 
     if (!collection.includes(tx.from)) {
       console.error('from field does not match any user address');
-      throw new TonConnectError('Bad request', 1);
+      throw new TonConnectError('Bad request');
     }
   }
 
@@ -226,7 +226,7 @@ export class MobileAdapter {
     // Message addresses can not be raw
     if (tx.messages.some((e) => e.address.includes(':'))) {
       console.error('Bad request, message address is invalid');
-      throw new TonConnectError('Bad request', 1);
+      throw new TonConnectError('Bad request');
     }
   }
 
@@ -237,7 +237,7 @@ export class MobileAdapter {
   validateNetwork(tx: ITransaction) {
     if (tx.network !== '-239') {
       console.error('Bad request, network id is invalid');
-      throw new TonConnectError('Bad request', 1);
+      throw new TonConnectError('Bad request');
     }
   }
 }

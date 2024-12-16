@@ -103,9 +103,26 @@ export class TonBridge implements TonConnectBridge {
         });
       }
     } catch (e) {
-      return this.emit(
-        formatConnectEventError(e as TonConnectError, this.connectionAttempts),
-      );
+      // Handle extension rejection
+      if ((e as any).code === 4001) {
+        return this.emit(
+          formatConnectEventError(
+            new TonConnectError('User declined the connection', 300),
+            this.connectionAttempts,
+          ),
+        );
+      }
+
+      if (e instanceof TonConnectError) {
+        return this.emit(formatConnectEventError(e, this.connectionAttempts));
+      } else {
+        return this.emit(
+          formatConnectEventError(
+            new TonConnectError((e as Error).message ?? 'Unknown error', 1),
+            this.connectionAttempts,
+          ),
+        );
+      }
     }
   }
 
