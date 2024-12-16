@@ -51,7 +51,7 @@ jobs:
           body: |
             New Release 🚀
           draft: false
-          prerelease: true
+          prerelease: false
 permissions:
   actions: write
   contents: write
