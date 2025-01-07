@@ -29,9 +29,11 @@ wallet to connect with decentralized applications.
 
 ## Supported chains
 
+- Aptos [Docs](https://github.com/trustwallet/trust-web3-provider/blob/main/packages/aptos/README.md)
 - Cosmos [Docs](/packages/cosmos/README.md)
 - Solana - _Wallet Standard fully compatible_ [Docs](/packages/solana/README.md)
 - Ethereum _EIP-1193_ [Docs](/packages/ethereum/README.md)
+- Ton [Docs](https://github.com/trustwallet/trust-web3-provider/blob/main/packages/ton/README.md)
 
 # Useful links
 
