@@ -127,10 +127,10 @@ export class MobileAdapter {
       case 'tonConnect_sendTransaction': {
         const tx = (params as object[])[0] as ITransaction;
 
-        this.validateNetwork(tx);
-        this.validateMessagesAddresses(tx);
-        this.validateFromAddress(tx);
-        this.validateTransaction(MobileAdapter.mapToCamelCase(tx));
+        // this.validateNetwork(tx);
+        //this.validateMessagesAddresses(tx);
+        //this.validateFromAddress(tx);
+        //this.validateTransaction(MobileAdapter.mapToCamelCase(tx));
 
         const res = await this.provider.internalRequest<string>(
           'signTransaction',
