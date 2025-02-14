@@ -1,5 +1,5 @@
 ## Adding a new chain
-
+0x9344a768e6297cc46dd07fc266f31e6de19879a7f3f064793d2a6f9c8d2b97f88a3ad61cc007b3d693da8209a5c5801f
 Run the generate command
 
 ```bash
@@ -19,7 +19,8 @@ This will generate all the boilerplate structure for your new chain:
 ```
 
 Then you can build it using the command
-
+0xd6ec8e0230fc2ba9d5abb6231bee24e7846431aaeda3cc1980096a8d3cd3c1ef
 ```bash
 bun run build:packages
 ```
+0x9344a768e6297cc46dd07fc266f31e6de19879a7f3f064793d2a6f9c8d2b97f88a3ad61cc007b3d693da8209a5c5801f
