@@ -21,8 +21,6 @@ export class MobileAdapter {
 
   private provider!: EthereumProvider;
 
-  private fetchingTokenData = false;
-
   static isUTF8(buffer: Buffer) {
     try {
       new TextDecoder('utf8', { fatal: true }).decode(buffer);
@@ -102,19 +100,12 @@ export class MobileAdapter {
           method: 'signTransaction',
           params: (args.params as object[])[0],
         });
-
       case 'wallet_watchAsset': {
         const { options, type } = args.params as unknown as IWatchAsset;
         const { address, symbol, decimals } = options;
 
-        if (this.fetchingTokenData) {
-          return null as T;
-        }
-
         let fetchedSymbol;
         let fetchedDecimals;
-
-        this.fetchingTokenData = true;
 
         if (!symbol) {
           try {
@@ -162,8 +153,6 @@ export class MobileAdapter {
           }
         }
 
-        this.fetchingTokenData = false;
-
         return this.provider.internalRequest({
           method: 'watchAsset',
           params: {
@@ -174,7 +163,6 @@ export class MobileAdapter {
           },
         });
       }
-
       case 'wallet_addEthereumChain':
         return this.provider.internalRequest({
           method: 'addEthereumChain',
