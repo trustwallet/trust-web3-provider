@@ -24,7 +24,7 @@
     "@rollup/plugin-json": "6.1.0",
     "@rollup/plugin-node-resolve": "13.3.0",
     "@types/bun": "latest",
-    "esbuild": "0.17.19",
+    "esbuild": "0.25.0",
     "eslint": "9.x",
     "globals": "^15.3.0",
     "rollup": "2.79.2",
