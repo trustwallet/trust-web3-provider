@@ -8,4 +8,5 @@ export const allowedPackages = [
   'solana',
   'aptos',
   'ton',
+  'tron',
 ];
