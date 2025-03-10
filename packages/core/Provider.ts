@@ -2,7 +2,6 @@ import { EventEmitter } from 'events';
 import type { CallbackAdapter } from './adapter/CallbackAdapter';
 import type { PromiseAdapter } from './adapter/PromiseAdapter';
 import { Adapter, AdapterStrategy } from './adapter/Adapter';
-import { RPCError } from './exceptions/RPCError';
 
 export interface IRequestArguments {
   method: string;
