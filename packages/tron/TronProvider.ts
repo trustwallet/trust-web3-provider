@@ -39,6 +39,7 @@ export class TronProvider extends BaseProvider implements ITronProvider {
           '*',
         );
       } else {
+        this.tronWeb.setAddress(accounts[0]);
         window.postMessage(
           {
             message: {
