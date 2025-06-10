@@ -224,7 +224,7 @@ export class MobileAdapter {
       params: {
         data:
           buffer.length === 0 ? MobileAdapter.bufferToHex(message) : message,
-        address: address,
+        address,
         originalMethod: 'personal_sign'
       },
     });
@@ -245,8 +245,8 @@ export class MobileAdapter {
         ? 'signPersonalMessage'
         : 'signMessage',
       params: {
-        data: data,
-        address: address,
+        data,
+        address,
         isEthSign: true,
         originalMethod: 'eth_sign'
       },
@@ -301,9 +301,9 @@ export class MobileAdapter {
       params: {
         data: '0x' + hash.toString('hex'),
         raw: typeof data === 'string' ? data : JSON.stringify(data),
-        address: address,
-        version: version,
-        originalMethod: originalMethod,
+        address,
+        version,
+        originalMethod,
       },
     });
   }
