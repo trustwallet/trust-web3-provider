@@ -190,7 +190,10 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
 
     const res = await this.#privateRequest<string>({
       method: 'signMessage',
-      params: { data },
+      params: {
+        data,
+        originalMethod: 'signMessage'
+      },
     });
 
     return {
