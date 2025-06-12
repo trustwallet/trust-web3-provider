@@ -143,6 +143,7 @@ test('Ethereum Provider → Mobile Adapter → eth_sign → signPersonalMessage 
         data: `0x${Buffer.from('hello world').toString('hex')}`,
         address: '0x0',
         isEthSign: true,
+        originalMethod: 'eth_sign',
       },
     }),
   );
@@ -187,6 +188,7 @@ test('Ethereum Provider → Mobile Adapter → eth_sign → signMessage payload 
         data: `0x${payload}`,
         address: '0x0',
         isEthSign: true,
+        originalMethod: 'eth_sign',
       },
     }),
   );
@@ -216,6 +218,7 @@ test('Ethereum Provider → Mobile Adapter → personal_sign → payload is corr
       params: {
         data: `0x123`,
         address: account,
+        originalMethod: 'personal_sign',
       },
     }),
   );
@@ -243,6 +246,7 @@ test('Ethereum Provider → Mobile Adapter → personal_sign → params are swap
       params: {
         data: `0x123`,
         address: account,
+        originalMethod: 'personal_sign',
       },
     }),
   );
@@ -314,6 +318,7 @@ test('Ethereum Provider → Mobile Adapter → eth_signTypedData_v1 → payload 
         raw: JSON.stringify(payload),
         address: account,
         version: 'V1',
+        originalMethod: 'eth_signTypedData',
       },
     }),
   );
@@ -392,6 +397,7 @@ test('Ethereum Provider → Mobile Adapter → eth_signTypedData_v3 → payload 
         raw: JSON.stringify(payload),
         address: account,
         version: 'V3',
+        originalMethod: 'eth_signTypedData_v3',
       },
     }),
   );
@@ -485,6 +491,7 @@ test('Ethereum Provider → Mobile Adapter → eth_signTypedData_v4 → payload 
         raw: JSON.stringify(payload),
         address: account,
         version: 'V4',
+        originalMethod: 'eth_signTypedData_v4',
       },
     }),
   );
@@ -702,6 +709,7 @@ test('Ethereum Provider → Mobile Adapter → permissions attaches address → 
       params: {
         data: `0x123`,
         address: account,
+        originalMethod: 'personal_sign',
       },
     }),
   );

@@ -91,6 +91,7 @@ test('Solana Provider → signMessage -> payload is correct', async () => {
       network: 'solana',
       params: {
         data: `0x${Buffer.from('Random message').toString('hex')}`,
+        originalMethod: 'signMessage',
       },
     }),
   );
