@@ -1,0 +1,8 @@
+{
+    "name": "Labubu Coin",
+    "symbol": "LPUC",
+    "type": "BEP20",
+    "decimals": 3,
+    "chainId": 56,
+    "address": "0x193D7606cCe09f3a15B1ec943a0CEaF7eebA8934"
+}
