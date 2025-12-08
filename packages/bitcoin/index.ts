@@ -1,1 +1,1 @@
-export * from './Provider';
+export * from './BitcoinProvider';
