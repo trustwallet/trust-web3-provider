@@ -25,7 +25,27 @@ export interface SignPSBTParams {
   options?: SignPSBTOptions;
 }
 
-export default interface IBitcoinProvider {
+export interface TrustBitcoinEvent {
+  connect(...args: unknown[]): unknown;
+  disconnect(...args: unknown[]): unknown;
+  accountsChanged(...args: unknown[]): unknown;
+}
+
+export interface TrustBitcoinEventEmitter {
+  on<E extends keyof TrustBitcoinEvent>(
+    event: E,
+    listener: TrustBitcoinEvent[E],
+    context?: any,
+  ): void;
+  off<E extends keyof TrustBitcoinEvent>(
+    event: E,
+    listener: TrustBitcoinEvent[E],
+    context?: any,
+  ): void;
+  emit(event: string, ...args: any[]): boolean;
+}
+
+export default interface IBitcoinProvider extends TrustBitcoinEventEmitter {
   connect(): Promise<BtcAccount[]>;
   disconnect(): void;
   isConnected(): boolean;

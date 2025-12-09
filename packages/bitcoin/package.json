@@ -19,6 +19,8 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "@trustwallet/web3-provider-core": "workspace:*"
+    "@trustwallet/web3-provider-core": "workspace:*",
+    "@wallet-standard/base": "1.1.0",
+    "@wallet-standard/features": "1.0.3"
   }
 }
