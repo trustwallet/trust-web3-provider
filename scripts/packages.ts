@@ -9,4 +9,5 @@ export const allowedPackages = [
   'aptos',
   'ton',
   'tron',
+  'bitcoin'
 ];
