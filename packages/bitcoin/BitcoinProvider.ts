@@ -6,6 +6,8 @@ import type {
   SignMessageParams,
   SignMessageResponse,
   SignPSBTParams,
+  PushPSBTParams,
+  PushPSBTResponse,
 } from './types/BitcoinProvider';
 
 export class BitcoinProvider extends BaseProvider implements IBitcoinProvider {
@@ -102,6 +104,20 @@ export class BitcoinProvider extends BaseProvider implements IBitcoinProvider {
     });
 
     return signedPSBT;
+  }
+
+  async pushPSBT(params: PushPSBTParams): Promise<PushPSBTResponse> {
+    const response = await this.request<string>({
+      method: 'pushPSBT',
+      params: {
+        psbtHex: params.psbtHex,
+      },
+    });
+
+    const result = JSON.parse(response);
+    return {
+      txid: result.txid,
+    };
   }
 
   /**

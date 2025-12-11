@@ -1,11 +1,5 @@
-import type { Wallet } from '@wallet-standard/base';
+import type { Wallet, WalletAccount } from '@wallet-standard/base';
 import {
-  StandardConnect,
-  type StandardConnectFeature,
-  type StandardConnectMethod,
-  StandardDisconnect,
-  type StandardDisconnectFeature,
-  type StandardDisconnectMethod,
   StandardEvents,
   type StandardEventsFeature,
   type StandardEventsListeners,
@@ -25,20 +19,55 @@ export type TrustFeature = {
   };
 };
 
+// Bitcoin-specific feature for connecting
+export const BitcoinConnect = 'bitcoin:connect';
+export type BitcoinAddressPurpose = 'ordinals' | 'payment';
+
+export interface BitcoinConnectInput {
+  readonly purposes?: BitcoinAddressPurpose[];
+}
+
+export interface BitcoinConnectOutput {
+  readonly accounts: readonly WalletAccount[];
+}
+
+export type BitcoinConnectMethod = (
+  input?: BitcoinConnectInput,
+) => Promise<BitcoinConnectOutput>;
+
+export type BitcoinConnectFeature = {
+  [BitcoinConnect]: {
+    version: '1.0.0';
+    connect: BitcoinConnectMethod;
+  };
+};
+
+// Bitcoin-specific feature for disconnecting
+export const BitcoinDisconnect = 'bitcoin:disconnect';
+
+export type BitcoinDisconnectMethod = () => void;
+
+export type BitcoinDisconnectFeature = {
+  [BitcoinDisconnect]: {
+    version: '1.0.0';
+    disconnect: BitcoinDisconnectMethod;
+  };
+};
+
 // Bitcoin-specific feature for signing messages
 export const BitcoinSignMessage = 'bitcoin:signMessage';
 export type BitcoinSignMessageMethod = (
-  input: BitcoinSignMessageInput,
-) => Promise<BitcoinSignMessageOutput>;
+  ...inputs: BitcoinSignMessageInput[]
+) => Promise<BitcoinSignMessageOutput[]>;
 
 export interface BitcoinSignMessageInput {
-  account: TrustBitcoinWalletAccount;
-  message: string | Uint8Array;
-  address: string;
+  readonly account: WalletAccount;
+  readonly message: Uint8Array;
 }
 
 export interface BitcoinSignMessageOutput {
-  signature: Uint8Array;
+  readonly signedMessage: Uint8Array;
+  readonly signature: Uint8Array;
 }
 
 export type BitcoinSignMessageFeature = {
@@ -48,28 +77,64 @@ export type BitcoinSignMessageFeature = {
   };
 };
 
-// Bitcoin-specific feature for signing PSBTs
-export const BitcoinSignPSBT = 'bitcoin:signPSBT';
-export type BitcoinSignPSBTMethod = (
-  input: BitcoinSignPSBTInput,
-) => Promise<BitcoinSignPSBTOutput>;
+// Bitcoin-specific feature for signing transactions
+export const BitcoinSignTransaction = 'bitcoin:signTransaction';
 
-export interface BitcoinSignPSBTInput {
-  account: TrustBitcoinWalletAccount;
-  psbtHex: string;
-  options?: {
-    autoFinalized?: boolean;
-  };
+export type BitcoinSigHash =
+  | 'ALL'
+  | 'NONE'
+  | 'SINGLE'
+  | 'ALL|ANYONECANPAY'
+  | 'NONE|ANYONECANPAY'
+  | 'SINGLE|ANYONECANPAY';
+
+export interface BitcoinInputToSign {
+  readonly account: WalletAccount;
+  readonly signingIndexes: readonly number[];
+  readonly sigHash?: BitcoinSigHash;
 }
 
-export interface BitcoinSignPSBTOutput {
-  psbtHex: string;
+export interface BitcoinSignTransactionInput {
+  readonly psbt: Uint8Array;
+  readonly inputsToSign: readonly BitcoinInputToSign[];
+  readonly chain?: string;
 }
 
-export type BitcoinSignPSBTFeature = {
-  [BitcoinSignPSBT]: {
+export interface BitcoinSignTransactionOutput {
+  readonly signedPsbt: Uint8Array;
+}
+
+export type BitcoinSignTransactionMethod = (
+  ...inputs: BitcoinSignTransactionInput[]
+) => Promise<BitcoinSignTransactionOutput[]>;
+
+export type BitcoinSignTransactionFeature = {
+  [BitcoinSignTransaction]: {
     version: '1.0.0';
-    signPSBT: BitcoinSignPSBTMethod;
+    signTransaction: BitcoinSignTransactionMethod;
+  };
+};
+
+// Bitcoin-specific feature for signing and sending transactions
+export const BitcoinSignAndSendTransaction = 'bitcoin:signAndSendTransaction';
+
+export interface BitcoinSignAndSendTransactionInput
+  extends Omit<BitcoinSignTransactionInput, 'chain'> {
+  readonly chain: string; // Required for signAndSend
+}
+
+export interface BitcoinSignAndSendTransactionOutput {
+  readonly txid: string;
+}
+
+export type BitcoinSignAndSendTransactionMethod = (
+  ...inputs: BitcoinSignAndSendTransactionInput[]
+) => Promise<BitcoinSignAndSendTransactionOutput[]>;
+
+export type BitcoinSignAndSendTransactionFeature = {
+  [BitcoinSignAndSendTransaction]: {
+    version: '1.0.0';
+    signAndSendTransaction: BitcoinSignAndSendTransactionMethod;
   };
 };
 
@@ -99,18 +164,19 @@ export class TrustBitcoinWallet implements Wallet {
     return BITCOIN_CHAINS.slice();
   }
 
-  get features(): StandardConnectFeature &
-    StandardDisconnectFeature &
+  get features(): BitcoinConnectFeature &
+    BitcoinDisconnectFeature &
     StandardEventsFeature &
     BitcoinSignMessageFeature &
-    BitcoinSignPSBTFeature &
+    BitcoinSignTransactionFeature &
+    BitcoinSignAndSendTransactionFeature &
     TrustFeature {
     return {
-      [StandardConnect]: {
+      [BitcoinConnect]: {
         version: '1.0.0',
         connect: this.#connect,
       },
-      [StandardDisconnect]: {
+      [BitcoinDisconnect]: {
         version: '1.0.0',
         disconnect: this.#disconnect,
       },
@@ -122,9 +188,13 @@ export class TrustBitcoinWallet implements Wallet {
         version: '1.0.0',
         signMessage: this.#signMessage,
       },
-      [BitcoinSignPSBT]: {
+      [BitcoinSignTransaction]: {
         version: '1.0.0',
-        signPSBT: this.#signPSBT,
+        signTransaction: this.#signTransaction,
+      },
+      [BitcoinSignAndSendTransaction]: {
+        version: '1.0.0',
+        signAndSendTransaction: this.#signAndSendTransaction,
       },
       [TrustNamespace]: {
         trust: this.#trust,
@@ -207,7 +277,7 @@ export class TrustBitcoinWallet implements Wallet {
     }
   };
 
-  #connect: StandardConnectMethod = async ({ silent } = {}) => {
+  #connect: BitcoinConnectMethod = async (input) => {
     if (this.#accounts.length === 0) {
       await this.#trust.connect();
     }
@@ -217,40 +287,111 @@ export class TrustBitcoinWallet implements Wallet {
     return { accounts: this.accounts };
   };
 
-  #disconnect: StandardDisconnectMethod = async () => {
-    await this.#trust.disconnect();
+  #disconnect: BitcoinDisconnectMethod = () => {
+    this.#trust.disconnect();
   };
 
-  #signMessage: BitcoinSignMessageMethod = async (input) => {
-    const { account, message, address } = input;
+  #signMessage: BitcoinSignMessageMethod = async (...inputs) => {
+    const outputs: BitcoinSignMessageOutput[] = [];
 
-    if (!this.#accounts.find((acc) => acc.address === account.address)) {
-      throw new Error('invalid account');
+    for (const input of inputs) {
+      const { account, message } = input;
+
+      if (!this.#accounts.find((acc) => acc.address === account.address)) {
+        throw new Error('invalid account');
+      }
+
+      // Use the first account's address if available
+      const address = this.#accounts[0]?.address || account.address;
+
+      const { signature } = await this.#trust.signMessage({
+        message: Buffer.from(message),
+        address,
+      });
+
+      outputs.push({
+        signedMessage: message,
+        signature,
+      });
     }
 
-    const messageToSign =
-      typeof message === 'string' ? message : Buffer.from(message);
-
-    const { signature } = await this.#trust.signMessage({
-      message: messageToSign,
-      address,
-    });
-
-    return { signature };
+    return outputs;
   };
 
-  #signPSBT: BitcoinSignPSBTMethod = async (input) => {
-    const { account, psbtHex, options } = input;
+  #signTransaction: BitcoinSignTransactionMethod = async (...inputs) => {
+    const outputs: BitcoinSignTransactionOutput[] = [];
 
-    if (!this.#accounts.find((acc) => acc.address === account.address)) {
-      throw new Error('invalid account');
+    for (const input of inputs) {
+      const { psbt, inputsToSign, chain } = input;
+
+      // Validate that at least one account is valid
+      for (const { account } of inputsToSign) {
+        if (!this.#accounts.find((acc) => acc.address === account.address)) {
+          throw new Error('invalid account');
+        }
+      }
+
+      // Validate chain if provided
+      if (chain && !this.chains.includes(chain as any)) {
+        throw new Error('invalid chain');
+      }
+
+      // Convert PSBT Uint8Array to base64 (standard PSBT format)
+      const psbtBase64 = Buffer.from(psbt).toString('base64');
+
+      // Sign the PSBT
+      const signedPsbtBase64 = await this.#trust.signPSBT({
+        psbtHex: psbtBase64,
+        options: {},
+      });
+
+      // Convert back to Uint8Array
+      const signedPsbt = new Uint8Array(Buffer.from(signedPsbtBase64, 'base64'));
+
+      outputs.push({ signedPsbt });
     }
 
-    const signedPsbtHex = await this.#trust.signPSBT({
-      psbtHex,
-      options,
-    });
+    return outputs;
+  };
 
-    return { psbtHex: signedPsbtHex };
+  #signAndSendTransaction: BitcoinSignAndSendTransactionMethod = async (...inputs) => {
+    const outputs: BitcoinSignAndSendTransactionOutput[] = [];
+
+    for (const input of inputs) {
+      const { psbt, inputsToSign, chain } = input;
+
+      // Validate that at least one account is valid
+      for (const { account } of inputsToSign) {
+        if (!this.#accounts.find((acc) => acc.address === account.address)) {
+          throw new Error('invalid account');
+        }
+      }
+
+      // Validate chain (required for signAndSend)
+      if (!chain) {
+        throw new Error('chain is required for signAndSendTransaction');
+      }
+      if (!this.chains.includes(chain as any)) {
+        throw new Error('invalid chain');
+      }
+
+      // Convert PSBT Uint8Array to base64 (standard PSBT format)
+      const psbtBase64 = Buffer.from(psbt).toString('base64');
+
+      // Sign the PSBT
+      const signedPsbtBase64 = await this.#trust.signPSBT({
+        psbtHex: psbtBase64,
+        options: { autoFinalized: true },
+      });
+
+      // Broadcast the signed transaction
+      const { txid } = await this.#trust.pushPSBT({
+        psbtHex: signedPsbtBase64,
+      });
+
+      outputs.push({ txid });
+    }
+
+    return outputs;
   };
 }

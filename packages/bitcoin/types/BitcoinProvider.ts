@@ -25,6 +25,14 @@ export interface SignPSBTParams {
   options?: SignPSBTOptions;
 }
 
+export interface PushPSBTParams {
+  psbtHex: string;
+}
+
+export interface PushPSBTResponse {
+  txid: string;
+}
+
 export interface TrustBitcoinEvent {
   connect(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
@@ -53,5 +61,6 @@ export default interface IBitcoinProvider extends TrustBitcoinEventEmitter {
   requestAccounts(): Promise<BtcAccount[]>;
   signMessage(params: SignMessageParams): Promise<SignMessageResponse>;
   signPSBT(params: SignPSBTParams): Promise<string>;
+  pushPSBT(params: PushPSBTParams): Promise<PushPSBTResponse>;
   getAccounts(): BtcAccount[];
 }
