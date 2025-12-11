@@ -1,5 +1,5 @@
 export interface IBitcoinProviderConfig {
-  // Config can be extended in the future if needed
+  enableAdapter?: boolean;
 }
 
 export interface BtcAccount {
