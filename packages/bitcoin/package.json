@@ -1,6 +1,6 @@
 {
   "name": "@trustwallet/web3-provider-bitcoin",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -19,7 +19,7 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "@trustwallet/web3-provider-core": "workspace:*",
+    "@trustwallet/web3-provider-core": "4.4.1",
     "@wallet-standard/base": "1.1.0",
     "@wallet-standard/features": "1.0.3"
   }
