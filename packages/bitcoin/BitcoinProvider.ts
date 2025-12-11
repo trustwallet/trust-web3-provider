@@ -9,6 +9,7 @@ import type {
   PushPSBTParams,
   PushPSBTResponse,
 } from './types/BitcoinProvider';
+import { initialize } from './adapter';
 
 export class BitcoinProvider extends BaseProvider implements IBitcoinProvider {
   static NETWORK = 'bitcoin';
@@ -16,6 +17,8 @@ export class BitcoinProvider extends BaseProvider implements IBitcoinProvider {
   private _isConnected = false;
 
   private _accounts: BtcAccount[] = [];
+
+  #enableAdapter = true;
 
   static bufferToHex(buffer: Buffer | Uint8Array | string) {
     return '0x' + Buffer.from(buffer).toString('hex');
@@ -34,7 +37,13 @@ export class BitcoinProvider extends BaseProvider implements IBitcoinProvider {
     super();
 
     if (config) {
-      // Config can be extended in the future if needed
+      if (typeof config.enableAdapter !== 'undefined') {
+        this.#enableAdapter = config.enableAdapter;
+      }
+    }
+
+    if (this.#enableAdapter) {
+      initialize(this);
     }
   }
 
