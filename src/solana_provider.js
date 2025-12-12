@@ -11,6 +11,7 @@ import * as Web3 from "@solana/web3.js";
 import bs58 from "bs58";
 import Utils from "./utils";
 import ProviderRpcError from "./error";
+import { default as Start } from "./adapter";
 
 const { PublicKey, Connection } = Web3;
 
@@ -26,6 +27,8 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       Web3.clusterApiUrl(config.solana.cluster),
       "confirmed"
     );
+
+    Start(this);
   }
 
   connect() {
@@ -66,14 +69,9 @@ class TrustSolanaWeb3Provider extends BaseProvider {
   }
 
   mapSignedTransaction(tx, signatureEncoded) {
-    const version = typeof tx.version !== "number" ? "legacy" : tx.version;
     const signature = bs58.decode(signatureEncoded);
 
     tx.addSignature(this.publicKey, signature);
-
-    if (version === "legacy" && !tx.verifySignatures()) {
-      throw new ProviderRpcError(4300, "Invalid signature");
-    }
 
     if (this.isDebug) {
       console.log(`==> signed single ${JSON.stringify(tx)}`);
@@ -84,13 +82,23 @@ class TrustSolanaWeb3Provider extends BaseProvider {
 
   signTransaction(tx) {
     const data = JSON.stringify(tx);
-    const version = typeof tx.version !== "number" ? "legacy" : tx.version;
+    const version = tx.version;
 
-    const raw = bs58.encode(
-      version === "legacy" ? tx.serializeMessage() : tx.serialize()
-    );
+    const raw = Buffer.from(
+      tx.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false,
+      })
+    ).toString("base64");
 
-    return this._request("signRawTransaction", { data, raw, version })
+    const rawMessage = Buffer.from(tx.message.serialize()).toString("base64");
+
+    return this._request("signRawTransaction", {
+      data,
+      raw,
+      rawMessage,
+      version,
+    })
       .then((signatureEncoded) =>
         this.mapSignedTransaction(tx, signatureEncoded)
       )
@@ -107,13 +115,20 @@ class TrustSolanaWeb3Provider extends BaseProvider {
     return this._request("signRawTransactionMulti", {
       transactions: txs.map((tx) => {
         const data = JSON.stringify(tx);
-        const version = typeof tx.version !== "number" ? "legacy" : tx.version;
+        const version = tx.version;
 
-        const raw = bs58.encode(
-          version === "legacy" ? tx.serializeMessage() : tx.serialize()
+        const rawMessage = Buffer.from(tx.message.serialize()).toString(
+          "base64"
         );
 
-        return { data, raw, version };
+        const raw = Buffer.from(
+          tx.serialize({
+            requireAllSignatures: false,
+            verifySignatures: false,
+          })
+        ).toString("base64");
+
+        return { data, raw, rawMessage, version };
       }),
     })
       .then((signaturesEncoded) =>
@@ -133,12 +148,11 @@ class TrustSolanaWeb3Provider extends BaseProvider {
       );
     }
     return this.signTransaction(tx).then(async (signedTx) => {
-      const signature = await Web3.sendAndConfirmRawTransaction(
-        this.connection,
+      const signature = await this.connection.sendRawTransaction(
         signedTx.serialize(),
-        Web3.BlockheightBasedTransactionConfirmationStrategy,
         options
       );
+
       return { signature: signature };
     });
   }

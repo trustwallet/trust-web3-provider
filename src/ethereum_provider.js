@@ -263,7 +263,10 @@ class TrustWeb3Provider extends BaseProvider {
     var message;
     let address;
 
-    if (this.address === payload.params[0].toLowerCase()) {
+    if (
+      typeof payload.params?.[0].toLowerCase() === "string" &&
+      this.address.toLowerCase() === payload.params?.[0].toLowerCase()
+    ) {
       message = payload.params[1];
       address = payload.params[0];
     } else {
@@ -297,7 +300,10 @@ class TrustWeb3Provider extends BaseProvider {
     let address;
     let data;
 
-    if (this.address === payload.params[0].toLowerCase()) {
+    if (
+      typeof payload.params?.[0] === "string" &&
+      this.address.toLowerCase() === payload.params?.[0].toLowerCase()
+    ) {
       data = payload.params[1];
       address = payload.params[0];
     } else {
@@ -309,7 +315,10 @@ class TrustWeb3Provider extends BaseProvider {
 
     const { chainId } = message.domain || {};
 
-    if (!chainId || Number(chainId) !== Number(this.chainId)) {
+    if (
+      typeof chainId !== "undefined" &&
+      Number(chainId) !== Number(this.chainId)
+    ) {
       throw new Error(
         "Provided chainId does not match the currently active chain"
       );
