@@ -35,8 +35,8 @@ wallet to connect with decentralized applications.
 
 # Useful links
 
+[Contributing](/docs/CONTRIBUTING.md)
+
 [Using the library](/docs/USAGE.md)
 
-[Contributing](/docs/BUILD.md)
-
-[Adding a new chain](/docs/NEW.md)
+[Adding a new chain](/docs/ADD_NEW_CHAIN.md)
