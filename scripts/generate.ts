@@ -72,6 +72,35 @@ Generating a new chain provider....
       console.log(`Added '${chainName}' to scripts/packages.ts ✓`);
     }
 
+    // Add the new package as a dependency to iOS and Android providers
+    const packageName = `@trustwallet/web3-provider-${chainName}`;
+    const platformPackages = [
+      'android-web3-provider',
+      'ios-web3-provider'
+    ];
+
+    for (const platformPkg of platformPackages) {
+      const pkgJsonPath = path.resolve(subpackagesDir, platformPkg, 'package.json');
+      try {
+        const pkgJsonContent = await readFile(pkgJsonPath, 'utf-8');
+        const pkgJson = JSON.parse(pkgJsonContent);
+
+        // Check if the dependency doesn't already exist
+        if (!pkgJson.dependencies || !pkgJson.dependencies[packageName]) {
+          if (!pkgJson.dependencies) {
+            pkgJson.dependencies = {};
+          }
+          pkgJson.dependencies[packageName] = 'workspace:*';
+
+          // Write back with proper formatting
+          await writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n', 'utf-8');
+          console.log(`Added '${packageName}' to ${platformPkg}/package.json ✓`);
+        }
+      } catch (e) {
+        console.warn(`Warning: Could not update ${platformPkg}/package.json:`, e instanceof Error ? e.message : String(e));
+      }
+    }
+
     console.log(`Boilerplate code generated for ${chainName} 🚀 Have Fun!`);
   } catch (e) {
     console.error(e);
