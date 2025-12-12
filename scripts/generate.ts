@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { mkdir, rm, readdir } from 'node:fs/promises';
+import { mkdir, rm, readdir, readFile, writeFile } from 'node:fs/promises';
 import { execSync } from 'child_process';
 
 const subpackagesDir = path.resolve(__dirname, '../packages');
@@ -56,6 +56,21 @@ Generating a new chain provider....
         cwd: path.resolve(__dirname, '../'),
       },
     );
+
+    // Add package name to packages.ts allowedPackages array
+    const packagesFilePath = path.resolve(__dirname, './packages.ts');
+    const packagesContent = await readFile(packagesFilePath, 'utf-8');
+
+    // Check if package is already in the array
+    if (!packagesContent.includes(`'${chainName}'`)) {
+      // Find the closing bracket of the array and add the new package before it with a comma
+      const updatedContent = packagesContent.replace(
+        /(\];)/,
+        `  '${chainName}',\n$1`
+      );
+      await writeFile(packagesFilePath, updatedContent, 'utf-8');
+      console.log(`Added '${chainName}' to scripts/packages.ts ✓`);
+    }
 
     console.log(`Boilerplate code generated for ${chainName} 🚀 Have Fun!`);
   } catch (e) {

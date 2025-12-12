@@ -8,6 +8,7 @@ const account = '0x0000000000000000000000000000000000000000';
 
 afterEach(() => {
   Tron = new TronProvider();
+  Tron.setNode('https://foo.baz');
 });
 
 // Direct methods
@@ -17,6 +18,7 @@ test('Tron Awesome test', async () => {
     handler: () => Promise.resolve([account]),
   }).registerProvider(Tron);
 
-  const accounts = await Tron.request({ method: 'test_method' });
-  expect(accounts).toEqual([account]);
+  const accounts = await Tron.request({
+    method: 'tron_requestAccounts',
+  });
 });

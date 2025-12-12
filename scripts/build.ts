@@ -9,7 +9,18 @@ const directories = fs
   .filter((dirent) => dirent.isDirectory())
   .map((dirent) => dirent.name);
 
-directories.forEach((directory) => {
+directories.sort((a, b) => {
+  const aHasWeb3Provider = a.includes('web3-provider');
+  const bHasWeb3Provider = b.includes('web3-provider');
+  if (aHasWeb3Provider && !bHasWeb3Provider) {
+    return 1;
+  } else if (!aHasWeb3Provider && bHasWeb3Provider) {
+    return -1;
+  }
+  return a.localeCompare(b);
+});
+
+['core', ...directories.filter((a) => a !== 'core')].forEach((directory) => {
   const dirPath = path.join(subpackagesDir, directory);
 
   console.log(`Building ${directory}`);

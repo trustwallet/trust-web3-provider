@@ -84,16 +84,19 @@ export class MobileAdapter {
         return this.ethSignTypedData(
           args.params as [string, string],
           SignTypedDataVersion.V3,
+          'eth_signTypedData_v3',
         );
       case 'eth_signTypedData_v4':
         return this.ethSignTypedData(
           args.params as [string, string],
           SignTypedDataVersion.V4,
+          'eth_signTypedData_v4',
         );
       case 'eth_signTypedData':
         return this.ethSignTypedData(
           args.params as [string, string],
           SignTypedDataVersion.V1,
+          'eth_signTypedData',
         );
       case 'eth_sendTransaction':
         return this.provider.internalRequest({
@@ -222,6 +225,7 @@ export class MobileAdapter {
         data:
           buffer.length === 0 ? MobileAdapter.bufferToHex(message) : message,
         address,
+        originalMethod: 'personal_sign'
       },
     });
   }
@@ -240,13 +244,19 @@ export class MobileAdapter {
       method: MobileAdapter.isUTF8(buffer)
         ? 'signPersonalMessage'
         : 'signMessage',
-      params: { data, address, isEthSign: true },
+      params: {
+        data,
+        address,
+        isEthSign: true,
+        originalMethod: 'eth_sign'
+      },
     });
   }
 
   private async ethSignTypedData<T>(
     params: [string, string],
     version: SignTypedDataVersion,
+    originalMethod: string,
   ): Promise<T> {
     const [originalAddress] = await this.provider.request<string[]>({
       method: 'eth_accounts',
@@ -293,6 +303,7 @@ export class MobileAdapter {
         raw: typeof data === 'string' ? data : JSON.stringify(data),
         address,
         version,
+        originalMethod,
       },
     });
   }
