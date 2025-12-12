@@ -10,5 +10,4 @@ export const allowedPackages = [
   'ton',
   'tron',
   'bitcoin',
-  'mychain',
 ];

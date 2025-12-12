@@ -20,6 +20,10 @@ This will generate all the boilerplate structure for your new chain:
 └─ package.json
 ```
 
+The script will also automatically:
+- Add the package to iOS and Android bundles
+- Register the package in [scripts/packages.ts](../scripts/packages.ts)
+
 Then you can build it using the command
 
 ```bash
