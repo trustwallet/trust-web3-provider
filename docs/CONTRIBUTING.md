@@ -61,6 +61,8 @@ feat: add support for new blockchain
 fix: resolve memory leak in provider
 ```
 
+> **Warning:** GitHub may automatically capitalize the first letter of your PR title when creating it (e.g., `feat: add Solana` becomes `Feat: add Solana`). This will break the semantic-release workflow. **Always verify and edit the commit message to use lowercase types** (feat, fix, chore, etc.) before merging the PR.
+
 ### Fork and set up your local env
 
 Install bun
