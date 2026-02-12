@@ -1,0 +1,146 @@
+version: 2
+updates:
+  # Root npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+      production-dependencies:
+        dependency-type: "production"
+
+  # Package: android-web3-provider
+  - package-ecosystem: "npm"
+    directory: "/packages/android-web3-provider"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "android-web3-provider"
+
+  # Package: aptos
+  - package-ecosystem: "npm"
+    directory: "/packages/aptos"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "aptos"
+
+  # Package: bitcoin
+  - package-ecosystem: "npm"
+    directory: "/packages/bitcoin"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "bitcoin"
+
+  # Package: core
+  - package-ecosystem: "npm"
+    directory: "/packages/core"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "core"
+
+  # Package: cosmos
+  - package-ecosystem: "npm"
+    directory: "/packages/cosmos"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "cosmos"
+
+  # Package: ethereum
+  - package-ecosystem: "npm"
+    directory: "/packages/ethereum"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "ethereum"
+
+  # Package: ios-web3-provider
+  - package-ecosystem: "npm"
+    directory: "/packages/ios-web3-provider"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "ios-web3-provider"
+
+  # Package: solana
+  - package-ecosystem: "npm"
+    directory: "/packages/solana"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "solana"
+
+  # Package: ton
+  - package-ecosystem: "npm"
+    directory: "/packages/ton"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "ton"
+
+  # Package: tron
+  - package-ecosystem: "npm"
+    directory: "/packages/tron"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "tron"
+
+  # Android Gradle dependencies
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "android"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2
+    labels:
+      - "github-actions"
