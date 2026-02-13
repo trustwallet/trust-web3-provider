@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "events": "^3.3.0",
-    "uuid": "9.0.1"
+    "uuid": "13.0.0"
   },
   "devDependencies": {
     "@types/uuid": "^9.0.8"
