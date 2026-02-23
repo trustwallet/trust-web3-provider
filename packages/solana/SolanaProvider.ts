@@ -1,5 +1,3 @@
-import 'rpc-websockets/dist/lib/client';
-
 import {
   BaseProvider,
   IRequestArguments,
@@ -20,7 +18,7 @@ import {
 import initialize from './adapter/initialize';
 import { TrustWallet } from './adapter/wallet';
 import { isVersionedTransaction } from './adapter/solana';
-import * as bs58 from 'bs58';
+import bs58 from 'bs58';
 import { MobileAdapter } from './MobileAdapter';
 
 export class SolanaProvider extends BaseProvider implements ISolanaProvider {
@@ -192,7 +190,7 @@ export class SolanaProvider extends BaseProvider implements ISolanaProvider {
       method: 'signMessage',
       params: {
         data,
-        originalMethod: 'signMessage'
+        originalMethod: 'signMessage',
       },
     });
 
