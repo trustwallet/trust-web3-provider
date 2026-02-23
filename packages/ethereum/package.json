@@ -19,7 +19,7 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "@metamask/eth-sig-util": "^7.0.1",
+    "@metamask/eth-sig-util": "^8.2.0",
     "@trustwallet/web3-provider-core": "workspace:*"
   }
 }
