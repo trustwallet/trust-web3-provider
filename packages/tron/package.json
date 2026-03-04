@@ -19,7 +19,7 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "tronweb": "6.0.1"
+    "tronweb": "6.2.1"
   },
   "devDependencies": {
     "@trustwallet/web3-provider-core": "workspace:*"
