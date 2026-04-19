@@ -7,6 +7,7 @@ import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         WebView.setWebContentsDebuggingEnabled(true)
         val webview: WebView = findViewById(R.id.webview)
         webview.settings.run {
+            @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true
             domStorageEnabled = true
         }
