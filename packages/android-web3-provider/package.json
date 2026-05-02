@@ -27,7 +27,7 @@
     "@trustwallet/web3-provider-ton": "workspace:*",
     "@trustwallet/web3-provider-bitcoin": "workspace:*",
     "core-js": "^3.38.1",
-    "uuid": "9.0.1"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.8",
