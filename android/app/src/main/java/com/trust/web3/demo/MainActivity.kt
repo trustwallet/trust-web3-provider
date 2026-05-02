@@ -1,8 +1,10 @@
 package com.trust.web3.demo
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
+import android.util.Log
 import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -84,18 +86,47 @@ class MainActivity : AppCompatActivity() {
             return false
         }
 
+        val allowedOrigins = allowedOriginRulesForDapp(DAPP_URL)
+        if (allowedOrigins.isEmpty()) {
+            // Without a derivable origin we fall back to onPageStarted injection
+            // rather than open the provider up to every page (setOf("*")).
+            return false
+        }
+
         documentStartScript?.remove()
         documentStartScript = WebViewCompat.addDocumentStartJavaScript(
             webView,
             providerJs + "\n" + bootstrapJs,
-            setOf("*")
+            allowedOrigins
         )
         return true
     }
 
+    /**
+     * Restrict provider injection to the configured dapp's origin so the wallet
+     * provider is not exposed to arbitrary pages the WebView may navigate to
+     * (redirects, embedded frames, third-party links, etc.).
+     */
+    private fun allowedOriginRulesForDapp(dappUrl: String): Set<String> {
+        val uri = runCatching { Uri.parse(dappUrl) }.getOrNull()
+        val scheme = uri?.scheme
+        val host = uri?.host
+        if (scheme.isNullOrBlank() || host.isNullOrBlank()) {
+            Log.w("MainActivity", "Could not derive origin from DAPP_URL=$dappUrl; refusing wildcard injection")
+            return emptySet()
+        }
+        val origin = buildString {
+            append(scheme).append("://").append(host)
+            if (uri.port != -1) append(":").append(uri.port)
+        }
+        return setOf(origin)
+    }
+
     private fun injectScripts(view: WebView?, providerJs: String, bootstrapJs: String) {
-        view?.evaluateJavascript(providerJs) {
-            view.evaluateJavascript(bootstrapJs, null)
+        view?.let { webView ->
+            webView.evaluateJavascript(providerJs) {
+                webView.evaluateJavascript(bootstrapJs, null)
+            }
         }
     }
 
@@ -140,6 +171,10 @@ class MainActivity : AppCompatActivity() {
 
                 trustwallet.ethereum = ethereum;
                 trustwallet.solana = solana;
+
+                if (typeof window.trustwallet !== 'object' || window.trustwallet === null) {
+                    window.trustwallet = {};
+                }
 
                 Object.assign(window.trustwallet, {
                     isTrust: true,
