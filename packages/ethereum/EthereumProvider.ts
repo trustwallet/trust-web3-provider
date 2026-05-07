@@ -48,6 +48,14 @@ export class EthereumProvider
         this.#rpcUrl = config.rpc || config.rpcUrl!;
       }
 
+      // Seed the in-memory address from config so eth_accounts / selectedAddress
+      // returns it on a fresh page load (auto-connect for previously trusted hosts).
+      // Without this, #address stays undefined until eth_requestAccounts runs and
+      // dapps that silently call eth_accounts on load see an empty array.
+      if (config.address) {
+        this.#address = config.address;
+      }
+
       if (typeof config.overwriteMetamask !== 'undefined') {
         this.#overwriteMetamask = config.overwriteMetamask;
       }
