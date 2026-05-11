@@ -2,6 +2,11 @@ name: Build Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override release version (e.g. 4.7.2). Leave empty to use semantic-release.'
+        required: false
+        type: string
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -27,6 +32,17 @@ jobs:
           bun run build:version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve release version
+        id: resolve-version
+        run: |
+          override="${{ inputs.version }}"
+          auto="${{ steps.get-next-version.outputs.new-release-version }}"
+          version="${override:-$auto}"
+          if [ -z "$version" ]; then
+            echo "::error::No release version available. Provide the 'version' input or push commits that trigger semantic-release."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Set output
         id: vars
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
@@ -35,7 +51,7 @@ jobs:
           bun install
           bun run build:packages
           bun run test
-          bun run rename ${{ steps.get-next-version.outputs.new-release-version }}
+          bun run rename ${{ steps.resolve-version.outputs.version }}
           bun run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,9 +61,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get-next-version.outputs.new-release-version }}
-          release_name:
-            Release ${{ steps.get-next-version.outputs.new-release-version }}
+          tag_name: v${{ steps.resolve-version.outputs.version }}
+          release_name: Release ${{ steps.resolve-version.outputs.version }}
           body: |
             New Release 🚀
           draft: false
