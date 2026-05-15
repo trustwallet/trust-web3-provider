@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@cosmjs/amino": "0.32.3",
-    "@cosmjs/proto-signing": "^0.32.3",
+    "@cosmjs/proto-signing": "^0.38.1",
     "@trustwallet/web3-provider-core": "workspace:*"
   },
   "devDependencies": {
