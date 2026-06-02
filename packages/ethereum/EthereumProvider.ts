@@ -29,11 +29,38 @@ export class EthereumProvider
 
   #rpc!: RPCServer;
 
+  // True after setRPC(…) installs a custom transport (e.g. NativeRPC). When
+  // set, subsequent setRPCUrl(…) calls update the stored URL but must NOT
+  // replace the RPC instance — otherwise chain switches silently revert to
+  // fetch() and trip the page CSP.
+  #customRpc: boolean = false;
+
   isTrust: boolean = true;
 
   isTrustWallet: boolean = true;
 
   providers: object[] | undefined;
+
+  // EIP-695 mandates eth_chainId return a hex string ("0x1"). Inputs from the
+  // native side can be bare integers, decimal strings, or hex strings — normalize
+  // all forms to a canonical lowercase hex string.
+  private static toHexChainId(chainId: string | number): string {
+    if (typeof chainId === 'number') {
+      return '0x' + chainId.toString(16);
+    }
+    if (typeof chainId === 'string') {
+      const trimmed = chainId.trim();
+      if (/^0x/i.test(trimmed)) {
+        const n = parseInt(trimmed, 16);
+        return Number.isFinite(n) ? '0x' + n.toString(16) : trimmed.toLowerCase();
+      }
+      const n = parseInt(trimmed, 10);
+      if (Number.isFinite(n)) {
+        return '0x' + n.toString(16);
+      }
+    }
+    return chainId as string;
+  }
 
   constructor(config?: IEthereumProviderConfig) {
     super();
@@ -41,7 +68,7 @@ export class EthereumProvider
 
     if (config) {
       if (config.chainId) {
-        this.#chainId = config.chainId;
+        this.#chainId = EthereumProvider.toHexChainId(config.chainId);
       }
 
       if (config.rpc || config.rpcUrl) {
@@ -287,12 +314,14 @@ export class EthereumProvider
   }
 
   public setChainId(chainId: string) {
-    this.#chainId = chainId;
+    this.#chainId = EthereumProvider.toHexChainId(chainId);
   }
 
   public setRPCUrl(rpcUrl: string) {
     this.#rpcUrl = rpcUrl;
-    this.#rpc = new RPCServer(this.#rpcUrl);
+    if (!this.#customRpc) {
+      this.#rpc = new RPCServer(this.#rpcUrl);
+    }
   }
 
   public getRPC() {
@@ -313,5 +342,6 @@ export class EthereumProvider
 
   setRPC(rpc: any) {
     this.#rpc = rpc;
+    this.#customRpc = true;
   }
 }

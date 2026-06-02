@@ -1,10 +1,67 @@
 import { IRequestArguments } from './types';
+import { RPCError } from './exceptions/RPCError';
+import type { EthereumProvider } from './EthereumProvider';
+
 export interface RPC {
   call<T>(payload: {
     jsonrpc: string;
     method: string;
     params: IRequestArguments['params'];
   }): Promise<T>;
+}
+
+// Methods that must never be tunneled to an RPC node — they're wallet-side
+// (EIP-1474 wallet_*, EIP-758 subscriptions, filter family). RPC nodes reject
+// them with a confusing 400; reject explicitly here.
+const NATIVE_RPC_DENYLIST_PREFIXES = ['wallet_'];
+const NATIVE_RPC_DENYLIST_EXACT = new Set<string>([
+  'eth_subscribe',
+  'eth_unsubscribe',
+  'eth_newFilter',
+  'eth_newBlockFilter',
+  'eth_newPendingTransactionFilter',
+  'eth_uninstallFilter',
+]);
+
+/**
+ * RPC implementation that tunnels JSON-RPC reads through the native bridge
+ * instead of fetch(). This avoids the page's `connect-src` CSP — which blocks
+ * Trust's RPC subdomain on dApps like Uniswap and aborts the swap flow before
+ * `eth_sendTransaction` is ever reached. Native HTTP is outside the WebView's
+ * policy boundary, so any method works.
+ */
+export class NativeRPC implements RPC {
+  #provider: EthereumProvider;
+
+  constructor(provider: EthereumProvider) {
+    this.#provider = provider;
+  }
+
+  async call<T>(payload: {
+    jsonrpc: string;
+    method: string;
+    params: IRequestArguments['params'];
+  }): Promise<T> {
+    const method = payload.method;
+    if (
+      NATIVE_RPC_DENYLIST_EXACT.has(method) ||
+      NATIVE_RPC_DENYLIST_PREFIXES.some((p) => method.startsWith(p))
+    ) {
+      throw new RPCError(
+        4200,
+        `EthereumProvider does not support calling ${method}`,
+      );
+    }
+
+    return this.#provider.internalRequest<T>({
+      method: 'rpcCall',
+      params: {
+        method: payload.method,
+        params: payload.params,
+        jsonrpc: payload.jsonrpc,
+      },
+    });
+  }
 }
 
 export class RPCServer implements RPC {
