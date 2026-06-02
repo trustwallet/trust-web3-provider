@@ -41,34 +41,13 @@ export class EthereumProvider
 
   providers: object[] | undefined;
 
-  // EIP-695 mandates eth_chainId return a hex string ("0x1"). Inputs from the
-  // native side can be bare integers, decimal strings, or hex strings — normalize
-  // all forms to a canonical lowercase hex string.
-  private static toHexChainId(chainId: string | number): string {
-    if (typeof chainId === 'number') {
-      return '0x' + chainId.toString(16);
-    }
-    if (typeof chainId === 'string') {
-      const trimmed = chainId.trim();
-      if (/^0x/i.test(trimmed)) {
-        const n = parseInt(trimmed, 16);
-        return Number.isFinite(n) ? '0x' + n.toString(16) : trimmed.toLowerCase();
-      }
-      const n = parseInt(trimmed, 10);
-      if (Number.isFinite(n)) {
-        return '0x' + n.toString(16);
-      }
-    }
-    return chainId as string;
-  }
-
   constructor(config?: IEthereumProviderConfig) {
     super();
     this.request = this.request.bind(this);
 
     if (config) {
       if (config.chainId) {
-        this.#chainId = EthereumProvider.toHexChainId(config.chainId);
+        this.#chainId = config.chainId;
       }
 
       if (config.rpc || config.rpcUrl) {
@@ -314,7 +293,7 @@ export class EthereumProvider
   }
 
   public setChainId(chainId: string) {
-    this.#chainId = EthereumProvider.toHexChainId(chainId);
+    this.#chainId = chainId;
   }
 
   public setRPCUrl(rpcUrl: string) {
