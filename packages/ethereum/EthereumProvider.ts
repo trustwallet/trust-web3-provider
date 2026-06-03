@@ -29,6 +29,12 @@ export class EthereumProvider
 
   #rpc!: RPCServer;
 
+  // True after setRPC(…) installs a custom transport (e.g. NativeRPC). When
+  // set, subsequent setRPCUrl(…) calls update the stored URL but must NOT
+  // replace the RPC instance — otherwise chain switches silently revert to
+  // fetch() and trip the page CSP.
+  #customRpc: boolean = false;
+
   isTrust: boolean = true;
 
   isTrustWallet: boolean = true;
@@ -292,7 +298,9 @@ export class EthereumProvider
 
   public setRPCUrl(rpcUrl: string) {
     this.#rpcUrl = rpcUrl;
-    this.#rpc = new RPCServer(this.#rpcUrl);
+    if (!this.#customRpc) {
+      this.#rpc = new RPCServer(this.#rpcUrl);
+    }
   }
 
   public getRPC() {
@@ -313,5 +321,6 @@ export class EthereumProvider
 
   setRPC(rpc: any) {
     this.#rpc = rpc;
+    this.#customRpc = true;
   }
 }
