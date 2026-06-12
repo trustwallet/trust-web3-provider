@@ -124,6 +124,13 @@ public struct TrustWeb3Provider {
 
                 // Generate instances
                 const ethereum = trustwallet.ethereum(config.ethereum);
+                // Route unhandled JSON-RPC reads (eth_blockNumber, eth_call, etc.)
+                // through the native bridge instead of fetch(rpcUrl). Page CSP can't
+                // reach the wallet's RPC subdomain from JS (CSP-restricted dApps like
+                // Uniswap); native HTTP is outside the WebView's policy boundary.
+                if (typeof trustwallet.nativeRpc === 'function' && typeof ethereum.setRPC === 'function') {
+                  ethereum.setRPC(trustwallet.nativeRpc(ethereum));
+                }
                 const solana = trustwallet.solana(config.solana);
                 const cosmos = trustwallet.cosmos();
                 const aptos = trustwallet.aptos(config.aptos);

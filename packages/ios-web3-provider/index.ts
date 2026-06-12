@@ -1,5 +1,8 @@
 import { SolanaProvider } from '@trustwallet/web3-provider-solana';
-import { EthereumProvider } from '@trustwallet/web3-provider-ethereum';
+import {
+  EthereumProvider,
+  NativeRPC,
+} from '@trustwallet/web3-provider-ethereum';
 import { CosmosProvider } from '@trustwallet/web3-provider-cosmos';
 import { Web3Provider } from '@trustwallet/web3-provider-core';
 import {
@@ -25,6 +28,10 @@ const cosmos = (config: ICosmosProviderConfig) => new CosmosProvider(config);
 const ethereum = (config: IEthereumProviderConfig) =>
   new EthereumProvider(config);
 
+// Factory for the native-bridge-backed RPC so the injector can plug it in with
+// a single line: `ethereum.setRPC(trustwallet.nativeRpc(ethereum))`.
+const nativeRpc = (provider: EthereumProvider) => new NativeRPC(provider);
+
 const aptos = (config: IAptosProviderConfig) => new AptosProvider(config);
 
 const ton = (config: ITonProviderConfig) => new TonProvider(config);
@@ -40,4 +47,5 @@ window.trustwallet = {
   aptos,
   ton,
   tonBridge,
+  nativeRpc,
 };
