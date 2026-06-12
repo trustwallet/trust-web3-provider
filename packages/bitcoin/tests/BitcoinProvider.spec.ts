@@ -4,6 +4,15 @@ import { BitcoinProvider } from '../BitcoinProvider';
 import { AdapterStrategy } from '@trustwallet/web3-provider-core/adapter/Adapter';
 import type { BtcAccount } from '../types/BitcoinProvider';
 
+(global as any).window = {
+  dispatchEvent: () => {},
+  addEventListener: () => {},
+  location: {
+    protocol: 'https',
+    hostname: 'trust',
+  },
+};
+
 let bitcoin = new BitcoinProvider();
 const mockAccount: BtcAccount = {
   address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
@@ -12,16 +21,6 @@ const mockAccount: BtcAccount = {
 
 afterEach(() => {
   bitcoin = new BitcoinProvider();
-});
-
-(global as any).window = {};
-
-// Mock window
-Object.assign(global.window, {
-  location: {
-    protocol: 'https',
-    hostname: 'trust',
-  },
 });
 
 test('Bitcoin -> connect()', async () => {

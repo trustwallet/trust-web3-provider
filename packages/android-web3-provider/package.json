@@ -26,16 +26,16 @@
     "@trustwallet/web3-provider-solana": "workspace:*",
     "@trustwallet/web3-provider-ton": "workspace:*",
     "@trustwallet/web3-provider-bitcoin": "workspace:*",
-    "core-js": "^3.38.1",
-    "uuid": "9.0.1"
+    "core-js": "^3.48.0",
+    "uuid": "13.0.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.25.8",
-    "@babel/preset-typescript": "^7.25.7",
-    "@rollup/plugin-babel": "^6.0.4",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-typescript": "^7.28.5",
+    "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "@types/uuid": "^9.0.8",
-    "rollup-plugin-corejs": "^1.0.0",
+    "@types/uuid": "^11.0.0",
+    "rollup-plugin-corejs": "^1.0.2",
     "rollup-plugin-polyfill-node": "0.13.0"
   }
 }
