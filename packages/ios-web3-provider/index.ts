@@ -17,6 +17,8 @@ import { IAptosProviderConfig } from '@trustwallet/web3-provider-aptos/types/Apt
 import { ITonProviderConfig } from '@trustwallet/web3-provider-ton/types/TonProvider';
 import { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/types/TonBridge';
 import { TonBridge, TonProvider } from '@trustwallet/web3-provider-ton';
+import { TronProvider } from '@trustwallet/web3-provider-tron';
+import { ITronProviderConfig } from '@trustwallet/web3-provider-tron/types/TronProvider';
 
 const core = (strategy: AdapterStrategyType, handler?: IHandler) =>
   new Web3Provider({ strategy, handler });
@@ -29,7 +31,9 @@ const ethereum = (config: IEthereumProviderConfig) =>
   new EthereumProvider(config);
 
 // Factory for the native-bridge-backed RPC so the injector can plug it in with
-// a single line: `ethereum.setRPC(trustwallet.nativeRpc(ethereum))`.
+// a single line: `ethereum.setRPC(trustwallet.nativeRpc(ethereum))`. Routes
+// JSON-RPC reads through the native bridge instead of fetch(), bypassing the
+// page's connect-src CSP.
 const nativeRpc = (provider: EthereumProvider) => new NativeRPC(provider);
 
 const aptos = (config: IAptosProviderConfig) => new AptosProvider(config);
@@ -39,6 +43,8 @@ const ton = (config: ITonProviderConfig) => new TonProvider(config);
 const tonBridge = (config: ITonBridgeConfig, provider: TonProvider) =>
   new TonBridge(config, provider);
 
+const tron = (config: ITronProviderConfig) => new TronProvider(config);
+
 window.trustwallet = {
   core,
   solana,
@@ -47,5 +53,6 @@ window.trustwallet = {
   aptos,
   ton,
   tonBridge,
+  tron,
   nativeRpc,
 };

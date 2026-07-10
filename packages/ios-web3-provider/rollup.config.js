@@ -15,6 +15,10 @@ const plugins = [
     modules: {
       Buffer: ['buffer', 'Buffer'],
     },
+    // tweetnacl-util (via tronweb) maps `buffer` to false in its browser
+    // field and feature-detects Buffer at runtime — injecting the import
+    // there resolves to an empty module and hard-fails the build.
+    exclude: ['**/tweetnacl-util/**'],
   }),
   nodePolyfills(),
   esbuild({
