@@ -536,6 +536,78 @@ test('Ethereum Provider → Mobile Adapter → eth_sendTransaction → payload i
   );
 });
 
+test('Ethereum Provider → Mobile Adapter → eth_sendTransaction → matching chainId is forwarded', async () => {
+  const handler = jest.fn((_params: IHandlerParams) =>
+    Promise.resolve([account]),
+  );
+
+  new Web3Provider({
+    strategy: AdapterStrategy.PROMISES,
+    handler,
+  }).registerProvider(ethereum);
+
+  ethereum.setChainId('0x1');
+
+  await ethereum.request<string>({ method: 'eth_requestAccounts' });
+
+  const params = {
+    from: account,
+    to: '0x0c54FcCd2e384b4BB6f2E405Bf5Cbc15a017AaFb',
+    value: '0x0',
+    chainId: '0x1',
+  };
+
+  await ethereum.request<string>({
+    method: 'eth_sendTransaction',
+    params: [params],
+  });
+
+  expect(handler).toHaveBeenNthCalledWith(
+    2,
+    expect.objectContaining({
+      name: 'signTransaction',
+      network: 'ethereum',
+      params,
+    }),
+  );
+});
+
+test('Ethereum Provider → Mobile Adapter → eth_sendTransaction → mismatched chainId is rejected', async () => {
+  const handler = jest.fn((_params: IHandlerParams) =>
+    Promise.resolve([account]),
+  );
+
+  new Web3Provider({
+    strategy: AdapterStrategy.PROMISES,
+    handler,
+  }).registerProvider(ethereum);
+
+  ethereum.setChainId('0x1');
+
+  await ethereum.request<string>({ method: 'eth_requestAccounts' });
+
+  expect(
+    ethereum.request<string>({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account,
+          to: '0x0c54FcCd2e384b4BB6f2E405Bf5Cbc15a017AaFb',
+          value: '0x0',
+          chainId: '0x1237',
+        },
+      ],
+    }),
+  ).rejects.toThrow(
+    new Error('Provided chainId does not match the currently active chain'),
+  );
+
+  // the transaction must never reach the signing handler
+  expect(handler).not.toHaveBeenCalledWith(
+    expect.objectContaining({ name: 'signTransaction' }),
+  );
+});
+
 test('Ethereum Provider → Mobile Adapter → wallet_watchAsset → payload is correct', async () => {
   const handler = jest.fn((_params: IHandlerParams) =>
     Promise.resolve([account]),
