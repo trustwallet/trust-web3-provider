@@ -47,7 +47,7 @@ test('Ethereum Provider → unsupported method returns error', async () => {
     handler: () => Promise.resolve([]),
   }).registerProvider(ethereum);
 
-  expect(ethereum.request({ method })).rejects.toThrow(
+  await expect(ethereum.request({ method })).rejects.toThrow(
     new RPCError(4200, `EthereumProvider does not support calling ${method}`),
   );
 });
@@ -602,7 +602,6 @@ test('Ethereum Provider → Mobile Adapter → eth_sendTransaction → mismatche
     new Error('Provided chainId does not match the currently active chain'),
   );
 
-  // the transaction must never reach the signing handler
   expect(handler).not.toHaveBeenCalledWith(
     expect.objectContaining({ name: 'signTransaction' }),
   );
