@@ -586,7 +586,7 @@ test('Ethereum Provider → Mobile Adapter → eth_sendTransaction → mismatche
 
   await ethereum.request<string>({ method: 'eth_requestAccounts' });
 
-  expect(
+  await expect(
     ethereum.request<string>({
       method: 'eth_sendTransaction',
       params: [
