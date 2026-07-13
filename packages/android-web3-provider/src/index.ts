@@ -23,6 +23,8 @@ import type { IAptosProviderConfig } from '@trustwallet/web3-provider-aptos/type
 
 import type { ITonProviderConfig } from '@trustwallet/web3-provider-ton/types/TonProvider';
 import type { ITonBridgeConfig } from '@trustwallet/web3-provider-ton/types/TonBridge';
+import { TronProvider } from '@trustwallet/web3-provider-tron';
+import type { ITronProviderConfig } from '@trustwallet/web3-provider-tron/types/TronProvider';
 
 const core = (strategy: AdapterStrategyType, handler?: IHandler) =>
   new Web3Provider({ strategy, handler });
@@ -45,6 +47,8 @@ const ton = (config: ITonProviderConfig) => new TonProvider(config);
 const tonBridge = (config: ITonBridgeConfig, provider: TonProvider) =>
   new TonBridge(config, provider);
 
+const tron = (config: ITronProviderConfig) => new TronProvider(config);
+
 window.trustwallet = {
   core,
   solana,
@@ -53,6 +57,7 @@ window.trustwallet = {
   aptos,
   ton,
   tonBridge,
+  tron,
   nativeRpc,
   randomUUID: () => uuidv4(),
 };
