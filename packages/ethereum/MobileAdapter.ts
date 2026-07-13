@@ -98,11 +98,27 @@ export class MobileAdapter {
           SignTypedDataVersion.V1,
           'eth_signTypedData',
         );
-      case 'eth_sendTransaction':
+      case 'eth_sendTransaction': {
+        const transaction = (
+          args.params as { chainId?: string | number }[]
+        )[0];
+
+        const { chainId } = transaction ?? {};
+
+        if (
+          typeof chainId !== 'undefined' &&
+          Number(chainId) !== Number(this.provider.getChainId())
+        ) {
+          throw new Error(
+            'Provided chainId does not match the currently active chain',
+          );
+        }
+
         return this.provider.internalRequest({
           method: 'signTransaction',
-          params: (args.params as object[])[0],
+          params: transaction,
         });
+      }
       case 'wallet_watchAsset': {
         const { options, type } = args.params as unknown as IWatchAsset;
         const { address, symbol, decimals } = options;
