@@ -13,6 +13,7 @@ public struct TrustWeb3Provider {
         public let solana: SolanaConfig
         public let aptos: AptosConfig
         public let ton: TonConfig
+        public let tron: TronConfig
         public let appVersion: String
         public let autoConnect: Bool
 
@@ -21,6 +22,9 @@ public struct TrustWeb3Provider {
             solana: SolanaConfig,
             aptos: AptosConfig = AptosConfig(network: "Mainnet", chainId: "1"),
             ton: TonConfig,
+            // No default: an empty nodeURL silently disables the TRON provider
+            // (tronWeb never constructed), so every call site must decide.
+            tron: TronConfig,
             appVersion: String,
             autoConnect: Bool
         ) {
@@ -28,6 +32,7 @@ public struct TrustWeb3Provider {
             self.solana = solana
             self.aptos = aptos
             self.ton = ton
+            self.tron = tron
             self.appVersion = appVersion
             self.autoConnect = autoConnect
         }
@@ -66,14 +71,26 @@ public struct TrustWeb3Provider {
                 self.chainId = chainId
             }
         }
+
+        public struct TronConfig: Equatable {
+            public let nodeURL: String
+
+            public init(nodeURL: String) {
+                self.nodeURL = nodeURL
+            }
+        }
     }
 
     private class dummy {}
-    private let filename = "trust-min"    
+    private static let filename = "trust-min"
     public static let scriptHandlerName = "_tw_"
     public let config: Config
 
     public var providerJsUrl: URL {
+        Self.providerJsUrl
+    }
+
+    public static var providerJsUrl: URL {
 #if COCOAPODS
         let bundle = Bundle(for: TrustWeb3Provider.dummy.self)
         let bundleURL = bundle.resourceURL?.appendingPathComponent("TrustWeb3Provider.bundle")
@@ -85,9 +102,19 @@ public struct TrustWeb3Provider {
     }
 
     public var providerScript: WKUserScript {
-        let source = try! String(contentsOf: providerJsUrl)
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        Self.cachedProviderScript
     }
+
+    // Built once: the bundled resource is immutable and config-independent,
+    // and this sits on the per-navigation path — re-reading the 2MB file on
+    // the main actor for every goTo(url:) is pure waste.
+    private static let cachedProviderScript: WKUserScript = {
+        // Explicit encoding: the no-encoding initializer runs Foundation's
+        // encoding *detection*, which fails on this BOM-less 2MB generated
+        // file (single 62K-char lines) and turned try! into a crash.
+        let source = try! String(contentsOf: providerJsUrl, encoding: .utf8)
+        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }()
 
     public var injectScript: WKUserScript {
         let source = """
@@ -106,6 +133,9 @@ public struct TrustWeb3Provider {
                 aptos: {
                     network: "\(config.aptos.network)",
                     chainId: "\(config.aptos.chainId)"
+                },
+                tron: {
+                    nodeURL: "\(config.tron.nodeURL)"
                 }
             };
 
@@ -126,8 +156,8 @@ public struct TrustWeb3Provider {
                 const ethereum = trustwallet.ethereum(config.ethereum);
                 // Route unhandled JSON-RPC reads (eth_blockNumber, eth_call, etc.)
                 // through the native bridge instead of fetch(rpcUrl). Page CSP can't
-                // reach the wallet's RPC subdomain from JS (CSP-restricted dApps like
-                // Uniswap); native HTTP is outside the WebView's policy boundary.
+                // reach Trust's RPC subdomain from JS (the original SC-138054 break);
+                // native HTTP is outside the WebView's policy boundary.
                 if (typeof trustwallet.nativeRpc === 'function' && typeof ethereum.setRPC === 'function') {
                   ethereum.setRPC(trustwallet.nativeRpc(ethereum));
                 }
@@ -135,6 +165,7 @@ public struct TrustWeb3Provider {
                 const cosmos = trustwallet.cosmos();
                 const aptos = trustwallet.aptos(config.aptos);
                 const ton = trustwallet.ton();
+                const tron = trustwallet.tron(config.tron);
 
                 const walletInfo = {
                   deviceInfo: {
@@ -160,7 +191,7 @@ public struct TrustWeb3Provider {
 
                 const tonBridge = trustwallet.tonBridge(walletInfo, ton);
 
-                core.registerProviders([ethereum, solana, cosmos, aptos, ton].map(provider => {
+                core.registerProviders([ethereum, solana, cosmos, aptos, ton, tron].map(provider => {
                   provider.sendResponse = core.sendResponse.bind(core);
                   provider.sendError = core.sendError.bind(core);
                   return provider;
@@ -200,11 +231,21 @@ public struct TrustWeb3Provider {
                 trustwallet.TrustCosmos = trustwallet.cosmos;
                 trustwallet.aptos = aptos;
                 trustwallet.ton = ton;
+                trustwallet.tron = tron;
 
                 window.ethereum = trustwallet.ethereum;
                 window.keplr = trustwallet.cosmos;
                 window.aptos = trustwallet.aptos;
                 window.ton = trustwallet.ton;
+
+                // TRON dapps discover wallets through the TronLink globals
+                // (window.tronLink + window.tronWeb + the initialized event),
+                // the same way Cosmos dapps find us via window.keplr.
+                if (tron.tronWeb) {
+                  window.tronLink = tron;
+                  window.tronWeb = tron.tronWeb;
+                  window.dispatchEvent(new Event('tronLink#initialized'));
+                }
 
                 const getDefaultCosmosProvider = (chainId) => {
                   return trustwallet.cosmos.getOfflineSigner(chainId);

@@ -14,6 +14,10 @@ export class TronProvider extends BaseProvider implements ITronProvider {
 
   ready = false;
 
+  // TronLink-compat: tronwallet-adapter probes window.tronLink.isTronLink to
+  // accept an injected provider as the genuine article.
+  readonly isTronLink = true;
+
   tronWeb!: TronWeb;
 
   #config!: ITronProviderConfig;
@@ -25,6 +29,10 @@ export class TronProvider extends BaseProvider implements ITronProvider {
 
     if (config) {
       this.#config = config;
+
+      if (config.nodeURL) {
+        this.setNode(config.nodeURL);
+      }
     }
 
     this.on('accountsChanged', (accounts: string[]) => {
@@ -39,7 +47,9 @@ export class TronProvider extends BaseProvider implements ITronProvider {
           '*',
         );
       } else {
-        this.tronWeb.setAddress(accounts[0]);
+        // The provider can be constructed without a nodeURL (tronWeb unset
+        // until setNode) — don't let the event handler throw.
+        this.tronWeb?.setAddress(accounts[0]);
         window.postMessage(
           {
             message: {
@@ -79,6 +89,13 @@ export class TronProvider extends BaseProvider implements ITronProvider {
     this.tronWeb = new TronWeb({ fullHost: url });
   }
 
+  // Both readiness flags are part of the TronLink-compat surface: dapps gate
+  // on window.tronWeb.ready, the adapter on window.tronLink.ready.
+  private markReady() {
+    this.ready = true;
+    (this.tronWeb as { ready?: boolean }).ready = true;
+  }
+
   async signMessage() {
     throw new Error('Not implemented signMessage');
   }
@@ -107,6 +124,15 @@ export class TronProvider extends BaseProvider implements ITronProvider {
         },
       });
 
+      // Native replies over the string sendResponse channel; dapps expect the
+      // signed transaction object (tronWeb.trx.sign contract), so re-hydrate.
+      if (typeof result === 'string') {
+        try {
+          return JSON.parse(result);
+        } catch {
+          throw new Error('Malformed signing response');
+        }
+      }
       return result;
     } else if (typeof transaction === 'string') {
       return this.signMessageV2(transaction);
@@ -122,18 +148,23 @@ export class TronProvider extends BaseProvider implements ITronProvider {
 
   async #requestAccounts() {
     try {
+      // No node, no functional provider — reject instead of throwing from
+      // deep inside the tronWeb calls below.
+      if (!this.tronWeb) {
+        return { code: 4001 };
+      }
+
       const accounts = await this.#internalRequest<string[]>({
         method: 'requestAccounts',
         params: {},
       });
 
       if (accounts) {
-        this.ready = true;
-
         this.tronWeb.trx.signMessageV2 = this.signMessageV2.bind(this) as any;
         this.tronWeb.trx.sign = this.sign.bind(this);
 
         this.tronWeb.setAddress(accounts[0]);
+        this.markReady();
 
         window.postMessage(
           {
