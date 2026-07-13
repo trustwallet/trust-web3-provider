@@ -19,7 +19,7 @@
     "dev": "bun build ./index.ts --outdir ./dist --watch"
   },
   "dependencies": {
-    "@cosmjs/amino": "0.32.3",
+    "@cosmjs/amino": "0.38.1",
     "@cosmjs/proto-signing": "^0.32.3",
     "@trustwallet/web3-provider-core": "workspace:*"
   },
