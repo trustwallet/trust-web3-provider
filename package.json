@@ -30,7 +30,7 @@
     "rollup": "2.79.2",
     "rollup-plugin-esbuild": "4.9.3",
     "simple-scaffold": "2.2.1",
-    "typescript": "5.0.0",
+    "typescript": "5.7.2",
     "typescript-eslint": "7.10.0"
   },
   "peerDependencies": {
