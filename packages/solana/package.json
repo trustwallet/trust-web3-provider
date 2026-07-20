@@ -28,6 +28,6 @@
     "rpc-websockets": "7.11.0"
   },
   "devDependencies": {
-    "@types/bs58": "^4.0.1"
+    "@types/bs58": "4.0.1"
   }
 }

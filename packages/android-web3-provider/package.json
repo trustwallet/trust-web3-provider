@@ -27,16 +27,16 @@
     "@trustwallet/web3-provider-ton": "workspace:*",
     "@trustwallet/web3-provider-tron": "workspace:*",
     "@trustwallet/web3-provider-bitcoin": "workspace:*",
-    "core-js": "^3.38.1",
+    "core-js": "3.38.1",
     "uuid": "9.0.1"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.25.8",
-    "@babel/preset-typescript": "^7.25.7",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@types/uuid": "^9.0.8",
-    "rollup-plugin-corejs": "^1.0.0",
+    "@babel/preset-env": "7.25.8",
+    "@babel/preset-typescript": "7.25.7",
+    "@rollup/plugin-babel": "6.0.4",
+    "@rollup/plugin-terser": "0.4.4",
+    "@types/uuid": "9.0.8",
+    "rollup-plugin-corejs": "1.0.0",
     "rollup-plugin-polyfill-node": "0.13.0"
   }
 }
