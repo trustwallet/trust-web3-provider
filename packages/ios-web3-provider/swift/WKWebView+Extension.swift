@@ -56,6 +56,15 @@ public extension TypeWrapper where T == WKWebView {
         value.evaluateJavaScript(script)
     }
 
+    // Send a raw JS-encoded value (number, array, object, quoted string, null)
+    // without wrapping it in single quotes. Used by the native JSON-RPC tunnel
+    // (nativeRpc) so callers get the same JS type they would have received from
+    // `await fetch(...).json()`.
+    func sendRaw(network: ProviderNetwork, rawValue: String, to id: Int64) {
+        let script = "trustwallet.\(network.rawValue).sendResponse(\(id), \(rawValue))"
+        value.evaluateJavaScript(script)
+    }
+
     func sendNull(network: ProviderNetwork, id: Int64) {
         let script = String(format: "trustwallet.\(network.rawValue).sendResponse(%ld, null)", id)
         value.evaluateJavaScript(script)
